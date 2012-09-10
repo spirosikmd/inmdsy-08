@@ -1,0 +1,68 @@
+\documentclass[a4paper, 11pt]{scrartcl}                % final (journal style)
+%\documentclass[review,journal]{vgtc}         % review (journal style)
+%\documentclass[widereview]{vgtc}             % wide-spaced review
+%\documentclass[preprint,journal]{vgtc}       % preprint (journal style)
+%\documentclass[electronic,journal]{vgtc}     % electronic version, journal
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}  
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=3cm, a4paper]{geometry}
+\usepackage[pdftex]{graphics} 
+\usepackage{mathptmx}
+\usepackage{graphicx}
+%\usepackage{times}
+
+
+
+\title{\Large Distributed file (storage?) system based on P2P networks}
+\author{\small Divya Avalur, Christian Manteuffel, and Spyros Ioakeimidis}
+\date{\small \today}
+
+\setlength{\parindent}{0pt} 
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+any-sized company needs a distributed file system
+
+many local networks exist internally in the companies, wireless or not
+
+these local networks could be used for the realization of the distributed file system
+
+or a cloud distributed file system
+
+however ...
+
+how is this different from a local network shared directory?
+
+\section{Project}
+
+Distributed file storage system based on peer-to-peer networks, independently from the kind of network.
+
+Peers share a local distributed file system.
+
+Files are replicated across the peers of the network.
+
+Every copy of the file must be the same.
+
+When a peer joins the network, then automatically the files are synchronized.
+
+Security stays at the level of the network security.
+
+Applicable for companies, which are in the need of a local distributed file system.
+
+\section{Challenges}
+
+\begin{itemize}
+	\item Replication
+	\item Synchronization
+	\item Concurrency
+	\item Failure Handling
+	\item Conflict Handling
+	
+	When a peer leaves network but keeps working in files, what happens when it rejoins the network?
+\end{itemize}
+
+\end{document}
