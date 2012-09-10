@@ -28,11 +28,11 @@
 In general, shared filesystems rely on a server-client scheme, where the actual files are stored on one server. 
 The disadvantage is that the files reside on the server and are not automatically distributed to the clients. This has to be done explicitly by the user, whether he wants to add new files or work on existing files.
 In order to share files, the computers must be connected to the server.
-In our project, we imagine a distributed filesystem based on a peer-to-peer network that goes without a central server. 
-The actual files do not reside on one particular computer but instead are spread across multiple computers. All computers together form a virtual filesystem.
+In our project, we imagine a distributed filesystem based on a peer-to-peer network that operates without a central server. 
+The actual files do not reside on one particular computer, but instead are spread across multiple computers. All computers together form a virtual filesystem.
 
 The goal of the project is to create an ad-hoc peer-to-peer network that synchronizes files between  computers. In this case ad-hoc means that as soon as a computer joins a network, it should search for other peers and start to exchange files. Eventually all computers have the same copy of all files. 
-The system should be designed for situation, in which computers reside only a short time in the same network. For example, a group of students that meets once a day. During that meeting, the system should automatically synchronize the files to the latest version. 
+The system should be designed for situations, in which computers reside only a short time in the same network. For example, a group of students that meets once a day. During that meeting, the system should automatically synchronize the files to the latest version. 
 Hence, the system needs to keep track of file changes and needs to be able to determine the latest version of a file. 
 
 \section{Problems and challenges}
@@ -45,7 +45,7 @@ Hence, the system needs to keep track of file changes and needs to be able to de
 	\item Creating a reliable and fault-tolerant middleware.
 	\item Consider security and privacy concerns. e.g.\ a shared key as access token. 
 	\item Synchronize files across different network topologies, e.g.\ not all peers are in the same network.
-	 \item Is the system applicable to a larger networks, e.g.  the Internet? What needs to be changed? 
+	 \item Is the system applicable to a larger network, e.g.  the Internet? What needs to be changed? 
 \end{itemize}
 
 \section{Literature / Similar Projects}
