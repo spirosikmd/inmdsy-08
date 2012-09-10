@@ -13,7 +13,7 @@
 
 
 
-\title{\Large Distributed file (storage?) system based on P2P networks}
+\title{\Large Ad-hoc peer-to-peer shared file storage}
 \author{\small Divya Avalur, Christian Manteuffel, and Spyros Ioakeimidis}
 \date{\small \today}
 
@@ -23,46 +23,40 @@
 
 \maketitle
 
-\section{Introduction}
+\section{Project Proposal}
 
-any-sized company needs a distributed file system
+In general, shared filesystems rely on a server-client scheme, where the actual files are stored on one server. 
+The disadvantage is that the files reside on the server and are not automatically distributed to the clients. This has to be done explicitly by the user, whether he wants to add new files or work on existing files.
+In order to share files, the computers must be connected to the server.
+In our project, we imagine a distributed filesystem based on a peer-to-peer network that goes without a central server. 
+The actual files do not reside on one particular computer but instead are spread across multiple computers. All computers together form a virtual filesystem.
 
-many local networks exist internally in the companies, wireless or not
+The goal of the project is to create an ad-hoc peer-to-peer network that synchronizes files between  computers. In this case ad-hoc means that as soon as a computer joins a network, it should search for other peers and start to exchange files. Eventually all computers have the same copy of all files. 
+The system should be designed for situation, in which computers reside only a short time in the same network. For example, a group of students that meets once a day. During that meeting, the system should automatically synchronize the files to the latest version. 
+Hence, the system needs to keep track of file changes and needs to be able to determine the latest version of a file. 
 
-these local networks could be used for the realization of the distributed file system
-
-or a cloud distributed file system
-
-however ...
-
-how is this different from a local network shared directory?
-
-\section{Project}
-
-Distributed file storage system based on peer-to-peer networks, independently from the kind of network.
-
-Peers share a local distributed file system.
-
-Files are replicated across the peers of the network.
-
-Every copy of the file must be the same.
-
-When a peer joins the network, then automatically the files are synchronized.
-
-Security stays at the level of the network security.
-
-Applicable for companies, which are in the need of a local distributed file system.
-
-\section{Challenges}
+\section{Problems and challenges}
 
 \begin{itemize}
-	\item Replication
-	\item Synchronization
-	\item Concurrency
-	\item Failure Handling
-	\item Conflict Handling
+    \setlength{\itemsep}{0pt} \setlength{\parskip}{0pt}
+
+	\item Automatically finding other peers within an arbitrary network.
+	\item Determining the latest version of a file and avoid conflicts.  For example, what happens when two peers changed the same file?
+	\item Creating a reliable and fault-tolerant middleware.
+	\item Consider security and privacy concerns. e.g.\ a shared key as access token. 
+	\item Synchronize files across different network topologies, e.g.\ not all peers are in the same network.
+	 \item Is the system applicable to a larger networks, e.g.  the Internet? What needs to be changed? 
+\end{itemize}
+
+\section{Literature / Similar Projects}
+
+\begin{itemize}
+	\item Hasan, R.; Anwar, Z.; Yurcik, W.; Brumbaugh, L.; Campbell, R.; , "A survey of peer-to-peer storage techniques for distributed file systems," Information Technology: Coding and Computing, 2005. ITCC 2005. International Conference on , vol.2, no., pp. 205- 213 Vol. 2, 4-6 April 2005
+doi: 10.1109/ITCC.2005.42
+	\item Peric, D.; Bocek, T.; Hecht, F.V.; Hausheer, D.; Stiller, B.; , "The Design and Evaluation of a Distributed Reliable File System," Parallel and Distributed Computing, Applications and Technologies, 2009 International Conference on , vol., no., pp.348-353, 8-11 Dec. 2009
+doi: 10.1109/PDCAT.2009.37
+	\item http://pdos.csail.mit.edu/ivy/; https://www.aerofs.com/features; http://code.google.com/p/perfs/
 	
-	When a peer leaves network but keeps working in files, what happens when it rejoins the network?
 \end{itemize}
 
 \end{document}
