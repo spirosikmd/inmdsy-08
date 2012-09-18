@@ -16,3 +16,6 @@
 *.toc
 *.lot
 *.fls
+*d
+*.fdb_latexmk
+*.class
