@@ -1,10 +1,14 @@
 %!TEX root = ../Peerbox.tex
 
 \subsection{Use cases}
-%divya
+We identify main scenarios which are helpful in designing the system. Here the users are represented as actors who are involved in the development of the peer-to-peer systems. These scenarios are described as follows:
 
 	\subsubsection{Joining a peer network}
-	
+	   This scenario describes how a user joins a P2P network. In order to join the network, the user should have some basic requirements such as a PC or laptop, software for P2P and internet. First step is the user runs the application on his/her computer. The second step is he/she gets new IP address for each connection. The third step is as soon as the user receives the IP address, he joins the P2P network and registers his content in the network.
 	\subsubsection{Browsing files}
-	
+	 This scenario describes how the user searches the files in a P2P network.  The first step is that the user searches the files by sending arbitrary queries into a P2P system. In the second step, any node that wishes to begin the search sends a query message to all nodes directly connected to it. In the third step, the query allows clients to search for files based on the certain criteria like series of keywords. In the fourth step, the node replies with a query hit message when it has content that can satisfy the request.
 	\subsubsection{Editing a file}
+          This scenario describes how the user make changes or edits the file in a P2P network. In this scenario, any user can edit/modify the files but it is important to transmit them to the user who creates the file for committing the changes. In the first step, the user sends a broadcasting  message for the new version of the file.  In the second step, this message is propagated in the form of a query. In the third step, the peer receives this message and verifies the version number. If it is smaller than the current version number then it is replaced by the new version of the file.
+           
+           
+          
