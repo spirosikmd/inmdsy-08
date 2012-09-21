@@ -37,9 +37,11 @@ All data are stored using the Past \gls{acr:dht}, which has been modified in ord
 	
 	One of its properties is that with a special arrangement between logs and the modifications of participants, it maintains meta-data consistency without locking. Ivy provides semantics like \gls{acr:nfs}, and is able of detecting conflicting modifications. Performance measurements show that Ivy is two to three time slower than \gls{acr:nfs}.
 	\item[ColonyFs]\-\\
-	ColonyFS \cite{Colony:2009fs} is a distributed file system which emphasises anonymity, security and dependability over a peer to peer network. This system implements a technique called \gls{acr:frs}, and uses an optimisation algorithm inspired by the movement of ants.
+	ColonyFS \cite{Colony:2009fs} is a distributed file system which emphasises anonymity, security and dependability over a peer to peer network. This system implements a technique called \gls{acr:frs}, and uses an optimisation algorithm inspired by the movement of ants. The aim of the project is to produce an implementation of these techniques for the specific requirements of a dynamic peer-to-peer network where participants can join and leave at will.
+	\item[Infinit]\-\\
+	Infinit\footnote{http://en.wikipedia.org/wiki/Infinit} is a peer-to-peer file system which allows users to store, access, and share files in a safe and collaborative way. It also allows the virtualisation of decentralised storage space as one coherent drive. Infinit ensures reliability by dynamically replicating the data so that devices can crash without incurring data loss. It also ensures privacy by access control mechanisms.
 	
-	The aim of the project is to produce an implementation of these techniques for the specific requirements of a dynamic peer-to-peer network where participants can join and leave at will.
-	\item[Infinity]\-\\
-	
+	Furthermore, it is known for ensuring synchronisation by distributing files and directories throughout the network's infrastructure and update them in real time. Some additional properties of Infinit are sharing, transparency, security, anonymity, and availability.
+	\item[Darknet]\-\\
+	Darknet \cite{Ledung:2010wq} is private peer-to-peer file system which aims to provide safe, fast, and scalable file sharing without constraining the users in this aspect. It utilises a decentralised peer-to-peer network overlay by creating a prototype with extreme programming as methodology. To maximise the freedom of users the network is accessed through a virtual file-system interface.
 \end{description}
