@@ -11,6 +11,22 @@ Christian, Divya, and Spyros are three students who work on a project in Securit
 \subsection{State of the Art}
 %spyros
 
-SMB
+During the past decade, various peer to peer systems were introduced. This section describes some of them.
 
-DFS
+\begin{description}
+	\item[Pastis]\-\\
+	Pastis \cite{Busca:2005gt} is a decentralised multi-user read-write peer-to-peer file system. Every file is described by
+a modifiable inode-like structure which contains the addresses of the immutable blocks in which the file contents are stored.
+
+All data are stored using the Past \gls{acr:dht}, which has been modified in order to reduce the number of network messages it generates, thus optimising replica retrieval. Pastis is known for its simplicity, high scalability, fault tolerance, and locality properties of its underlying storage layer.
+	\item[Ivy]\-\\
+	Ivy \cite{Muthitacharoen:2002iv} is a multi-user read and write peer-to-peer file system. It has no centralised or dedicated components. It provides useful integrity properties without requiring users to fully trust either the underlying peer-to-peer storage or other users of the file system.
+	
+	One of its properties is that with a special arrangement between logs and the modifications of participants, it maintains meta-data consistency without locking. Ivy provides semantics like \gls{acr:nfs}, and is able of detecting conflicting modifications. Performance measurements show that Ivy is two to three time slower than \gls{acr:nfs}.
+	\item[ColonyFs]\-\\
+	ColonyFS \cite{Colony:2009fs} is a distributed file system which emphasises anonymity, security and dependability over a peer to peer network. This system implements a technique called \gls{acr:frs}, and uses an optimisation algorithm inspired by the movement of ants.
+	
+	The aim of the project is to produce an implementation of these techniques for the specific requirements of a dynamic peer-to-peer network where participants can join and leave at will.
+	\item[Infinity]\-\\
+	
+\end{description}
