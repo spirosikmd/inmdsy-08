@@ -34,7 +34,7 @@ public class ReadSource implements Runnable {
 	private synchronized void _fireEvent(byte[] utf) {
 		ReadEvent event = new ReadEvent(this, utf);
 		Iterator i = _listeners.iterator();
-		while(i.hasNext())	{
+		while(i.hasNext()) {
 			((ReadEventListener) i.next()).handleReadEvent(event);
 		}
 	}
