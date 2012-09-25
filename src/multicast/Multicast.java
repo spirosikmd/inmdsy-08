@@ -6,7 +6,7 @@ public class Multicast {
 	public static void main(String[] args) throws IOException {
 		if ((args.length != 1) || (args[0].indexOf (":") < 0))
 			throw new IllegalArgumentException(
-				"Syntax: MulticastChat <group>:<port>");
+				"Syntax: Multicast <group>:<port>");
 
 		int idx = args[0].indexOf(":");
 		InetAddress group = InetAddress.getByName(args[0].substring(0, idx));
