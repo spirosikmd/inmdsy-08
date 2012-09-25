@@ -20,3 +20,5 @@
 *.fdb_latexmk
 *.class
 *.tmproj
+*.sublime-project
+*.sublime-workspace
