@@ -24,18 +24,18 @@ public class ReadSource implements Runnable {
 	}
 
 	public synchronized void addEventListener(ReadEventListener listener) {
-    	_listeners.add(listener);
-    }
+		_listeners.add(listener);
+	}
 
-    public synchronized void removeEventListener(ReadEventListener listener) {
-    	_listeners.remove(listener);
-    }
+	public synchronized void removeEventListener(ReadEventListener listener) {
+		_listeners.remove(listener);
+	}
 
 	private synchronized void _fireEvent(byte[] utf) {
-    	ReadEvent event = new ReadEvent(this, utf);
-    	Iterator i = _listeners.iterator();
-    	while(i.hasNext())	{
-      		((ReadEventListener) i.next()).handleReadEvent(event);
-    	}
-    }
+		ReadEvent event = new ReadEvent(this, utf);
+		Iterator i = _listeners.iterator();
+		while(i.hasNext())	{
+			((ReadEventListener) i.next()).handleReadEvent(event);
+		}
+	}
 }
