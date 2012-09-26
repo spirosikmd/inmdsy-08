@@ -4,7 +4,7 @@ import java.net.*;
 public class Multicast {
 
 	public static void main(String[] args) throws IOException {
-		if ((args.length != 1) || (args[0].indexOf (":") < 0))
+		if ((args.length != 1) || (args[0].indexOf(":") < 0))
 			throw new IllegalArgumentException(
 				"Syntax: Multicast <group>:<port>");
 

@@ -9,7 +9,7 @@ public class ReadEvent extends EventObject {
 		_utf = utf;
 	}
 
-	public byte[] getReadInput() {
+	public synchronized byte[] getReadInput() {
 		return _utf;
 	}
 }

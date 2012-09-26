@@ -35,7 +35,7 @@ public class ReadSource implements Runnable {
 		ReadEvent event = new ReadEvent(this, utf);
 		Iterator i = _listeners.iterator();
 		while(i.hasNext()) {
-			((ReadEventListener) i.next()).handleReadEvent(event);
+			((ReadEventListener)i.next()).handleReadEvent(event);
 		}
 	}
 }

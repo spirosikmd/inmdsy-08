@@ -43,11 +43,11 @@ public class Peer implements Runnable, ReadEventListener {
 		socket = new MulticastSocket(port);
 		socket.setTimeToLive(5);
 		socket.joinGroup(group);
-		outgoing = new DatagramPacket (new byte[1], 1, group, port);
-		incoming = new DatagramPacket (new byte[65508], 65508);
+		outgoing = new DatagramPacket(new byte[1], 1, group, port);
+		incoming = new DatagramPacket(new byte[65508], 65508);
 	}
 
-	public synchronized void stop () throws IOException {
+	public synchronized void stop() throws IOException {
 		if (listener != null) {
 			listener.interrupt();
 			listener = null;
@@ -59,7 +59,7 @@ public class Peer implements Runnable, ReadEventListener {
 		}
 	}
 
-	public void handleReadEvent(ReadEvent e) {
+	public synchronized void handleReadEvent(ReadEvent e) {
 		try {
 			byte[] utf = e.getReadInput();
 			outgoing.setData(utf);
