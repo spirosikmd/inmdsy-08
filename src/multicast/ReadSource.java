@@ -5,7 +5,7 @@ public class ReadSource implements Runnable {
 
 	private BufferedReader _input;
 	private PrintStream _output;
-	private List _listeners = new ArrayList();
+	private List<ReadEventListener> _listeners = new ArrayList<ReadEventListener>();
 
 	public ReadSource(BufferedReader input, PrintStream output) {
 		_input = input;
