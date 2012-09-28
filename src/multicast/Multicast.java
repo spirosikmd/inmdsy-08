@@ -13,10 +13,10 @@ public class Multicast {
 		int port = Integer.parseInt(args[0].substring(idx + 1));
 
 		ReadSource readSource = new ReadSource();
-
 		Peer peer = new Peer(group, port);
-		peer.start();
-
+		
 		readSource.addEventListener(peer);
+		
+		peer.start();
 	}
 }

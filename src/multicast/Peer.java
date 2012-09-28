@@ -49,10 +49,6 @@ public class Peer implements Runnable, ReadEventListener {
 			initNet();
 			listener = new Thread(this);
 			listener.start();
-			//ReadSource readSource = new ReadSource(input, output);
-			//readSourceListener = new Thread(readSource);
-			//readSourceListener.start();
-			//readSource.addEventListener(this);
 		}
 	}
 
