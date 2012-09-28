@@ -25,4 +25,5 @@
 .project
 .classpath
 *.prefs
+.metadata
 
