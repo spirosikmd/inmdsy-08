@@ -2,14 +2,14 @@ import java.util.*;
 
 public class ReadEvent extends EventObject {
 
-	private byte[] _utf;
+	private byte[] utf;
 
 	public ReadEvent(Object source, byte[] utf) {
 		super(source);
-		_utf = utf;
+		this.utf = utf;
 	}
 
 	public synchronized byte[] getReadInput() {
-		return _utf;
+		return this.utf;
 	}
 }
