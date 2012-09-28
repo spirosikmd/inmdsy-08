@@ -22,3 +22,7 @@
 *.tmproj
 *.sublime-project
 *.sublime-workspace
+.project
+.classpath
+*.prefs
+
