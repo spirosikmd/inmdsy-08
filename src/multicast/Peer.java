@@ -86,7 +86,8 @@ public class Peer implements Runnable, ReadEventListener {
 	public void run() {
 		try {
 			while (!Thread.interrupted()) {
-				incomingPacket = new DatagramPacket(new byte[65508], 65508);
+				byte[] b = new byte[65508]; 
+				incomingPacket = new DatagramPacket(b, b.length);
 				socket.receive(incomingPacket);
 				bais = new ByteArrayInputStream(incomingPacket.getData());
 				incomingObject = new ObjectInputStream(bais);

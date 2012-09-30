@@ -19,5 +19,7 @@ public class Multicast {
 		readSource.addEventListener(peer);
 		
 		peer.start();
+
+		VirtualFileSystem vfs = new VirtualFileSystem();		
 	}
 }
