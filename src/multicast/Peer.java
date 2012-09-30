@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.UUID;
 
 public class Peer implements Runnable, ReadEventListener {
 
@@ -34,10 +33,6 @@ public class Peer implements Runnable, ReadEventListener {
 		socket.joinGroup(group);
 		// outgoingPacket = new DatagramPacket(new byte[1], 1, group, port);
 		incomingPacket = new DatagramPacket(new byte[65508], 65508);
-		
-		
-		
-
 	}
 
 	private synchronized void handleIOException (IOException ex) {
@@ -103,15 +98,15 @@ public class Peer implements Runnable, ReadEventListener {
 				ByteArrayInputStream bais = new ByteArrayInputStream(incomingPacket.getData());
 				incomingObject = new ObjectInputStream(bais);
 				Message messageObject = (Message) incomingObject.readObject();
-				if (messageObject.getID() != this.peerID) {
+				if (!messageObject.getID().equals(this.peerID)) {
 					String message = messageObject.getMessage();
 					output.println(message);
-				} 
+				}
 			}
 		} catch (IOException ex) {
 			handleIOException(ex);
 		} catch (ClassNotFoundException cnfex) {
-			
+
 		}
 	}
 }

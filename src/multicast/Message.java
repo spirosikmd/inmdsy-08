@@ -1,4 +1,4 @@
-import java.io.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 public class Message implements Serializable {
