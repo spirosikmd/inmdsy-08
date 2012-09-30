@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.EventObject;
 
 public class ReadEvent extends EventObject {
 
