@@ -7,8 +7,8 @@ public class VirtualFileSystem implements FileAlterationListener {
 
 	private File directory;
 
-	public VirtualFileSystem() {
-		directory = new File("/tmp/incoming");
+	public VirtualFileSystem(String directory) {
+		this.directory = new File(directory);
 		FileAlterationObserver observer = new FileAlterationObserver(directory);
 		observer.addListener(this);
 		FileAlterationMonitor monitor = new FileAlterationMonitor(10);
@@ -33,7 +33,7 @@ public class VirtualFileSystem implements FileAlterationListener {
 	}
 
 	public void onFileChange(File file) {
-
+		System.out.println("file changed");
 	}
 
 	public void onFileCreate(File file) {
