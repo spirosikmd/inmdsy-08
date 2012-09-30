@@ -10,7 +10,9 @@ public class Peer implements Runnable, ReadEventListener {
 	private PrintStream output;
 	private Thread listener;
 	private MulticastSocket socket;
-	private DatagramPacket incomingPacket;
+	private ByteArrayOutputStream baos;
+	private ByteArrayInputStream bais;
+	private DatagramPacket incomingPacket, outgoingPacket;
 	private ObjectOutputStream outgoingObject;
 	private ObjectInputStream incomingObject;
 	private UUID peerID;
@@ -31,8 +33,6 @@ public class Peer implements Runnable, ReadEventListener {
 		socket = new MulticastSocket(port);
 		socket.setTimeToLive(5);
 		socket.joinGroup(group);
-		// outgoingPacket = new DatagramPacket(new byte[1], 1, group, port);
-		incomingPacket = new DatagramPacket(new byte[65508], 65508);
 	}
 
 	private synchronized void handleIOException (IOException ex) {
@@ -70,17 +70,13 @@ public class Peer implements Runnable, ReadEventListener {
 
 	public synchronized void handleReadEvent(ReadEvent e) {
 		try {
-			// byte[] utf = e.getReadInput();
-			// outgoing.setData(utf);
-			// outgoing.setLength(utf.length);
-			// socket.send(outgoing);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			baos = new ByteArrayOutputStream();
 			outgoingObject = new ObjectOutputStream(baos);
 			String message = "This is a message from " + this.peerID;
 			Message mes = new Message(this.peerID, message);
 			outgoingObject.writeObject(mes);
 			byte[] b = baos.toByteArray();
-			DatagramPacket outgoingPacket = new DatagramPacket(b, b.length, group, port);
+			outgoingPacket = new DatagramPacket(b, b.length, group, port);
 			socket.send(outgoingPacket);
 		} catch (IOException ex) {
 			handleIOException(ex);
@@ -90,12 +86,9 @@ public class Peer implements Runnable, ReadEventListener {
 	public void run() {
 		try {
 			while (!Thread.interrupted()) {
-				//incoming.setLength(incoming.getData().length);
+				incomingPacket = new DatagramPacket(new byte[65508], 65508);
 				socket.receive(incomingPacket);
-				//String message = new String(
-				// 	incoming.getData(), 0, incoming.getLength(), "UTF8");
-				// output.println(message);
-				ByteArrayInputStream bais = new ByteArrayInputStream(incomingPacket.getData());
+				bais = new ByteArrayInputStream(incomingPacket.getData());
 				incomingObject = new ObjectInputStream(bais);
 				Message messageObject = (Message) incomingObject.readObject();
 				if (!messageObject.getID().equals(this.peerID)) {
