@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.UUID;
 
 public class Peer implements Runnable, ReadEventListener {
 
@@ -10,9 +11,13 @@ public class Peer implements Runnable, ReadEventListener {
 	private PrintStream output;
 	private Thread listener;
 	private MulticastSocket socket;
-	private DatagramPacket outgoing, incoming;
+	private DatagramPacket incomingPacket;
+	private ObjectOutputStream outgoingObject;
+	private ObjectInputStream incomingObject;
+	private UUID peerID;
 
 	public Peer(InetAddress group, int port) {
+		this.peerID = UUID.randomUUID();
 		this.group = group;
 		this.port = port;
 		initIO();
@@ -27,8 +32,12 @@ public class Peer implements Runnable, ReadEventListener {
 		socket = new MulticastSocket(port);
 		socket.setTimeToLive(5);
 		socket.joinGroup(group);
-		outgoing = new DatagramPacket(new byte[1], 1, group, port);
-		incoming = new DatagramPacket(new byte[65508], 65508);
+		// outgoingPacket = new DatagramPacket(new byte[1], 1, group, port);
+		incomingPacket = new DatagramPacket(new byte[65508], 65508);
+		
+		
+		
+
 	}
 
 	private synchronized void handleIOException (IOException ex) {
@@ -66,10 +75,18 @@ public class Peer implements Runnable, ReadEventListener {
 
 	public synchronized void handleReadEvent(ReadEvent e) {
 		try {
-			byte[] utf = e.getReadInput();
-			outgoing.setData(utf);
-			outgoing.setLength(utf.length);
-			socket.send(outgoing);
+			// byte[] utf = e.getReadInput();
+			// outgoing.setData(utf);
+			// outgoing.setLength(utf.length);
+			// socket.send(outgoing);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			outgoingObject = new ObjectOutputStream(baos);
+			String message = "This is a message from " + this.peerID;
+			Message mes = new Message(this.peerID, message);
+			outgoingObject.writeObject(mes);
+			byte[] b = baos.toByteArray();
+			DatagramPacket outgoingPacket = new DatagramPacket(b, b.length, group, port);
+			socket.send(outgoingPacket);
 		} catch (IOException ex) {
 			handleIOException(ex);
 		}
@@ -78,14 +95,23 @@ public class Peer implements Runnable, ReadEventListener {
 	public void run() {
 		try {
 			while (!Thread.interrupted()) {
-				incoming.setLength(incoming.getData().length);
-				socket.receive(incoming);
-				String message = new String(
-					incoming.getData(), 0, incoming.getLength(), "UTF8");
-				output.println(message);
+				//incoming.setLength(incoming.getData().length);
+				socket.receive(incomingPacket);
+				//String message = new String(
+				// 	incoming.getData(), 0, incoming.getLength(), "UTF8");
+				// output.println(message);
+				ByteArrayInputStream bais = new ByteArrayInputStream(incomingPacket.getData());
+				incomingObject = new ObjectInputStream(bais);
+				Message messageObject = (Message) incomingObject.readObject();
+				if (messageObject.getID() != this.peerID) {
+					String message = messageObject.getMessage();
+					output.println(message);
+				} 
 			}
 		} catch (IOException ex) {
 			handleIOException(ex);
+		} catch (ClassNotFoundException cnfex) {
+			
 		}
 	}
 }
