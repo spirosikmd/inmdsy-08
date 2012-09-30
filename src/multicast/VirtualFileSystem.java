@@ -12,12 +12,12 @@ public class VirtualFileSystem implements FileAlterationListener {
 		FileAlterationObserver observer = new FileAlterationObserver(directory);
 		observer.addListener(this);
 		FileAlterationMonitor monitor = new FileAlterationMonitor(10);
-        monitor.addObserver(observer);
-        try {
-        	monitor.start();
-        } catch (Exception ex) {
+		monitor.addObserver(observer);
+		try {
+			monitor.start();
+		} catch (Exception ex) {
 
-        }
+		}
 	}
 
 	public void onDirectoryChange(File directory) {
