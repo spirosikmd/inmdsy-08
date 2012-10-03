@@ -1,0 +1,16 @@
+Request
+
+ID	Name	Payload		Type		Description					Response
+----------------------------------------------------
+100	Hello	name,ip,port	Multicast	Peer joins network and introduces himself	DirectMessage with name,ip,port from each peer
+
+200	GetFile	fileid		Direct		Request file
+
+
+
+
+
+Response
+ID
+---------
+1	Welcome	name,ip,port	Direct		Answer to peers hello request			
