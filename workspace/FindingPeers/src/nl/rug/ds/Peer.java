@@ -35,7 +35,6 @@ public class Peer implements Observer {
 			MulticastListener listener = MulticastListener
 					.createListener(socket);
 			peer.setListener(listener);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -75,14 +74,12 @@ public class Peer implements Observer {
 		if (o == listener) {
 			if (arg instanceof Message) {
 				Message m = (Message)arg;
+				System.out.println(m.getNumber() + "@" + m.getSource() + ":" + m.getMessage() );
 				if (id == m.getSource() ) return;
 				synchronized (this) {
-					messageCounter = m.getNumber()+1;
+					messageCounter = m.getNumber();
 				}
-				System.out.println(m.getNumber() + "@" + m.getSource() + ":" + m.getMessage() );
-				//upate messagecounter , watch for synchronized
 			}
-			
 		}
 	}
 

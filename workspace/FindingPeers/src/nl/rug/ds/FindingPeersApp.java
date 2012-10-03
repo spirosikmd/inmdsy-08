@@ -26,6 +26,8 @@ public class FindingPeersApp {
 				message = scanner.nextLine();
 				if ("close".equals(message)) {
 					break;
+				} else if ("list".equals(message)) {
+					System.out.println("List all the files");
 				}
 				peer.sendMessage(message);
 			} while (true);
