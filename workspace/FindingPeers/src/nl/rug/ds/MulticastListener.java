@@ -7,8 +7,6 @@ import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.Observable;
 
-import javax.management.RuntimeErrorException;
-
 public class MulticastListener extends Observable implements Runnable {
 
 	private MulticastSocket socket;
@@ -38,29 +36,28 @@ public class MulticastListener extends Observable implements Runnable {
 
 	private void startListener() {
 		Thread t = new Thread(this);
+		t.setDaemon(true); // remove later to proper shutdown
 		t.start();
 	}
 
 	public void run() {
-
 		try {
-			out.println("Multicast listener started on "
-					+ socket.getInterface().toString() + ":"
-					+ socket.getLocalPort());
-			DatagramPacket incoming = new DatagramPacket(new byte[65508], 65508);
 			out.println("Listening");
 			while (!Thread.interrupted()) {
+				DatagramPacket incoming = new DatagramPacket(new byte[65508], 65508);
 				incoming.setLength(incoming.getData().length);
 				socket.receive(incoming);
-				Message m = Message.fromByte(incoming.getData());
-				//String message = new String(incoming.getData(), 0, incoming.getLength(), "UTF8");
-				setChanged();
-				notifyObservers(m);
-
+				try {
+					Message m = Message.fromByte(incoming.getData());
+					setChanged();
+					notifyObservers(m);
+				} catch (ChecksumFailedException ex) {
+					ex.printStackTrace();
+				}
+				
 			}
 		} catch (IOException ex) {
 			out.println(ex);
 		}
 	}
-
 }

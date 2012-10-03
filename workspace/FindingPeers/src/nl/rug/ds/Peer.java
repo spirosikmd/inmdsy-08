@@ -1,7 +1,6 @@
 package nl.rug.ds;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -11,20 +10,26 @@ import java.util.Random;
 
 public class Peer implements Observer {
 
-	private static final int id = new Random().nextInt();
+	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
 	private MulticastSocket socket;
 	private MulticastListener listener;
-	private int messageCounter;
-
+	private volatile int messageCounter = 0;
+	private final int port;
+	private final InetAddress group;
+	
+	private Peer(InetAddress group, int port) {
+		this.port = port;
+		this.group = group;
+	}
+	
 	public static Peer createPeer(InetAddress group, int port) {
-		Random random = new Random();
 		Peer peer = null;
 		try {
 			MulticastSocket socket = new MulticastSocket(port);
 			socket.setTimeToLive(5);
 			socket.joinGroup(group);
 
-			peer = new Peer();
+			peer = new Peer(group, port);
 			peer.setSocket(socket);
 
 			MulticastListener listener = MulticastListener
@@ -48,12 +53,14 @@ public class Peer implements Observer {
 	public void sendMessage(String message) {
 		try {
 			Message m = new Message();
-			m.setNumber(++messageCounter);
+			synchronized (this) {
+				m.setNumber(++messageCounter);
+			}
 			m.setMessage(message);
 			m.setSource(id);
 			
 			DatagramPacket outgoing = new DatagramPacket(m.toByte(), m.getLength(),
-					socket.getInterface(), socket.getLocalPort());
+					group, port);
 			socket.send(outgoing);
 		} catch (IOException ex) {
 			System.out.println(ex);
@@ -68,7 +75,12 @@ public class Peer implements Observer {
 		if (o == listener) {
 			if (arg instanceof Message) {
 				Message m = (Message)arg;
+				if (id == m.getSource() ) return;
+				synchronized (this) {
+					messageCounter = m.getNumber()+1;
+				}
 				System.out.println(m.getNumber() + "@" + m.getSource() + ":" + m.getMessage() );
+				//upate messagecounter , watch for synchronized
 			}
 			
 		}

@@ -1,19 +1,24 @@
 package nl.rug.ds;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.zip.CRC32;
 
+/**
+ * Uses a CRC32 checksum check for integrity 
+ * 
+ * @author cm
+ *
+ */
 public class Message {
 
+	private static final int HEADER_LENGTH = 20;
+
 	private static final String ENCODING = "UTF-8";
-
-	private static final int MAX_SIZE = 65508;
-	//private static final int SOURCE_OFFSET = 4;
-	//private static final int MESSAGE_OFFSET = 8;
-
-	private int number;
+	
+	private int number; //check for integrity (reject duplicates), piggyback
 	private int source;
+	private int payloadLength = 0;
 	private String message="";
 
 	public String getMessage() {
@@ -32,6 +37,11 @@ public class Message {
 		if (message == null) {
 			message = "";
 		}
+		try {
+			payloadLength = message.getBytes(ENCODING).length;			
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		this.message = message;
 	}
 
@@ -43,22 +53,33 @@ public class Message {
 		this.source = source;
 	}
 	
-	public int getLength() {
-		int msgLength = 0;
+	public int getLength() {	
+		return HEADER_LENGTH + payloadLength;
+	}
+
+	public static Message fromByte(byte[] bytes) throws ChecksumFailedException {
+		Message tmp = new Message();
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		
+		long checksum = buffer.getLong();		
+		tmp.setNumber(buffer.getInt());
+		tmp.setSource(buffer.getInt());
+		int msgLength = buffer.getInt();
+		
 		try {
-			msgLength = message.getBytes(ENCODING).length;
+			tmp.setMessage(new String(buffer.array(), HEADER_LENGTH, msgLength, ENCODING));
+			CRC32 crc32 = new CRC32();
+			byte[] messageBytes = tmp.getMessage().getBytes(ENCODING);
+			crc32.update(messageBytes);
+
+			if (checksum != crc32.getValue()) {
+				throw new ChecksumFailedException();
+			}
+			
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		return 8 + msgLength;
-	}
-
-	public static Message fromByte(byte[] bytes) {
-		Message tmp = new Message();
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		tmp.setNumber(buffer.getInt());
-		tmp.setSource(buffer.getInt());
-		tmp.setMessage(buffer.asCharBuffer().toString());
+		
 		return tmp;
 	}
 
@@ -67,20 +88,23 @@ public class Message {
 		ByteBuffer bytes = ByteBuffer.allocateDirect(0);
 		try {
 			byte[] messageBytes = message.getBytes(ENCODING);
-			int length = messageBytes.length;
-			System.out.println(length);
-			//bytes.position(MESSAGE_OFFSET);
+			CRC32 crc32 = new CRC32();
+			crc32.update(messageBytes);
+
+			long checksum = crc32.getValue();
 			
 			bytes = ByteBuffer.allocate(getLength());
+			
+			bytes.putLong(checksum);
 			bytes.putInt(number);
 			bytes.putInt(source);
-			bytes.put(messageBytes, 0, length);
+			bytes.putInt(payloadLength);
+			bytes.put(messageBytes, 0, payloadLength);
 			
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return bytes.array();
 	}
-
+	
 }

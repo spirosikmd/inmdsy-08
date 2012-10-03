@@ -7,11 +7,9 @@ import java.util.Scanner;
 
 public class FindingPeersApp {
 
-
-	
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 
@@ -20,32 +18,22 @@ public class FindingPeersApp {
 			int port = 1567;
 
 			Peer peer = Peer.createPeer(group, port);
-				
+
 			String message;
 			Scanner scanner = new Scanner(System.in);
-			
-			
-			Message m = new Message();
-			m.setMessage("Hello, this is dog!");
-			m.setNumber(1);
-			m.setSource(3);
-			
-			for (byte b : m.toByte()) {
-				System.out.print(b + ",");
-			}
-			//System.out.println(m.toByte().toString());
-			
-			
+
 			do {
-				 message = scanner.nextLine();
+				message = scanner.nextLine();
+				if ("close".equals(message)) {
+					break;
+				}
 				peer.sendMessage(message);
-			} while (! "close".equals(message));
+			} while (true);
 			scanner.close();
-			
+
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 	}
-
 
 }
