@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 //TODO what happens in case of an socket exception, close socket etc.
 public class Peer implements Observer {
 
-	static final int MAX_MESSAGE_SIZE = 256;
+	static final int MAX_MESSAGE_SIZE = 4069;
 	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - Message.HEADER_SIZE;
 
 	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
@@ -21,6 +22,8 @@ public class Peer implements Observer {
 	private final AtomicInteger messageCounter = new AtomicInteger();
 	private final int port;
 	private final InetAddress group;
+	
+	private HashMap<Integer, Integer> peers = new HashMap<Integer, Integer>(); 
 
 	private Peer(InetAddress group, int port, MulticastSocket socket) {
 		this.port = port;
@@ -77,7 +80,20 @@ public class Peer implements Observer {
 		Message m = null;
 		try {
 			m = Message.fromByte(bytes);
-			//if (id != m.getSource()) {
+			System.out.println(m);
+			if (id != m.getSource()) {
+				if (!peers.containsKey(m.getSource())) {
+					System.out.println("I am not alone :)");
+					peers.put(m.getSource(), m.getS_piggyback());
+				} else {
+					if (m.getS_piggyback() > peers.get(m.getSource())+1) {
+						System.out.println("I think I missed something");
+						Message miss = Message.miss(id, m.getSource(), messageCounter.incrementAndGet(), peers.get(m.getSource())+1);
+						sendMessage(miss);
+						return;
+						// put message into hold back queue until I am happy
+					}
+				}
 				switch (m.getCommand()) {
 				case Message.SEND:
 					// received a send message
@@ -87,12 +103,12 @@ public class Peer implements Observer {
 					sendMessage(ack);
 					break;
 				}
-			//}
+			}
 		} catch (ChecksumFailedException e) {
 			e.printStackTrace();
 			// miss
 		}
-		System.out.println(m);
+		
 		// inform listeners
 	}
 
