@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.Observable;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class MulticastListener extends Observable implements Runnable {
 
 	private MulticastSocket socket;
+	private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(
+			512);
 
 	private MulticastListener() {
 	}
@@ -35,22 +39,39 @@ public class MulticastListener extends Observable implements Runnable {
 	}
 
 	private void startListener() {
+		Thread listener = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						byte[] data = queue.take();
+						setChanged();
+						notifyObservers(data);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		listener.setDaemon(true);
+		listener.start();
+		
 		Thread t = new Thread(this);
 		t.setDaemon(true); // remove later to proper shutdown
 		t.start();
+
 	}
 
 	public void run() {
 		try {
 			out.println("Listening");
 			while (!Thread.interrupted()) {
-				DatagramPacket incoming = new DatagramPacket(new byte[Peer.MAX_MESSAGE_SIZE],
-						Peer.MAX_MESSAGE_SIZE);
-				incoming.setLength(incoming.getData().length);
+				DatagramPacket incoming = new DatagramPacket(
+						new byte[Peer.MAX_MESSAGE_SIZE], Peer.MAX_MESSAGE_SIZE);
 				socket.receive(incoming);
-				setChanged();
-				notifyObservers(incoming.getData());
-
+				queue.offer(incoming.getData());
+				
 			}
 		} catch (IOException ex) {
 			out.println(ex);

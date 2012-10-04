@@ -17,23 +17,22 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import java.util.zip.CRC32;
+import static java.lang.System.out;
 
 public class Peer implements Observer {
 
 	private static final int CHECKSUM_SIZE = Long.SIZE / Byte.SIZE;
-	public static final int HEADER_SIZE = CHECKSUM_SIZE + (Short.SIZE/8);
-	public static final int MAX_MESSAGE_SIZE = 256;//(int) (Math.pow(2, Short.SIZE));  
+	public static final int HEADER_SIZE = CHECKSUM_SIZE + (Short.SIZE / 8);
+	public static final int MAX_MESSAGE_SIZE = 256;// (int) (Math.pow(2,
+													// Short.SIZE));
 	public static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
-	
-	
+
 	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
 	private MulticastSocket socket;
 	private MulticastListener listener;
 	private volatile int messageCounter = 0;
 	private final int port;
 	private final InetAddress group;
-	
-	
 
 	private Peer(InetAddress group, int port) {
 		this.port = port;
@@ -67,7 +66,6 @@ public class Peer implements Observer {
 		this.socket = socket;
 	}
 
-
 	public void sendObject(Serializable object) {
 		Message outgoing = new Message();
 		synchronized (this) {
@@ -75,28 +73,29 @@ public class Peer implements Observer {
 		}
 		outgoing.setSource(id);
 		outgoing.setPayload(object);
-		
+
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream os = new ObjectOutputStream(baos);
 			os.writeObject(outgoing);
 			byte[] data = baos.toByteArray();
 			long checksum = calculateChecksum(data);
-			
+
 			if (data.length > MAX_PAYLOAD_SIZE) {
 				throw new RuntimeException("Payload too large");
 			}
-			
-			ByteBuffer tmpBuffer =  ByteBuffer.allocate(HEADER_SIZE + data.length);
+
+			ByteBuffer tmpBuffer = ByteBuffer.allocate(HEADER_SIZE
+					+ data.length);
 			tmpBuffer.putLong(checksum);
 			tmpBuffer.putShort((short) data.length);
 			tmpBuffer.put(data);
-			
+
 			byte[] completeMessage = tmpBuffer.array();
 			DatagramPacket outgoingPacket = new DatagramPacket(completeMessage,
-					completeMessage.length, group, port);
-			
-			socket.send(outgoingPacket);			
+					MAX_MESSAGE_SIZE, group, port);
+
+			socket.send(outgoingPacket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -107,10 +106,10 @@ public class Peer implements Observer {
 
 	private long calculateChecksum(byte[] data, int offset, int length) {
 		CRC32 crc32 = new CRC32();
-		crc32.update(data,offset, length);
+		crc32.update(data, offset, length);
 		return crc32.getValue();
 	}
-	
+
 	private long calculateChecksum(byte[] data) {
 		return calculateChecksum(data, 0, data.length);
 	}
@@ -119,30 +118,33 @@ public class Peer implements Observer {
 	public void update(Observable o, Object arg) {
 		if (o == listener) {
 			if (arg instanceof byte[]) {
-				byte[] bytes = (byte[])arg;
-				try (PrintStream out = new PrintStream(new File("output"+id))) {
-					for (int i = 0; i != bytes.length; ++i)
-						out.append((char)bytes[i]);
-					out.println();
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
+				byte[] bytes = (byte[]) arg;
+
+				for (int i = 0; i != bytes.length; ++i) {
+					out.printf("%02x ", bytes[i]);
 				}
+				out.println();
+
 				ByteBuffer tmpBuffer = ByteBuffer.wrap(bytes);
 				long originalChecksum = tmpBuffer.getLong();
 				short length = tmpBuffer.getShort();
 				long checksum = calculateChecksum(bytes, HEADER_SIZE, length);
-				
+
 				if (originalChecksum != checksum) {
-					System.out.println("Checksum failed" + checksum + "  " + originalChecksum);
-					//throw new ChecksumFailedException();
+					System.out.println("Checksum failed" + checksum + "  "
+							+ originalChecksum);
+					// throw new ChecksumFailedException();
 				}
-				
+
 				try {
-					ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes, HEADER_SIZE, length));
+					ObjectInputStream ois = new ObjectInputStream(
+							new ByteArrayInputStream(bytes, HEADER_SIZE, length));
 					Object object = ois.readObject();
 					if (object instanceof Message) {
-						Message incoming = (Message)object;
-						System.out.println(incoming.getNumber() + "@" + incoming.getSource() + " : " + (String)incoming.getPayload());
+						Message incoming = (Message) object;
+						System.out.println(incoming.getNumber() + "@"
+								+ incoming.getSource() + " : "
+								+ (String) incoming.getPayload());
 						synchronized (this) {
 							messageCounter = incoming.getNumber();
 						}
@@ -150,9 +152,7 @@ public class Peer implements Observer {
 				} catch (IOException | ClassNotFoundException e) {
 					e.printStackTrace();
 				}
-				
-				
-				
+
 			}
 		}
 	}
