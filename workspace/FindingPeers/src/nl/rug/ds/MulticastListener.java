@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 public class MulticastListener extends Observable implements Runnable {
 
 	private MulticastSocket socket;
-	private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(
+	private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<DatagramPacket>(
 			512);
 
 	private MulticastListener() {
@@ -45,9 +45,9 @@ public class MulticastListener extends Observable implements Runnable {
 			public void run() {
 				while (true) {
 					try {
-						byte[] data = queue.take();
+						DatagramPacket data = queue.take();
 						setChanged();
-						notifyObservers(data);
+						notifyObservers(data.getData());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -60,7 +60,6 @@ public class MulticastListener extends Observable implements Runnable {
 		Thread t = new Thread(this);
 		t.setDaemon(true); // remove later to proper shutdown
 		t.start();
-
 	}
 
 	public void run() {
@@ -70,8 +69,7 @@ public class MulticastListener extends Observable implements Runnable {
 				DatagramPacket incoming = new DatagramPacket(
 						new byte[Peer.MAX_MESSAGE_SIZE], Peer.MAX_MESSAGE_SIZE);
 				socket.receive(incoming);
-				queue.offer(incoming.getData());
-				
+				queue.offer(incoming);
 			}
 		} catch (IOException ex) {
 			out.println(ex);
