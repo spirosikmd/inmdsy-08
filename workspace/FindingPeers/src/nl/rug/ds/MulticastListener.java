@@ -44,17 +44,13 @@ public class MulticastListener extends Observable implements Runnable {
 		try {
 			out.println("Listening");
 			while (!Thread.interrupted()) {
-				DatagramPacket incoming = new DatagramPacket(new byte[65508], 65508);
+				DatagramPacket incoming = new DatagramPacket(new byte[Peer.MAX_MESSAGE_SIZE],
+						Peer.MAX_MESSAGE_SIZE);
 				incoming.setLength(incoming.getData().length);
 				socket.receive(incoming);
-				try {
-					Message m = Message.fromByte(incoming.getData());
-					setChanged();
-					notifyObservers(m);
-				} catch (ChecksumFailedException ex) {
-					ex.printStackTrace();
-				}
-				
+				setChanged();
+				notifyObservers(incoming.getData());
+
 			}
 		} catch (IOException ex) {
 			out.println(ex);

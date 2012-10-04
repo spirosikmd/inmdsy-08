@@ -29,7 +29,7 @@ public class FindingPeersApp {
 				} else if ("list".equals(message)) {
 					System.out.println("List all the files");
 				}
-				peer.sendMessage(message);
+				peer.sendObject(message);
 			} while (true);
 			scanner.close();
 
