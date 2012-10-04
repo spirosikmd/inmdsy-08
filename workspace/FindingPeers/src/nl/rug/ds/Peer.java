@@ -23,8 +23,7 @@ public class Peer implements Observer {
 
 	private static final int CHECKSUM_SIZE = Long.SIZE / Byte.SIZE;
 	public static final int HEADER_SIZE = CHECKSUM_SIZE + (Short.SIZE / 8);
-	public static final int MAX_MESSAGE_SIZE = 256;// (int) (Math.pow(2,
-													// Short.SIZE));
+	public static final int MAX_MESSAGE_SIZE =  256;//(int) (Math.pow(2, Short.SIZE));
 	public static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
 
 	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
@@ -85,8 +84,7 @@ public class Peer implements Observer {
 				throw new RuntimeException("Payload too large");
 			}
 
-			ByteBuffer tmpBuffer = ByteBuffer.allocate(HEADER_SIZE
-					+ data.length);
+			ByteBuffer tmpBuffer = ByteBuffer.allocate(MAX_MESSAGE_SIZE);
 			tmpBuffer.putLong(checksum);
 			tmpBuffer.putShort((short) data.length);
 			tmpBuffer.put(data);
