@@ -27,7 +27,7 @@ final class Message {
 
 	private long checksum;
 	private short length;
-	private byte[] payload;
+	private byte[] payload = new byte[0];
 
 	private Message() {
 	}
