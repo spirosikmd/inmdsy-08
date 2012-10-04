@@ -1,4 +1,4 @@
-package nl.rug.ds;
+package nl.rug.ds.reliable;
 
 import static java.lang.System.out;
 

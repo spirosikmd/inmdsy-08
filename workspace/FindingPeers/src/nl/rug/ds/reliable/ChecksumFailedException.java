@@ -1,4 +1,4 @@
-package nl.rug.ds;
+package nl.rug.ds.reliable;
 
 public class ChecksumFailedException extends Exception {
 
