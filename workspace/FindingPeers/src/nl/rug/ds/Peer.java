@@ -2,17 +2,17 @@ package nl.rug.ds;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -22,7 +22,7 @@ public class Peer implements Observer {
 
 	private static final int CHECKSUM_SIZE = Long.SIZE / Byte.SIZE;
 	public static final int HEADER_SIZE = CHECKSUM_SIZE + (Short.SIZE/8);
-	public static final int MAX_MESSAGE_SIZE = (int) (Math.pow(2, Short.SIZE));  
+	public static final int MAX_MESSAGE_SIZE = 256;//(int) (Math.pow(2, Short.SIZE));  
 	public static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
 	
 	
@@ -120,7 +120,13 @@ public class Peer implements Observer {
 		if (o == listener) {
 			if (arg instanceof byte[]) {
 				byte[] bytes = (byte[])arg;
-							
+				try (PrintStream out = new PrintStream(new File("output"+id))) {
+					for (int i = 0; i != bytes.length; ++i)
+						out.append((char)bytes[i]);
+					out.println();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
 				ByteBuffer tmpBuffer = ByteBuffer.wrap(bytes);
 				long originalChecksum = tmpBuffer.getLong();
 				short length = tmpBuffer.getShort();

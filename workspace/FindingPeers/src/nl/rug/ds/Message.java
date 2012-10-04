@@ -1,10 +1,6 @@
 package nl.rug.ds;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.util.zip.CRC32;
 
 /**
  * Uses a CRC32 checksum check for integrity 
