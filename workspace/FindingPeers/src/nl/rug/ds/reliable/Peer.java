@@ -9,21 +9,23 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+//TODO what happens in case of an socket exception, close socket etc.
 public class Peer implements Observer {
 
-	 static final int MAX_MESSAGE_SIZE = 256;
-	 static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - Message.HEADER_SIZE;
+	static final int MAX_MESSAGE_SIZE = 256;
+	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - Message.HEADER_SIZE;
 
 	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
-	private MulticastSocket socket;
+	private final MulticastSocket socket;
 	private MulticastListener listener;
 	private final AtomicInteger messageCounter = new AtomicInteger();
 	private final int port;
 	private final InetAddress group;
 
-	private Peer(InetAddress group, int port) {
+	private Peer(InetAddress group, int port, MulticastSocket socket) {
 		this.port = port;
 		this.group = group;
+		this.socket = socket;
 	}
 
 	public static Peer createPeer(InetAddress group, int port) {
@@ -33,8 +35,7 @@ public class Peer implements Observer {
 			socket.setTimeToLive(5);
 			socket.joinGroup(group);
 
-			peer = new Peer(group, port);
-			peer.setSocket(socket);
+			peer = new Peer(group, port, socket);
 
 			MulticastListener listener = MulticastListener
 					.createListener(socket);
@@ -45,12 +46,8 @@ public class Peer implements Observer {
 		return peer;
 	}
 
-	 MulticastSocket getSocket() {
+	MulticastSocket getSocket() {
 		return socket;
-	}
-
-	 void setSocket(MulticastSocket socket) {
-		this.socket = socket;
 	}
 
 	public void sendMessage(byte[] payload) {
@@ -61,9 +58,13 @@ public class Peer implements Observer {
 
 		Message outgoing = Message.send(id, messageCounter.incrementAndGet(),
 				payload);
+		sendMessage(outgoing);
+	}
+
+	private void sendMessage(Message outgoing) {
 		byte[] data = outgoing.toByte();
-		DatagramPacket outgoingPacket = new DatagramPacket(data,
-				data.length, group, port);
+		DatagramPacket outgoingPacket = new DatagramPacket(data, data.length,
+				group, port);
 
 		try {
 			socket.send(outgoingPacket);
@@ -76,12 +77,23 @@ public class Peer implements Observer {
 		Message m = null;
 		try {
 			m = Message.fromByte(bytes);
+			//if (id != m.getSource()) {
+				switch (m.getCommand()) {
+				case Message.SEND:
+					// received a send message
+					Message ack = Message.ack(id, m.getSource(),
+							messageCounter.incrementAndGet(),
+							m.getS_piggyback());
+					sendMessage(ack);
+					break;
+				}
+			//}
 		} catch (ChecksumFailedException e) {
 			e.printStackTrace();
-			//miss
+			// miss
 		}
 		System.out.println(m);
-		//inform listeners
+		// inform listeners
 	}
 
 	@Override

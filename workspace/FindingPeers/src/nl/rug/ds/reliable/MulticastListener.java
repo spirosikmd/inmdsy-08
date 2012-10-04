@@ -13,7 +13,7 @@ public class MulticastListener extends Observable implements Runnable {
 
 	private MulticastSocket socket;
 	private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<DatagramPacket>(
-			512);
+			1024);
 
 	private MulticastListener() {
 	}
