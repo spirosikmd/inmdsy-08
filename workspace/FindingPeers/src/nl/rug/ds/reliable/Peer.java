@@ -27,6 +27,7 @@ public class Peer implements Observer {
 
 	private HashMap<Integer, Integer> peers = new HashMap<Integer, Integer>();
 	private List<Message> deliveryQueue = new ArrayList<Message>();
+	private List<Message> holdbackQueue = new ArrayList<Message>();
 
 	private Peer(InetAddress group, int port, MulticastSocket socket) {
 		this.port = port;
@@ -86,47 +87,58 @@ public class Peer implements Observer {
 		Message m = null;
 		try {
 			m = Message.fromByte(bytes);
-			System.out.println(m);
-			if (id != m.getSource()) {
-
-				switch (m.getCommand()) {
-				case Message.SEND:
-					if (!peers.containsKey(m.getSource())) {
-						System.out.println("I am not alone :)");
-						peers.put(m.getSource(),-1);
-					}
-					int r = peers.get(m.getSource());
-					int s = m.getS_piggyback();
-					if (s > r + 1) {
-						System.out.println("I think I missed something");
-						Message miss = Message.miss(id, m.getSource(),
-								messageCounter.get(), r + 1);
-						sendMessage(miss);
-						// put message into hold back queue until I am happy
-						return;
-					} else if (s <= r) {
-						// discard
-						return;
-					} else {
-						peers.put(m.getSource(), ++r);
-						Message ack = Message.ack(id, m.getSource(),
-								messageCounter.get(), s);
-						sendMessage(ack);
-						return;
-
-					}
-					// received a send message
-				case Message.MISS:
-					sendMessage(deliveryQueue.get(m.getR_piggyback()));
-					break;
-				}
-			}
 		} catch (ChecksumFailedException e) {
 			e.printStackTrace();
 			// miss
-		}
+		}		
+		receiveMessage(m);
+	}
 
-		// inform listeners
+	private void receiveMessage(Message m) {
+		if (id != m.getSource()) {
+
+			switch (m.getCommand()) {
+			case Message.SEND:
+				if (!peers.containsKey(m.getSource())) {
+					peers.put(m.getSource(), -1);
+				}
+				int r = peers.get(m.getSource());
+				int s = m.getS_piggyback();
+				if (s > r + 1) {
+					Message miss = Message.miss(id, m.getSource(),
+							messageCounter.get(), r + 1);
+					sendMessage(miss);
+					holdbackQueue.add(m);
+					// put message into hold back queue
+					return;
+				} else if (s <= r) {
+					// discard
+					return;
+				} else {
+					peers.put(m.getSource(), ++r);
+					Message ack = Message.ack(id, m.getSource(),
+							messageCounter.get(), s);
+					sendMessage(ack);
+					System.out.println(m);
+					
+					for (Message stored : holdbackQueue) {
+						if (stored.getSource() == m.getSource() && stored.getS_piggyback() == m.getS_piggyback()+1) {
+							holdbackQueue.remove(stored);
+							receiveMessage(stored);
+							break;
+						} 
+					}
+					//what if multiple messages were missed?
+					
+					return;
+
+				}
+				// received a send message
+			case Message.MISS:
+				sendMessage(deliveryQueue.get(m.getR_piggyback()));
+				break;
+			}
+		}
 	}
 
 	@Override
