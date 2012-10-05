@@ -101,6 +101,7 @@ public class Peer implements Observer {
 			if (!peers.containsKey(m.getSource())) {
 				peers.put(m.getSource(), m.getS_piggyback()-1);
 			}
+			// first message can be lost unnoticed kind of ;/
 			int r = peers.get(m.getSource());
 			int s = m.getS_piggyback();
 			if (s > r + 1) {
@@ -128,6 +129,7 @@ public class Peer implements Observer {
 					}
 				}
 				// what if multiple messages were missed?
+				// check piggyback counter if the message in holdback queue was last than fine else send miss
 
 				return;
 
