@@ -93,7 +93,7 @@ public class Peer implements Observer {
 				case Message.SEND:
 					if (!peers.containsKey(m.getSource())) {
 						System.out.println("I am not alone :)");
-						peers.put(m.getSource(), m.getS_piggyback());
+						peers.put(m.getSource(),-1);
 					}
 					int r = peers.get(m.getSource());
 					int s = m.getS_piggyback();
