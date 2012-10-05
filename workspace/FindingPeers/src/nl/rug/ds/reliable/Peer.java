@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -19,11 +21,12 @@ public class Peer implements Observer {
 	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
 	private final MulticastSocket socket;
 	private MulticastListener listener;
-	private final AtomicInteger messageCounter = new AtomicInteger();
+	private final AtomicInteger messageCounter = new AtomicInteger(-1);
 	private final int port;
 	private final InetAddress group;
 	
 	private HashMap<Integer, Integer> peers = new HashMap<Integer, Integer>(); 
+	private List<Message> deliveryQueue = new ArrayList<Message>(); 
 
 	private Peer(InetAddress group, int port, MulticastSocket socket) {
 		this.port = port;
@@ -71,6 +74,9 @@ public class Peer implements Observer {
 
 		try {
 			socket.send(outgoingPacket);
+			if (outgoing.getCommand() == Message.SEND) {
+				deliveryQueue.add(outgoing);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -103,7 +109,7 @@ public class Peer implements Observer {
 						} else {
 							peers.put(m.getSource(), ++r);
 							Message ack = Message.ack(id, m.getSource(),
-									messageCounter.incrementAndGet(),
+									messageCounter.get(),
 									s);
 							sendMessage(ack);
 							return;
@@ -112,8 +118,7 @@ public class Peer implements Observer {
 					// received a send message
 					break;
 				case Message.MISS:
-					Message resend = Message.send(id, m.getR_piggyback(), new byte[]{97});
-					sendMessage(resend);
+					sendMessage(deliveryQueue.get(m.getR_piggyback()));
 					break;
 				}
 			}
