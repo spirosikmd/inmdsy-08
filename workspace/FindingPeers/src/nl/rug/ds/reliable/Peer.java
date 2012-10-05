@@ -99,7 +99,7 @@ public class Peer implements Observer {
 		switch (m.getCommand()) {
 		case Message.SEND:
 			if (!peers.containsKey(m.getSource())) {
-				peers.put(m.getSource(), -1);
+				peers.put(m.getSource(), m.getS_piggyback()-1);
 			}
 			int r = peers.get(m.getSource());
 			int s = m.getS_piggyback();
