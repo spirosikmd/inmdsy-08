@@ -109,7 +109,6 @@ public class Peer implements Observer {
 							messageCounter.get(), r + 1);
 					sendMessage(miss);
 					holdbackQueue.add(m);
-					// put message into hold back queue
 					return;
 				} else if (s <= r) {
 					// discard
@@ -136,6 +135,8 @@ public class Peer implements Observer {
 				// received a send message
 			case Message.MISS:
 				sendMessage(deliveryQueue.get(m.getR_piggyback()));
+			case Message.ACK:
+				System.out.println(m);
 				break;
 			}
 		}
