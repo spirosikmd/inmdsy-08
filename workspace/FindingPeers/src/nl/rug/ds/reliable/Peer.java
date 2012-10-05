@@ -82,25 +82,38 @@ public class Peer implements Observer {
 			m = Message.fromByte(bytes);
 			System.out.println(m);
 			if (id != m.getSource()) {
-				if (!peers.containsKey(m.getSource())) {
-					System.out.println("I am not alone :)");
-					peers.put(m.getSource(), m.getS_piggyback());
-				} else {
-					if (m.getS_piggyback() > peers.get(m.getSource())+1) {
-						System.out.println("I think I missed something");
-						Message miss = Message.miss(id, m.getSource(), messageCounter.incrementAndGet(), peers.get(m.getSource())+1);
-						sendMessage(miss);
-						return;
-						// put message into hold back queue until I am happy
-					}
-				}
+				
 				switch (m.getCommand()) {
 				case Message.SEND:
+					if (!peers.containsKey(m.getSource())) {
+						System.out.println("I am not alone :)");
+						peers.put(m.getSource(), m.getS_piggyback());
+					} else {
+						int r = peers.get(m.getSource());
+						int s = m.getS_piggyback();
+						if (s > r+1) {
+							System.out.println("I think I missed something");
+							Message miss = Message.miss(id, m.getSource(), messageCounter.get(), r+1);
+							sendMessage(miss);
+							// put message into hold back queue until I am happy
+							return;
+						} else if (s <= r){
+							//discard
+							return;
+						} else {
+							peers.put(m.getSource(), ++r);
+							Message ack = Message.ack(id, m.getSource(),
+									messageCounter.incrementAndGet(),
+									s);
+							sendMessage(ack);
+							return;
+						}
+					}
 					// received a send message
-					Message ack = Message.ack(id, m.getSource(),
-							messageCounter.incrementAndGet(),
-							m.getS_piggyback());
-					sendMessage(ack);
+					break;
+				case Message.MISS:
+					Message resend = Message.send(id, m.getR_piggyback(), new byte[]{97});
+					sendMessage(resend);
 					break;
 				}
 			}
