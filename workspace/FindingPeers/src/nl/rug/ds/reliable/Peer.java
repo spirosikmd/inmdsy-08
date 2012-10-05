@@ -134,7 +134,13 @@ public class Peer implements Observer {
 			}
 			// received a send message
 		case Message.MISS:
-			sendMessage(deliveryQueue.get(m.getR_piggyback()));
+			for (Message stored : deliveryQueue) {
+				if (stored.getS_piggyback() == m.getR_piggyback()) {
+					sendMessage(stored);
+					break;
+				}
+			}
+		
 		case Message.ACK:
 			System.out.println(m);
 			break;
