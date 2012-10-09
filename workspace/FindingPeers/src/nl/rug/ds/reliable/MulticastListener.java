@@ -1,7 +1,5 @@
 package nl.rug.ds.reliable;
 
-import static java.lang.System.out;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
@@ -9,8 +7,12 @@ import java.util.Observable;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.apache.log4j.Logger;
+
 public class MulticastListener extends Observable implements Runnable {
 
+	static Logger logger = Logger.getLogger(MulticastListener.class);
+	
 	private MulticastSocket socket;
 	private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<DatagramPacket>(
 			1024);
@@ -30,6 +32,7 @@ public class MulticastListener extends Observable implements Runnable {
 		MulticastListener instance = new MulticastListener();
 
 		if (socket == null) {
+			logger.error("Socket is null");
 			throw new RuntimeException("socket is null");
 		}
 
@@ -64,15 +67,15 @@ public class MulticastListener extends Observable implements Runnable {
 
 	public void run() {
 		try {
-			out.println("Listening");
+			logger.info("Start listening");
 			while (!Thread.interrupted()) {
 				DatagramPacket incoming = new DatagramPacket(
-						new byte[Peer.MAX_MESSAGE_SIZE], Peer.MAX_MESSAGE_SIZE);
+						new byte[RMulticast.MAX_MESSAGE_SIZE], RMulticast.MAX_MESSAGE_SIZE);
 				socket.receive(incoming);
 				queue.offer(incoming);
 			}
 		} catch (IOException ex) {
-			out.println(ex);
+			logger.error(ex);
 		}
 	}
 }

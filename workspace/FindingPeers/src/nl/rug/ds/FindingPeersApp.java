@@ -5,21 +5,31 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import nl.rug.ds.reliable.Peer;
+import nl.rug.ds.reliable.RMulticast;
+
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
 public class FindingPeersApp {
 
+	static Logger logger = Logger.getLogger(FindingPeersApp.class);
+	
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 
+		BasicConfigurator.configure();
+		
+		
 		try {
 			InetAddress group = InetAddress.getByName("239.1.2.4");
 			int port = 1567;
+			
+			logger.info(" (m)Starting app to find peers in group " + group.getHostAddress() + ":" + port);
 
-			Peer peer = Peer.createPeer(group, port);
+			RMulticast peer = RMulticast.createPeer(group, port);
 
 			String message;
 			Scanner scanner = new Scanner(System.in);

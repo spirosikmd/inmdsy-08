@@ -1,171 +1,53 @@
 package nl.rug.ds.reliable;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+class Peer {
 
-//TODO what happens in case of an socket exception, close socket etc.
-public class Peer implements Observer {
+	private int hostID;
+	private int processedMessageID;
+	private int actualMessageID;
 
-	static final int MAX_MESSAGE_SIZE = 4069;
-	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - Message.HEADER_SIZE;
-
-	private static final int id = new Random().nextInt(Integer.MAX_VALUE);
-	private final MulticastSocket socket;
-	private MulticastListener listener;
-	private final AtomicInteger messageCounter = new AtomicInteger(-1);
-	private final int port;
-	private final InetAddress group;
-
-	private HashMap<Integer, Integer> peers = new HashMap<Integer, Integer>();
-	private List<Message> deliveryQueue = new ArrayList<Message>();
-	private List<Message> holdbackQueue = new ArrayList<Message>();
-
-	private Peer(InetAddress group, int port, MulticastSocket socket) {
-		this.port = port;
-		this.group = group;
-		this.socket = socket;
+	static Peer find(int hostID) {
+		Peer p  = new Peer();
+		p.setHostID(hostID);
+		return p;
+	}
+	
+	int getHostID() {
+		return hostID;
 	}
 
-	public static Peer createPeer(InetAddress group, int port) {
-		Peer peer = null;
-		try {
-			MulticastSocket socket = new MulticastSocket(port);
-			socket.setTimeToLive(5);
-			socket.joinGroup(group);
-
-			peer = new Peer(group, port, socket);
-
-			MulticastListener listener = MulticastListener
-					.createListener(socket);
-			peer.setListener(listener);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return peer;
+	void setHostID(int hostID) {
+		this.hostID = hostID;
 	}
 
-	MulticastSocket getSocket() {
-		return socket;
+	int getReceivedMessageID() {
+		return processedMessageID;
 	}
 
-	public void sendMessage(byte[] payload) {
-
-		if (payload.length > MAX_PAYLOAD_SIZE) {
-			throw new RuntimeException("Payload too large");
-		}
-
-		Message outgoing = Message.send(id, messageCounter.incrementAndGet(),
-				payload);
-		sendMessage(outgoing);
+	void setReceivedMessageID(int receivedMessageID) {
+		this.processedMessageID = receivedMessageID;
 	}
 
-	private void sendMessage(Message outgoing) {
-		byte[] data = outgoing.toByte();
-		DatagramPacket outgoingPacket = new DatagramPacket(data, data.length,
-				group, port);
-
-		try {
-			socket.send(outgoingPacket);
-			if (outgoing.getCommand() == Message.SEND) {
-				deliveryQueue.add(outgoing);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	int getSeenMessageID() {
+		return actualMessageID;
 	}
 
-	private void receiveMessage(byte[] bytes) {
-		Message m = null;
-		try {
-			m = Message.fromByte(bytes);
-		} catch (ChecksumFailedException e) {
-			e.printStackTrace();
-			// miss
-		}
-		receiveMessage(m);
+	void setSeenMessageID(int seenMessageID) {
+		this.actualMessageID = seenMessageID;
 	}
-
-	private void receiveMessage(Message m) {
-
-		switch (m.getCommand()) {
-		case Message.SEND:
-			if (!peers.containsKey(m.getSource())) {
-				peers.put(m.getSource(), m.getS_piggyback()-1);
-			}
-			// first message can be lost unnoticed kind of ;/
-			int r = peers.get(m.getSource());
-			int s = m.getS_piggyback();
-			if (s > r + 1) {
-				Message miss = Message.miss(id, m.getSource(),
-						messageCounter.get(), r + 1);
-				sendMessage(miss);
-				holdbackQueue.add(m);
-				return;
-			} else if (s <= r) {
-				// discard
-				return;
-			} else {
-				peers.put(m.getSource(), ++r);
-				Message ack = Message.ack(id, m.getSource(),
-						messageCounter.get(), s);
-				sendMessage(ack);
-				System.out.println(m);
-
-				for (Message stored : holdbackQueue) {
-					if (stored.getSource() == m.getSource()
-							&& stored.getS_piggyback() == m.getS_piggyback() + 1) {
-						holdbackQueue.remove(stored);
-						receiveMessage(stored);
-						break;
-					}
-				}
-				// what if multiple messages were missed?
-				// check piggyback counter if the message in holdback queue was last than fine else send miss
-
-				return;
-
-			}
-			// received a send message
-		case Message.MISS:
-			for (Message stored : deliveryQueue) {
-				if (stored.getS_piggyback() == m.getR_piggyback()) {
-					sendMessage(stored);
-					break;
-				}
-			}
-		
-		case Message.ACK:
-			System.out.println(m);
-			break;
-		}
-
-	}
-
+	
 	@Override
-	public void update(Observable o, Object arg) {
-		if (o == listener) {
-			if (arg instanceof byte[]) {
-				byte[] bytes = (byte[]) arg;
-				receiveMessage(bytes);
-			}
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof Peer) {
+			Peer other = (Peer)obj;
+			return this.hostID == other.hostID;
 		}
+		return false;
 	}
-
-	private void setListener(MulticastListener listener) {
-		if (this.listener != null) {
-			this.listener.deleteObserver(this);
-		}
-		listener.addObserver(this);
-		this.listener = listener;
+	
+	@Override
+	public int hashCode() {
+		return hostID;
 	}
 
 }
