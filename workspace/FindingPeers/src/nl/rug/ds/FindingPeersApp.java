@@ -17,8 +17,9 @@ public class FindingPeersApp {
 	/**
 	 * @param args
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 
 		PropertyConfigurator.configure("log4j.properties");
 
@@ -41,8 +42,9 @@ public class FindingPeersApp {
 				} else if ("list".equals(message)) {
 					System.out.println("List all the files");
 				} else if ("test".equals(message)) {
-					for (int i = 0 ; i < 1000 ; i++) {
+					for (int i = 0 ; i < 100 ; i++) {
 						peer.sendMessage(String.valueOf(i).getBytes());
+						Thread.sleep(100);
 					}
 				} else {
 					peer.sendMessage(message.getBytes());
