@@ -74,7 +74,7 @@ public class RMulticast implements Observer {
 
 		try {
 			socket.send(outgoingPacket);
-			if (outgoing.getCommand() == Message.SEND) {
+			if (outgoing.getCommand() == Message.MESSAGE) {
 				if (!deliveryQueue.contains(outgoing)) {
 					deliveryQueue.add(outgoing);
 				}
@@ -99,8 +99,11 @@ public class RMulticast implements Observer {
 	private void receiveMessage(Message m) {
 				
 		switch (m.getCommand()) {
-		case Message.SEND:
+		case Message.MESSAGE:
 			if (m.getSource() == id) return;
+			
+			logger.debug("Received: " + m.toString());
+			
 			Peer p = null;
 			if (!peers.containsKey(m.getSource())) {
 				logger.debug("Detected peer " + m.getSource()
@@ -148,7 +151,7 @@ public class RMulticast implements Observer {
 			}
 			break;
 
-		case Message.MISS:
+		case Message.NACK:
 			logger.debug(m.toString());
 			for (Message stored : deliveryQueue) {
 				if (stored.getMessageID() == m.getMessageID()) {
@@ -171,7 +174,7 @@ public class RMulticast implements Observer {
 	}
 
 	private void rdeliver(Message m) {
-		logger.debug("Received: " + m.toString());
+		logger.debug("Consumed: " + m.toString());
 	}
 
 	private void sendMiss(int peer, int message_id) {

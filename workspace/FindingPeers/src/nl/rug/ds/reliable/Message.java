@@ -12,9 +12,9 @@ import java.util.zip.CRC32;
  */
 final class Message {
 
-	static final byte SEND = 1;
+	static final byte MESSAGE = 1;
 	static final byte ACK = 2;
-	static final byte MISS = 4;
+	static final byte NACK = 4;
 
 	static final int HEADER_SIZE = 19;
 
@@ -30,7 +30,7 @@ final class Message {
 
 	static Message send(int source, int s_piggyback, byte[] payload) {
 		Message m = new Message();
-		m.command = SEND;
+		m.command = MESSAGE;
 		m.length = (short) payload.length;
 		m.payload = payload;
 		m.checksum = m.calculateChecksum(payload);
@@ -50,7 +50,7 @@ final class Message {
 
 	static Message miss(int destination, int r_piggyback) {
 		Message m = new Message();
-		m.command = MISS;
+		m.command = NACK;
 		m.source = destination;
 		m.messageID = r_piggyback;
 		return m;
@@ -137,8 +137,8 @@ final class Message {
 	private String cmdToText(byte command) {
 		switch (command) {
 		case ACK: return "ACK";
-		case MISS: return "MISS";
-		case SEND: return "SEND";
+		case NACK: return "MISS";
+		case MESSAGE: return "MESSAGE";
 		default: return "STRANGE";
 		}
 	}
