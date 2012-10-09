@@ -152,6 +152,7 @@ public class RMulticast implements Observer {
 			break;
 
 		case Message.NACK:
+			if (m.getSource() != id) return;
 			logger.debug(m.toString());
 			for (Message stored : deliveryQueue) {
 				if (stored.getMessageID() == m.getMessageID()) {
