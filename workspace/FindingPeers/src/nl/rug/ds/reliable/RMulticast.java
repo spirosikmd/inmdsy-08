@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -29,8 +29,8 @@ public class RMulticast implements Observer {
 	private final InetAddress group;
 
 	private HashMap<Integer, Peer> peers = new HashMap<Integer, Peer>();
-	private List<Message> deliveryQueue = new ArrayList<Message>();
-	private List<Message> holdbackQueue = new ArrayList<Message>();
+	private List<Message> deliveryQueue = new CopyOnWriteArrayList<Message>();
+	private List<Message> holdbackQueue = new CopyOnWriteArrayList<Message>();
 
 	private RMulticast(InetAddress group, int port, MulticastSocket socket) {
 		this.port = port;
