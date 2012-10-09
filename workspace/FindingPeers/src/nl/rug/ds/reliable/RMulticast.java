@@ -98,6 +98,9 @@ public class RMulticast implements Observer {
 	int i = 0;
 
 	private void receiveMessage(Message m) {
+		
+		if (m.getSource() == id) return;
+		
 		logger.debug(m.toString());
 
 		switch (m.getCommand()) {
