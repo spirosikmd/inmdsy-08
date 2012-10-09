@@ -1,4 +1,4 @@
-package nl.rug.ds.reliable;
+package nl.rug.ds.middleware;
 
 import java.util.HashMap;
 

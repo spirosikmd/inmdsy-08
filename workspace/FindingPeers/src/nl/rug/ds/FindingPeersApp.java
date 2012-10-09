@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import nl.rug.ds.reliable.RMulticast;
+import nl.rug.ds.middleware.RMulticast;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
