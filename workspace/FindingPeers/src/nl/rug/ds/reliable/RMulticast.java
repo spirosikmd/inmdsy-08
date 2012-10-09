@@ -121,7 +121,7 @@ public class RMulticast implements Observer {
 			if (s > p.getSeenMessageID()) {
 				p.setSeenMessageID(s);
 			}
-			
+
 			if (s == r + 1) {
 				p.setReceivedMessageID(++r);
 
@@ -133,8 +133,10 @@ public class RMulticast implements Observer {
 
 				Message stored = findMessageInHoldbackQueue(p.getHostID(),
 						s + 1);
-				holdbackQueue.remove(stored);
-				receiveMessage(stored);
+				if (stored != null) {
+					holdbackQueue.remove(stored);
+					receiveMessage(stored);
+				}
 
 			} else if (s > r + 1) {
 				logger.debug("Missed message " + (r + 1)
