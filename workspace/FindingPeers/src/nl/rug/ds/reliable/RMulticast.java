@@ -108,13 +108,13 @@ public class RMulticast implements Observer {
 		switch (m.getCommand()) {
 		case Message.SEND:
 
-			++i;
-			if (m.getSource() != id) {
-				if (i > 2 && i < 6) {
-					logger.info("Discard message " + i);
-					return;
-				}
-			}
+//			++i;
+//			if (m.getSource() != id) {
+//				if (i > 2 && i < 6) {
+//					logger.info("Discard message " + i);
+//					return;
+//				}
+//			}
 			Peer p = null;
 			if (!peers.containsKey(m.getSource())) {
 				logger.debug("Store peer " + m.getSource()
