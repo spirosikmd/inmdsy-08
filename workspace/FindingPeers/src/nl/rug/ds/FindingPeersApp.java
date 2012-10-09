@@ -44,7 +44,7 @@ public class FindingPeersApp {
 				} else if ("test".equals(message)) {
 					for (int i = 0 ; i < 100 ; i++) {
 						peer.sendMessage(String.valueOf(i).getBytes());
-						Thread.sleep(100);
+						Thread.sleep(10);
 					}
 				} else {
 					peer.sendMessage(message.getBytes());
