@@ -171,8 +171,7 @@ public class RMulticast implements Observer {
 	}
 
 	private void rdeliver(Message m) {
-		logger.debug(m.toString());
-		logger.debug("R-Deliver message");
+		logger.debug("Received: " + m.toString());
 	}
 
 	private void sendMiss(int peer, int message_id) {
