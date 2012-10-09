@@ -58,7 +58,7 @@ public class RMulticast implements Observer {
 
 			Thread sender = new Thread(new Runnable() {
 				
-				TimedSemaphore semaphore = new TimedSemaphore(1	, TimeUnit.SECONDS, 10);
+				TimedSemaphore semaphore = new TimedSemaphore(100	, TimeUnit.MILLISECONDS, 1);
 				
 				@Override
 				public void run() {
