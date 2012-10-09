@@ -99,8 +99,9 @@ public class RMulticast implements Observer {
 
 		switch (m.getCommand()) {
 		case Message.MESSAGE:
-//			if (m.getSource() == id)
-//				return;
+			
+			if (m.getSource() == id)
+				return;
 
 			logger.debug("Received: " + m.toString());
 
