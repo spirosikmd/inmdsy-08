@@ -97,12 +97,10 @@ public class RMulticast implements Observer {
 	int i = 0;
 
 	private void receiveMessage(Message m) {
-		
-		if (m.getSource() == id) return;
-		
+				
 		switch (m.getCommand()) {
 		case Message.SEND:
-
+			if (m.getSource() == id) return;
 			Peer p = null;
 			if (!peers.containsKey(m.getSource())) {
 				logger.debug("Detected peer " + m.getSource()
