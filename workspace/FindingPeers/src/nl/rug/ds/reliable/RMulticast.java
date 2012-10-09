@@ -57,9 +57,10 @@ public class RMulticast implements Observer {
 			peer.setListener(listener);
 
 			Thread sender = new Thread(new Runnable() {
-				
-				TimedSemaphore semaphore = new TimedSemaphore(100	, TimeUnit.MILLISECONDS, 1);
-				
+
+				TimedSemaphore semaphore = new TimedSemaphore(100,
+						TimeUnit.MILLISECONDS, 1);
+
 				@Override
 				public void run() {
 					while (true) {
@@ -86,7 +87,7 @@ public class RMulticast implements Observer {
 			sender.setName("Sender");
 			sender.setDaemon(true);
 			sender.start();
-			
+
 			return peer;
 
 		} catch (IOException e) {
@@ -108,7 +109,11 @@ public class RMulticast implements Observer {
 
 	private void sendMessage(Message outgoing) {
 		try {
-			sendQueue.put(outgoing);
+			if (!sendQueue.contains(outgoing)) {
+				sendQueue.put(outgoing);
+			} else {
+				logger.debug("Discarded duplicate message in send queue");
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -132,8 +137,6 @@ public class RMulticast implements Observer {
 			if (m.getSource() == id)
 				return;
 
-			logger.debug("Received: " + m.toString());
-
 			Peer p = null;
 			if (!peers.containsKey(m.getSource())) {
 				logger.debug("Detected peer " + m.getSource()
@@ -154,6 +157,7 @@ public class RMulticast implements Observer {
 			}
 
 			if (s == r + 1) {
+				logger.debug("Received: " + m.toString());
 				p.setReceivedMessageID(++r);
 				sendMessage(m);
 				rdeliver(m);
@@ -166,6 +170,7 @@ public class RMulticast implements Observer {
 				}
 
 			} else if (s > r + 1) {
+				logger.debug("Received: " + m.toString());
 				logger.debug("Missed message " + (r + 1)
 						+ " detected from peer " + m.getSource());
 				holdbackQueue.add(m);
@@ -174,6 +179,8 @@ public class RMulticast implements Observer {
 						sendMiss(m.getSource(), missedID);
 					}
 				}
+			} else {
+				logger.debug("Discarded duplicate: " + m.toString());
 			}
 			break;
 

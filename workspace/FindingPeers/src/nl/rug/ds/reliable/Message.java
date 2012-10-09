@@ -39,7 +39,7 @@ final class Message {
 		return m;
 	}
 
-	static Message ack(int destination,	int r_piggyback) {
+	static Message ack(int destination, int r_piggyback) {
 		Message m = new Message();
 		m.command = ACK;
 		m.source = destination;
@@ -120,27 +120,45 @@ final class Message {
 	private long calculateChecksum(byte[] data) {
 		return calculateChecksum(data, 0, data.length);
 	}
-	
+
 	@Override
 	public String toString() {
-		return cmdToText(command) + " " +source + "(" + messageID + ")  => " + byteToText(payload);
+		return cmdToText(command) + " " + source + "(" + messageID + ")  => "
+				+ byteToText(payload);
 	}
-	
+
 	private String byteToText(byte[] bytes) {
 		StringBuffer bf = new StringBuffer();
 		for (byte b : bytes) {
-		bf.append((char)b);
+			bf.append((char) b);
 		}
 		return bf.toString();
 	}
-	
+
 	private String cmdToText(byte command) {
 		switch (command) {
-		case ACK: return "ACK";
-		case NACK: return "MISS";
-		case MESSAGE: return "MESSAGE";
-		default: return "STRANGE";
+		case ACK:
+			return "ACK";
+		case NACK:
+			return "MISS";
+		case MESSAGE:
+			return "MESSAGE";
+		default:
+			return "STRANGE";
 		}
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Message)) {
+			return false;
+		} 
+		
+		Message other = (Message) obj;
+		return (command == other.command && source == other.source
+				&& messageID == other.messageID && checksum == other.checksum
+				&& length == other.length && Arrays.equals(payload,
+				other.payload));
+
+	}
 }
