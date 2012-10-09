@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,6 +33,8 @@ public class RMulticast implements Observer {
 	private HashMap<Integer, Peer> peers = new HashMap<Integer, Peer>();
 	private List<Message> deliveryQueue = new CopyOnWriteArrayList<Message>();
 	private List<Message> holdbackQueue = new CopyOnWriteArrayList<Message>();
+	private final BlockingQueue<Message> sendQueue = new ArrayBlockingQueue<Message>(
+			1024);
 
 	private RMulticast(InetAddress group, int port, MulticastSocket socket) {
 		this.port = port;
@@ -39,21 +43,50 @@ public class RMulticast implements Observer {
 	}
 
 	public static RMulticast createPeer(InetAddress group, int port) {
-		RMulticast peer = null;
 		try {
 			MulticastSocket socket = new MulticastSocket(port);
 			socket.setTimeToLive(5);
 			socket.joinGroup(group);
 
-			peer = new RMulticast(group, port, socket);
+			final RMulticast peer = new RMulticast(group, port, socket);
 
 			MulticastListener listener = MulticastListener
 					.createListener(socket);
 			peer.setListener(listener);
+
+			Thread sender = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					while (true) {
+						try {
+							Message message = peer.sendQueue.take();
+							byte[] data = message.toByte();
+							DatagramPacket outgoingPacket = new DatagramPacket(
+									data, data.length, peer.group, peer.port);
+							logger.debug("Send: " + message);
+							peer.socket.send(outgoingPacket);
+							if (message.getCommand() == Message.MESSAGE) {
+								if (!peer.deliveryQueue.contains(message)) {
+									peer.deliveryQueue.add(message);
+								}
+							}
+						} catch (IOException | InterruptedException e) {
+							logger.error(e);
+						}
+					}
+
+				}
+			});
+			sender.setDaemon(true);
+			sender.start();
+			
+			return peer;
+
 		} catch (IOException e) {
 			logger.error(e);
 		}
-		return peer;
+		return null;
 	}
 
 	public void sendMessage(byte[] payload) {
@@ -68,20 +101,10 @@ public class RMulticast implements Observer {
 	}
 
 	private void sendMessage(Message outgoing) {
-		byte[] data = outgoing.toByte();
-		DatagramPacket outgoingPacket = new DatagramPacket(data, data.length,
-				group, port);
-
 		try {
-			logger.debug("Send: " + outgoing);
-			socket.send(outgoingPacket);
-			if (outgoing.getCommand() == Message.MESSAGE) {
-				if (!deliveryQueue.contains(outgoing)) {
-					deliveryQueue.add(outgoing);
-				}
-			}
-		} catch (IOException e) {
-			logger.error(e);
+			sendQueue.put(outgoing);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -99,7 +122,7 @@ public class RMulticast implements Observer {
 
 		switch (m.getCommand()) {
 		case Message.MESSAGE:
-			
+
 			if (m.getSource() == id)
 				return;
 

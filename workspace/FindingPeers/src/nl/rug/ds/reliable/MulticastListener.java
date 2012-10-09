@@ -72,7 +72,9 @@ public class MulticastListener extends Observable implements Runnable {
 				DatagramPacket incoming = new DatagramPacket(
 						new byte[RMulticast.MAX_MESSAGE_SIZE], RMulticast.MAX_MESSAGE_SIZE);
 				socket.receive(incoming);
-				queue.offer(incoming);
+				if (!queue.offer(incoming)) {
+					logger.equals("Incoming Blockingqueue is full");
+				}
 			}
 		} catch (IOException ex) {
 			logger.error(ex);
