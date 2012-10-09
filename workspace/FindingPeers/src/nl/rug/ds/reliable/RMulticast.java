@@ -99,8 +99,8 @@ public class RMulticast implements Observer {
 
 		switch (m.getCommand()) {
 		case Message.MESSAGE:
-			if (m.getSource() == id)
-				return;
+//			if (m.getSource() == id)
+//				return;
 
 			logger.debug("Received: " + m.toString());
 
@@ -125,7 +125,7 @@ public class RMulticast implements Observer {
 
 			if (s == r + 1) {
 				p.setReceivedMessageID(++r);
-
+				sendMessage(m);
 				rdeliver(m);
 
 				Message stored = findMessageInHoldbackQueue(p.getHostID(),
