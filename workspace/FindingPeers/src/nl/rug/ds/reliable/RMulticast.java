@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
-//TODO what happens in case of an socket exception, close socket etc.
 public class RMulticast implements Observer {
 
 	static final int MAX_MESSAGE_SIZE = 4069;
