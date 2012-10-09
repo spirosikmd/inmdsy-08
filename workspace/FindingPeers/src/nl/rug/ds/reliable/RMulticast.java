@@ -6,7 +6,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -58,10 +57,6 @@ public class RMulticast implements Observer {
 		return peer;
 	}
 
-	MulticastSocket getSocket() {
-		return socket;
-	}
-
 	public void sendMessage(byte[] payload) {
 
 		if (payload.length > MAX_PAYLOAD_SIZE) {
@@ -82,7 +77,7 @@ public class RMulticast implements Observer {
 			socket.send(outgoingPacket);
 			if (outgoing.getCommand() == Message.SEND) {
 				if (!deliveryQueue.contains(outgoing)) {
-					deliveryQueue.add(0, outgoing);// add(outgoing);
+					deliveryQueue.add(outgoing);
 				}
 			}
 		} catch (IOException e) {
@@ -108,17 +103,10 @@ public class RMulticast implements Observer {
 		switch (m.getCommand()) {
 		case Message.SEND:
 
-//			++i;
-//			if (m.getSource() != id) {
-//				if (i > 2 && i < 6) {
-//					logger.info("Discard message " + i);
-//					return;
-//				}
-//			}
 			Peer p = null;
 			if (!peers.containsKey(m.getSource())) {
-				logger.debug("Store peer " + m.getSource()
-						+ " and set counter to " + (m.getS_piggyback() - 1));
+				logger.debug("Detected peer " + m.getSource()
+						+ " with piggyback " + (m.getS_piggyback() - 1));
 				p = new Peer();
 				p.setHostID(m.getSource());
 				p.setSeenMessageID(m.getS_piggyback() - 1);
@@ -130,41 +118,33 @@ public class RMulticast implements Observer {
 
 			int r = p.getReceivedMessageID();
 			int s = m.getS_piggyback();
-
 			if (s > p.getSeenMessageID()) {
 				p.setSeenMessageID(s);
 			}
-			logger.debug(s + " - " + r);
+			
 			if (s == r + 1) {
 				p.setReceivedMessageID(++r);
-				Message ack = Message.ack(id, m.getSource(),
-						messageCounter.get(), s);
+
+				// Message ack = Message.ack(id, m.getSource(),
+				// messageCounter.get(), s);
 				// sendMessage(ack);
 
-				logger.debug("R-Deliver message");
-				// r-deliver
+				rdeliver(m);
 
-				// check holdback queue
-				for (Message stored : holdbackQueue) {
-					if (stored.getSource() == m.getSource()
-							&& stored.getS_piggyback() == s + 1) {
-						holdbackQueue.remove(stored);
-						receiveMessage(stored);
-						break;
-					}
-				}
+				Message stored = findMessageInHoldbackQueue(p.getHostID(),
+						s + 1);
+				holdbackQueue.remove(stored);
+				receiveMessage(stored);
 
 			} else if (s > r + 1) {
 				logger.debug("Missed message " + (r + 1)
 						+ " detected from peer" + m.getSource());
-				logger.debug("Actual id " + p.getSeenMessageID()
-						+ " but processed " + p.getReceivedMessageID());
 				holdbackQueue.add(m);
 				for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
-					// if in holdback queue than skip else
-					sendMiss(m.getSource(), missedID);
+					if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
+						sendMiss(m.getSource(), missedID);
+					}
 				}
-
 			}
 			break;
 
@@ -178,6 +158,19 @@ public class RMulticast implements Observer {
 		case Message.ACK:
 			return;
 		}
+	}
+
+	private Message findMessageInHoldbackQueue(int host, int messageID) {
+		for (Message m : holdbackQueue) {
+			if (m.getSource() == host && m.getS_piggyback() == messageID) {
+				return m;
+			}
+		}
+		return null;
+	}
+
+	private void rdeliver(Message m) {
+		logger.debug("R-Deliver message");
 	}
 
 	private void sendMiss(int peer, int message_id) {
