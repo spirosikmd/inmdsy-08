@@ -16,15 +16,11 @@ final class Message {
 	static final byte ACK = 2;
 	static final byte MISS = 4;
 
-	static final int HEADER_SIZE = 27;
+	static final int HEADER_SIZE = 19;
 
 	private byte command;
 	private int source;
-	private int destination;
-	private int s_piggyback;
-	private int r_piggyback;// check for integrity (reject duplicates),
-							// piggyback
-
+	private int messageID;
 	private long checksum;
 	private short length;
 	private byte[] payload = new byte[0];
@@ -39,30 +35,24 @@ final class Message {
 		m.payload = payload;
 		m.checksum = m.calculateChecksum(payload);
 		m.source = source;
-		m.s_piggyback = s_piggyback;
+		m.messageID = s_piggyback;
 		return m;
 	}
 
-	static Message ack(int source, int destination, int s_piggyback,
-			int r_piggyback) {
+	static Message ack(int destination,	int r_piggyback) {
 		Message m = new Message();
 		m.command = ACK;
-		m.source = source;
-		m.destination = destination;
-		m.s_piggyback = s_piggyback;
-		m.r_piggyback = r_piggyback;
+		m.source = destination;
+		m.messageID = r_piggyback;
 		return m;
 
 	}
 
-	static Message miss(int source, int destination, int s_piggyback,
-			int r_piggyback) {
+	static Message miss(int destination, int r_piggyback) {
 		Message m = new Message();
 		m.command = MISS;
-		m.source = source;
-		m.destination = destination;
-		m.s_piggyback = s_piggyback;
-		m.r_piggyback = r_piggyback;
+		m.source = destination;
+		m.messageID = r_piggyback;
 		return m;
 	}
 
@@ -72,9 +62,7 @@ final class Message {
 		Message tmp = new Message();
 		tmp.command = buffer.get();
 		tmp.source = buffer.getInt();
-		tmp.destination = buffer.getInt();
-		tmp.s_piggyback = buffer.getInt();
-		tmp.r_piggyback = buffer.getInt();
+		tmp.messageID = buffer.getInt();
 		tmp.checksum = buffer.getLong();
 		tmp.length = buffer.getShort();
 		tmp.payload = (byte[]) Arrays.copyOfRange(buffer.array(), HEADER_SIZE,
@@ -92,9 +80,7 @@ final class Message {
 		ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE + length);
 		buffer.put(command);
 		buffer.putInt(source);
-		buffer.putInt(destination);
-		buffer.putInt(s_piggyback);
-		buffer.putInt(r_piggyback);
+		buffer.putInt(messageID);
 		buffer.putLong(checksum);
 		buffer.putShort(length);
 		buffer.put(payload);
@@ -109,16 +95,8 @@ final class Message {
 		return source;
 	}
 
-	int getDestination() {
-		return destination;
-	}
-
-	int getS_piggyback() {
-		return s_piggyback;
-	}
-
-	int getR_piggyback() {
-		return r_piggyback;
+	int getMessageID() {
+		return messageID;
 	}
 
 	long getChecksum() {
@@ -145,7 +123,7 @@ final class Message {
 	
 	@Override
 	public String toString() {
-		return cmdToText(command) + " " +source + "(" + s_piggyback + ") " + destination + "(" + r_piggyback + ") => " + byteToText(payload);
+		return cmdToText(command) + " " +source + "(" + messageID + ")  => " + byteToText(payload);
 	}
 	
 	private String byteToText(byte[] bytes) {

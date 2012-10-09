@@ -107,18 +107,18 @@ public class RMulticast implements Observer {
 			Peer p = null;
 			if (!peers.containsKey(m.getSource())) {
 				logger.debug("Detected peer " + m.getSource()
-						+ " with piggyback " + (m.getS_piggyback() - 1));
+						+ " with piggyback " + (m.getMessageID() - 1));
 				p = new Peer();
 				p.setHostID(m.getSource());
-				p.setSeenMessageID(m.getS_piggyback() - 1);
-				p.setReceivedMessageID(m.getS_piggyback() - 1);
+				p.setSeenMessageID(m.getMessageID() - 1);
+				p.setReceivedMessageID(m.getMessageID() - 1);
 				peers.put(m.getSource(), p);
 			} else {
 				p = peers.get(m.getSource());
 			}
 
 			int r = p.getReceivedMessageID();
-			int s = m.getS_piggyback();
+			int s = m.getMessageID();
 			if (s > p.getSeenMessageID()) {
 				p.setSeenMessageID(s);
 			}
@@ -141,7 +141,7 @@ public class RMulticast implements Observer {
 
 			} else if (s > r + 1) {
 				logger.debug("Missed message " + (r + 1)
-						+ " detected from peer" + m.getSource());
+						+ " detected from peer " + m.getSource());
 				holdbackQueue.add(m);
 				for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
 					if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
@@ -154,7 +154,7 @@ public class RMulticast implements Observer {
 		case Message.MISS:
 			logger.debug(m.toString());
 			for (Message stored : deliveryQueue) {
-				if (stored.getS_piggyback() == m.getR_piggyback()) {
+				if (stored.getMessageID() == m.getMessageID()) {
 					sendMessage(stored);
 					return;
 				}
@@ -166,7 +166,7 @@ public class RMulticast implements Observer {
 
 	private Message findMessageInHoldbackQueue(int host, int messageID) {
 		for (Message m : holdbackQueue) {
-			if (m.getSource() == host && m.getS_piggyback() == messageID) {
+			if (m.getSource() == host && m.getMessageID() == messageID) {
 				return m;
 			}
 		}
@@ -179,7 +179,7 @@ public class RMulticast implements Observer {
 	}
 
 	private void sendMiss(int peer, int message_id) {
-		Message miss = Message.miss(id, peer, messageCounter.get(), message_id);
+		Message miss = Message.miss(peer, message_id);
 		sendMessage(miss);
 	}
 
