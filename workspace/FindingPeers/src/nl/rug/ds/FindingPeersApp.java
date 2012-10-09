@@ -7,8 +7,8 @@ import java.util.Scanner;
 
 import nl.rug.ds.reliable.RMulticast;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -20,7 +20,7 @@ public class FindingPeersApp {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		BasicConfigurator.configure();
+		PropertyConfigurator.configure("log4j.properties");
 
 		try {
 			InetAddress group = InetAddress.getByName("239.1.2.4");
