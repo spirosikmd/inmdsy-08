@@ -12,8 +12,10 @@ import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.concurrent.TimedSemaphore;
 import org.apache.log4j.Logger;
 
 public class RMulticast implements Observer {
@@ -55,11 +57,14 @@ public class RMulticast implements Observer {
 			peer.setListener(listener);
 
 			Thread sender = new Thread(new Runnable() {
-
+				
+				TimedSemaphore semaphore = new TimedSemaphore(1	, TimeUnit.SECONDS, 10);
+				
 				@Override
 				public void run() {
 					while (true) {
 						try {
+							semaphore.acquire();
 							Message message = peer.sendQueue.take();
 							byte[] data = message.toByte();
 							DatagramPacket outgoingPacket = new DatagramPacket(
