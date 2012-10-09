@@ -101,8 +101,6 @@ public class RMulticast implements Observer {
 		
 		if (m.getSource() == id) return;
 		
-		logger.debug(m.toString());
-
 		switch (m.getCommand()) {
 		case Message.SEND:
 
@@ -154,6 +152,7 @@ public class RMulticast implements Observer {
 			break;
 
 		case Message.MISS:
+			logger.debug(m.toString());
 			for (Message stored : deliveryQueue) {
 				if (stored.getS_piggyback() == m.getR_piggyback()) {
 					sendMessage(stored);
@@ -175,6 +174,7 @@ public class RMulticast implements Observer {
 	}
 
 	private void rdeliver(Message m) {
+		logger.debug(m.toString());
 		logger.debug("R-Deliver message");
 	}
 
