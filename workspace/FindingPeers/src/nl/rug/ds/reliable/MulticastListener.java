@@ -57,6 +57,7 @@ public class MulticastListener extends Observable implements Runnable {
 				}
 			}
 		});
+		listener.setName("Receiver");
 		listener.setDaemon(true);
 		listener.start();
 		

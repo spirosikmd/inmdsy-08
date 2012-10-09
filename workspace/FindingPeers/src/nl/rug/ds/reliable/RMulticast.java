@@ -78,6 +78,7 @@ public class RMulticast implements Observer {
 
 				}
 			});
+			sender.setName("Sender");
 			sender.setDaemon(true);
 			sender.start();
 			

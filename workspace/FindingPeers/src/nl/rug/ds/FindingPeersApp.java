@@ -20,7 +20,7 @@ public class FindingPeersApp {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-
+		Thread.currentThread().setName("Main");
 		PropertyConfigurator.configure("log4j.properties");
 
 		try {
