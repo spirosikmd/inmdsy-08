@@ -58,7 +58,7 @@ public class FindingPeersApp {
 				}
 			} while (alive);
 
-			System.exit(0);
+
 			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
