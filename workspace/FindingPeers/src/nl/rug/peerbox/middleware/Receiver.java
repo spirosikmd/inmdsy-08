@@ -139,7 +139,7 @@ final class Receiver {
 	}
 
 	void sendMiss(int peer, int message_id) {
-		Message miss = Message.miss(peer, message_id);
+		Message miss = Message.nack(peer, message_id);
 		group.sendMessage(miss);
 	}
 	

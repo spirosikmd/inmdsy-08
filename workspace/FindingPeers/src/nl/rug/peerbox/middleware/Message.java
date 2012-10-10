@@ -36,28 +36,31 @@ final class Message {
 		m.command = MESSAGE;
 		m.payload = payload;
 		m.length = (short) m.payload.length;
-		m.checksum = m.calculateChecksum(payload);
+		m.checksum = m.calculateChecksum(m.payload);
 		m.source = source;
 		m.messageID = s_piggyback;
 		return m;
 	}
 
-	static Message ack(int destination, int r_piggyback, int source) {
+	static Message ack(int destination, int messageID, int acknowledger) {
 		Message m = new Message();
 		m.command = ACK;
 		m.source = destination;
-		m.messageID = r_piggyback;
-		m.payload = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(source).array();
+		m.messageID = messageID;
+		m.payload = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(acknowledger).array();
 		m.length = (short)m.payload.length;
+		m.checksum = m.calculateChecksum(m.payload);
 		return m;
 
 	}
 
-	static Message miss(int destination, int r_piggyback) {
+	static Message nack(int destination, int messageID) {
 		Message m = new Message();
 		m.command = NACK;
 		m.source = destination;
-		m.messageID = r_piggyback;
+		m.messageID = messageID;
+		m.length = (short)m.payload.length;
+		m.checksum = m.calculateChecksum(m.payload);
 		return m;
 	}
 
@@ -81,12 +84,13 @@ final class Message {
 		return tmp;
 	}
 
+
 	byte[] toByte() {
 		ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE + length);
 		buffer.put(command);
 		buffer.putInt(source);
 		buffer.putInt(messageID);
-		buffer.putLong(checksum);
+		buffer.putLong(calculateChecksum(payload));
 		buffer.putShort(length);
 		buffer.put(payload);
 		return buffer.array();
