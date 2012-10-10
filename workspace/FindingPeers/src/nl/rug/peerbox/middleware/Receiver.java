@@ -98,13 +98,13 @@ final class Receiver {
 
 			if (s == r + 1) {
 				logger.debug("Received: " + m.toString());
-				p.setReceivedMessageID(++r);
-				sendAck(m);
 				
+				p.setReceivedMessageID(++r);
+				
+				group.sendMessage(m);
 				group.rdeliver(m);
 
-				Message stored = findMessageInHoldbackQueue(p.getHostID(),
-						s + 1);
+				Message stored = findMessageInHoldbackQueue(p.getHostID(),	s + 1);
 				if (stored != null) {
 					holdbackQueue.remove(stored);
 					receiveMessage(stored);

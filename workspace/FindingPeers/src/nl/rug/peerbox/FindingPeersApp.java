@@ -8,8 +8,8 @@ import java.util.Scanner;
 import nl.rug.peerbox.middleware.MulticastGroup;
 import nl.rug.peerbox.middleware.RMulticastGroup;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -24,8 +24,8 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		BasicConfigurator.configure();
-		// PropertyConfigurator.configure("log4j.properties");
+		//BasicConfigurator.configure();
+		PropertyConfigurator.configure("log4j.properties");
 
 		try {
 			InetAddress address = InetAddress.getByName("239.1.2.4");
