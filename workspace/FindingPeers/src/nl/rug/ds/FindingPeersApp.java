@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import nl.rug.ds.middleware.RMulticast;
+import nl.rug.ds.middleware.RMulticastGroup;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -30,7 +30,7 @@ public class FindingPeersApp {
 			logger.info(" (m)Starting app to find peers in group "
 					+ group.getHostAddress() + ":" + port);
 
-			RMulticast peer = RMulticast.createPeer(group, port);
+			RMulticastGroup peer = RMulticastGroup.createPeer(group, port);
 
 			String message;
 			Scanner scanner = new Scanner(System.in);
