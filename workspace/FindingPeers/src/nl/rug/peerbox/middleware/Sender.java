@@ -2,10 +2,10 @@ package nl.rug.peerbox.middleware;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.concurrent.TimedSemaphore;
@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 final class Sender {
 
-	private final List<Message> sentMessagesList = new CopyOnWriteArrayList<Message>();
+	private final Queue<Message> sentMessagesList = new ConcurrentLinkedQueue<Message>();
 	private final BlockingQueue<Message> waitingForSendQueue = new ArrayBlockingQueue<Message>(
 			1024);
 	private final TimedSemaphore semaphore = new TimedSemaphore(100,
@@ -64,6 +64,7 @@ final class Sender {
 				logger.debug("Sender stopped");
 			}
 		});
+		thread.setDaemon(true);
 		thread.setName("Sender");
 		thread.start();
 	}

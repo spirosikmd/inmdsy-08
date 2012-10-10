@@ -1,50 +1,74 @@
 package nl.rug.peerbox.middleware;
 
 import java.net.DatagramPacket;
-import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-final class Receiver implements Runnable {
-	
+import org.apache.log4j.Logger;
+
+final class Receiver {
+
+	private final static Logger logger = Logger.getLogger(Receiver.class);
+
+	private final Queue<Message> holdbackQueue = new ConcurrentLinkedQueue<Message>();
 	private final BlockingQueue<DatagramPacket> receivedDataQueue = new ArrayBlockingQueue<DatagramPacket>(
 			1024);
+
 	private RMulticastGroup group;
-	private List<Message> holdbackQueue = new CopyOnWriteArrayList<Message>();
 
 	public Receiver(RMulticastGroup group) {
 		this.group = group;
 	}
 
-	@Override
-	public void run() {
-		while (true) {
-			try {
-				DatagramPacket data = receivedDataQueue.take();
-				receiveMessage(data.getData());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+	private volatile boolean alive = true;
+	private Thread thread;
+
+	void start() {
+		thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (alive) {
+					try {
+						DatagramPacket data = receivedDataQueue.take();
+						processMessage(data.getData());
+					} catch (InterruptedException e) {
+						logger.debug("Receiver interrupted");
+					}
+				}
+				logger.debug("Receiver stopped");
 			}
-		}
+
+		});
+		thread.setDaemon(true);
+		thread.setName("Receiver");
+		thread.start();
 	}
-	
+
+	void shutdown() {
+		logger.debug("Stop Receiver Thread");
+		alive = false;
+		thread.interrupt();
+	}
+
 	void pushDataPacket(DatagramPacket dp) {
 		if (!receivedDataQueue.offer(dp)) {
-			RMulticastGroup.logger.equals("Incoming Blockingqueue is full");
+			logger.equals("Incoming Blockingqueue is full");
 		}
 	}
-	
-	private void receiveMessage(byte[] bytes) {
+
+	private void processMessage(byte[] bytes) {
 		Message m = null;
 		try {
 			m = Message.fromByte(bytes);
 			receiveMessage(m);
 		} catch (ChecksumFailedException e) {
-			RMulticastGroup.logger.warn("Checksum failed");
+			logger.warn("Checksum failed");
 		}
 	}
-	
+
 	private void receiveMessage(Message m) {
 
 		switch (m.getCommand()) {
@@ -55,7 +79,7 @@ final class Receiver implements Runnable {
 
 			Peer p = null;
 			if (!group.getPeers().containsKey(m.getSource())) {
-				RMulticastGroup.logger.debug("Detected group " + m.getSource()
+				logger.debug("Detected group " + m.getSource()
 						+ " with piggyback " + (m.getMessageID() - 1));
 				p = new Peer();
 				p.setHostID(m.getSource());
@@ -73,9 +97,10 @@ final class Receiver implements Runnable {
 			}
 
 			if (s == r + 1) {
-				RMulticastGroup.logger.debug("Received: " + m.toString());
+				logger.debug("Received: " + m.toString());
 				p.setReceivedMessageID(++r);
-				group.sendMessage(m);
+				sendAck(m);
+				
 				group.rdeliver(m);
 
 				Message stored = findMessageInHoldbackQueue(p.getHostID(),
@@ -86,26 +111,36 @@ final class Receiver implements Runnable {
 				}
 
 			} else if (s > r + 1) {
-				RMulticastGroup.logger.debug("Received: " + m.toString());
-				RMulticastGroup.logger.debug("Missed message " + (r + 1)
+				logger.debug("Received: " + m.toString());
+				logger.debug("Missed message " + (r + 1)
 						+ " detected from group " + m.getSource());
 				holdbackQueue.add(m);
 				for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
 					if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
-						group.sendMiss(m.getSource(), missedID);
+						sendMiss(m.getSource(), missedID);
 					}
 				}
-			} else {
-				RMulticastGroup.logger.debug("Discarded duplicate: " + m.toString());
+			} else if (s <= r) {
+				logger.debug("Discarded duplicate: " + m.toString());
 			}
 			break;
 
 		case Message.NACK:
 			if (m.getSource() != group.getId())
 				return;
-			RMulticastGroup.logger.debug(m.toString());
+			logger.debug(m.toString());
 			group.getSender().resendMessage(m.getMessageID());
 		}
+	}
+
+	private void sendAck(Message m) {
+		Message ack = Message.ack(m.getSource(), m.getMessageID(), group.getId());
+		group.sendMessage(ack);
+	}
+
+	void sendMiss(int peer, int message_id) {
+		Message miss = Message.miss(peer, message_id);
+		group.sendMessage(miss);
 	}
 	
 	private Message findMessageInHoldbackQueue(int host, int messageID) {

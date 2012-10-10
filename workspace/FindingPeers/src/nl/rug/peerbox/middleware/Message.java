@@ -34,8 +34,8 @@ final class Message {
 	static Message send(int source, int s_piggyback, byte[] payload) {
 		Message m = new Message();
 		m.command = MESSAGE;
-		m.length = (short) payload.length;
 		m.payload = payload;
+		m.length = (short) m.payload.length;
 		m.checksum = m.calculateChecksum(payload);
 		m.source = source;
 		m.messageID = s_piggyback;
@@ -48,6 +48,7 @@ final class Message {
 		m.source = destination;
 		m.messageID = r_piggyback;
 		m.payload = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(source).array();
+		m.length = (short)m.payload.length;
 		return m;
 
 	}

@@ -16,14 +16,14 @@ final class Listener {
 		this.group = group;
 	}
 
-	void startListener() {
+	void start() {
+		
 		Thread listenerThread = new Thread(new Runnable() {
 
 			public void run() {
 				try {
 
-					RMulticastGroup.logger
-							.info("Start listening for incoming packages");
+					logger.info("Start listening for incoming packages");
 					while (!Thread.interrupted()) {
 						DatagramPacket incoming = new DatagramPacket(
 								new byte[Message.MAX_MESSAGE_SIZE],
@@ -34,13 +34,14 @@ final class Listener {
 
 				} catch (SocketException se) {
 					// shutdown listener, but actually nothing to do
-					logger.debug("Stopped incoming packages listener");
+					logger.debug("Stopped listening for incoming packages");
 				} catch (IOException ioe) {
 					logger.error(ioe);
 				}
+				logger.debug("Listener stopped");
 			}
 		});
-		
+		listenerThread.setDaemon(true);
 		listenerThread.setName("Listener");
 		listenerThread.start();
 	}

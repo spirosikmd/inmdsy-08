@@ -8,8 +8,8 @@ import java.util.Scanner;
 import nl.rug.peerbox.middleware.MulticastGroup;
 import nl.rug.peerbox.middleware.RMulticastGroup;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -23,7 +23,9 @@ public class FindingPeersApp {
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 		Thread.currentThread().setName("Main");
-		PropertyConfigurator.configure("log4j.properties");
+
+		BasicConfigurator.configure();
+		// PropertyConfigurator.configure("log4j.properties");
 
 		try {
 			InetAddress address = InetAddress.getByName("239.1.2.4");
@@ -39,24 +41,24 @@ public class FindingPeersApp {
 			boolean alive = true;
 			do {
 				message = scanner.nextLine();
-				if ("close".equals(message)) {
-					alive = false;
+				if ("shutdown".equals(message)) {
 					group.shutdown();
-					logger.info("Stop mgroup");
+				} else if ("close".equals(message)) {
+					alive=false;
+					scanner.close();
+					System.exit(0);
+				} else if ("threads".equals(message)) {
+					Thread.currentThread().getThreadGroup().list();
 				} else if ("list".equals(message)) {
 					System.out.println("List all the files");
 				} else if ("test".equals(message)) {
 					for (int i = 0; i < 100; i++) {
 						group.sendMessage(String.valueOf(i).getBytes());
-						Thread.sleep(10);
 					}
 				} else {
 					group.sendMessage(message.getBytes());
 				}
 			} while (alive);
-			scanner.close();
-			
-			Thread.currentThread().getThreadGroup().list();
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

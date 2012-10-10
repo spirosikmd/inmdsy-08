@@ -17,9 +17,11 @@ public class RMulticastGroup implements MulticastGroup {
 	
 	private final int port;
 	private final InetAddress address;
-	private final MulticastSocket socket;
+	
 	private final HashMap<Integer, Peer> peers = new HashMap<Integer, Peer>();
+	
 	private Sender sender;
+	private MulticastSocket socket;
 	private Receiver receiver;
 	private Listener listener;
 	
@@ -44,13 +46,8 @@ public class RMulticastGroup implements MulticastGroup {
 			
 						
 			group.sender.start();
-			
-			Thread receiverThread = new Thread(group.receiver);
-			receiverThread.setName("Receiver");
-			receiverThread.setDaemon(true);
-			receiverThread.start();
-			
-			group.listener.startListener();
+			group.receiver.start();
+			group.listener.start();
 			
 			return group;
 
@@ -75,12 +72,6 @@ public class RMulticastGroup implements MulticastGroup {
 		sender.pushMessage(outgoing);
 	}
 	
-	void sendMiss(int peer, int message_id) {
-		Message miss = Message.miss(peer, message_id);
-		sendMessage(miss);
-	}
-
-
 	void rdeliver(Message m) {
 		logger.debug("Consumed: " + m.toString());
 	}
@@ -116,6 +107,7 @@ public class RMulticastGroup implements MulticastGroup {
 	@Override
 	public void shutdown() {
 		logger.debug("Shutdown Multicast group");
+		receiver.shutdown();
 		sender.shutdown();
 		
 		try {
@@ -125,7 +117,6 @@ public class RMulticastGroup implements MulticastGroup {
 		} finally {
 			socket.close();
 		}
-		
 		
 	}
 }
