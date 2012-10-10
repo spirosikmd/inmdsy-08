@@ -1,11 +1,11 @@
-package nl.rug.ds;
+package nl.rug.peerbox;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import nl.rug.ds.middleware.RMulticastGroup;
+import nl.rug.peerbox.middleware.RMulticastGroup;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;

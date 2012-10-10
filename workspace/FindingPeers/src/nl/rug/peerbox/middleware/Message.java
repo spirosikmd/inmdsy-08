@@ -1,4 +1,4 @@
-package nl.rug.ds.middleware;
+package nl.rug.peerbox.middleware;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

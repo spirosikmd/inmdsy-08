@@ -1,4 +1,4 @@
-package nl.rug.ds.middleware;
+package nl.rug.peerbox.middleware;
 
 public interface MulticastGroup {
 
