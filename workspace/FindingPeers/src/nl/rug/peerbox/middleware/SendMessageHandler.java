@@ -3,11 +3,11 @@ package nl.rug.peerbox.middleware;
 class SendMessageHandler extends MessageHandler {
 	
 	static {
-		MessageHandler.register(Message.MESSAGE, new SendMessageHandler());
+		MessageHandler.register(MulticastMessage.MESSAGE, new SendMessageHandler());
 	}
 	
 	@Override
-	void processMessage(Message m) {
+	void processMessage(MulticastMessage m) {
 		
 	}
 }

@@ -26,8 +26,8 @@ final class Listener {
 					logger.info("Start listening for incoming packages");
 					while (!Thread.interrupted()) {
 						DatagramPacket incoming = new DatagramPacket(
-								new byte[Message.MAX_MESSAGE_SIZE],
-								Message.MAX_MESSAGE_SIZE);
+								new byte[MulticastMessage.MAX_MESSAGE_SIZE],
+								MulticastMessage.MAX_MESSAGE_SIZE);
 						group.getSocket().receive(incoming);
 						group.getReceiver().pushDataPacket(incoming);
 					}

@@ -13,8 +13,8 @@ import org.apache.log4j.Logger;
 
 final class Sender {
 
-	private final Queue<Message> sentMessagesList = new ConcurrentLinkedQueue<Message>();
-	private final BlockingQueue<Message> waitingForSendQueue = new ArrayBlockingQueue<Message>(
+	private final Queue<MulticastMessage> sentMessagesList = new ConcurrentLinkedQueue<MulticastMessage>();
+	private final BlockingQueue<MulticastMessage> waitingForSendQueue = new ArrayBlockingQueue<MulticastMessage>(
 			1024);
 	private final TimedSemaphore semaphore = new TimedSemaphore(100,
 			TimeUnit.MILLISECONDS, 1);
@@ -39,7 +39,7 @@ final class Sender {
 						// limit bandwidth
 						semaphore.acquire();
 						// get message from queue, if no message in queue wait
-						Message message = waitingForSendQueue.take();
+						MulticastMessage message = waitingForSendQueue.take();
 
 						RMulticastGroup.logger.debug("Send: " + message);
 
@@ -49,7 +49,7 @@ final class Sender {
 								group.getPort());
 
 						group.getSocket().send(outgoingPacket);
-						if (message.getCommand() == Message.MESSAGE) {
+						if (message.getCommand() == MulticastMessage.MESSAGE) {
 							if (!sentMessagesList.contains(message)) {
 								sentMessagesList.add(message);
 							}
@@ -76,7 +76,7 @@ final class Sender {
 	}
 
 	void resendMessage(int messageID) {
-		for (Message stored : sentMessagesList) {
+		for (MulticastMessage stored : sentMessagesList) {
 			if (stored.getMessageID() == messageID) {
 				pushMessage(stored);
 				return;
@@ -84,7 +84,7 @@ final class Sender {
 		}
 	}
 
-	void pushMessage(Message toBeDeliverd) {
+	void pushMessage(MulticastMessage toBeDeliverd) {
 		try {
 			if (!waitingForSendQueue.contains(toBeDeliverd)) {
 				waitingForSendQueue.put(toBeDeliverd);

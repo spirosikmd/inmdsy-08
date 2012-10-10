@@ -14,7 +14,7 @@ final class Receiver {
 
 	private final static Logger logger = Logger.getLogger(Receiver.class);
 
-	private final Queue<Message> holdbackQueue = new ConcurrentLinkedQueue<Message>();
+	private final Queue<MulticastMessage> holdbackQueue = new ConcurrentLinkedQueue<MulticastMessage>();
 	private final BlockingQueue<DatagramPacket> receivedDataQueue = new ArrayBlockingQueue<DatagramPacket>(
 			RECEIVE_QUEUE_SIZE);
 
@@ -62,34 +62,34 @@ final class Receiver {
 	}
 
 	private void processMessage(byte[] bytes) {
-		Message m = null;
+		MulticastMessage m = null;
 		try {
-			m = Message.fromByte(bytes);
+			m = MulticastMessage.fromByte(bytes);
 			receiveMessage(m);
 		} catch (ChecksumFailedException e) {
 			logger.warn("Checksum failed");
 		}
 	}
 
-	private void receiveMessage(Message m) {
+	private void receiveMessage(MulticastMessage m) {
 
 		switch (m.getCommand()) {
-		case Message.MESSAGE:
+		case MulticastMessage.MESSAGE:
 
-			if (m.getSource() == group.getPeerId())
+			if (m.getPeerID() == group.getPeerId())
 				return;
 
 			Peer p = null;
-			if (!group.getPeers().containsKey(m.getSource())) {
-				logger.debug("Detected group " + m.getSource()
+			if (!group.getPeers().containsKey(m.getPeerID())) {
+				logger.debug("Detected group " + m.getPeerID()
 						+ " with piggyback " + (m.getMessageID() - 1));
 				p = new Peer();
-				p.setHostID(m.getSource());
+				p.setHostID(m.getPeerID());
 				p.setSeenMessageID(m.getMessageID() - 1);
 				p.setReceivedMessageID(m.getMessageID() - 1);
-				group.getPeers().put(m.getSource(), p);
+				group.getPeers().put(m.getPeerID(), p);
 			} else {
-				p = group.getPeers().get(m.getSource());
+				p = group.getPeers().get(m.getPeerID());
 			}
 
 			int r = p.getReceivedMessageID();
@@ -102,12 +102,10 @@ final class Receiver {
 				logger.debug("Received: " + m.toString());
 
 				p.setReceivedMessageID(++r);
-
-				// group.sendMessage(m);
-				sendAck(m);
+				//sendAck(m);
 				group.rdeliver(m);
 
-				Message stored = findMessageInHoldbackQueue(p.getHostID(),
+				MulticastMessage stored = findMessageInHoldbackQueue(p.getHostID(),
 						s + 1);
 				if (stored != null) {
 					holdbackQueue.remove(stored);
@@ -117,11 +115,11 @@ final class Receiver {
 			} else if (s > r + 1) {
 				logger.debug("Received: " + m.toString());
 				logger.debug("Missed message " + (r + 1)
-						+ " detected from group " + m.getSource());
+						+ " detected from group " + m.getPeerID());
 				holdbackQueue.add(m);
 				for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
 					if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
-						sendMiss(m.getSource(), missedID);
+						sendMiss(m.getPeerID(), missedID);
 					}
 				}
 			} else if (s <= r) {
@@ -129,34 +127,28 @@ final class Receiver {
 			}
 			break;
 
-		case Message.NACK:
-			if (m.getSource() != group.getPeerId())
+		case MulticastMessage.NACK:
+			if (m.getPeerID() != group.getPeerId())
 				return;
 			logger.debug(m.toString());
 			group.getSender().resendMessage(m.getMessageID());
 
-		case Message.ACK:
-			if (m.getSource() != group.getPeerId()) {
+		case MulticastMessage.ACK:
+			if (m.getPeerID() != group.getPeerId()) {
 				logger.debug("Acked: " + m.toString());
 			}
 			
 		}
 	}
 
-	private void sendAck(Message m) {
-		Message ack = Message.ack(m.getSource(), m.getMessageID(),
-				group.getPeerId());
-		group.sendMessage(ack);
-	}
-
 	void sendMiss(int peer, int message_id) {
-		Message miss = Message.nack(peer, message_id);
+		MulticastMessage miss = MulticastMessage.nack(peer, message_id);
 		group.sendMessage(miss);
 	}
 
-	private Message findMessageInHoldbackQueue(int host, int messageID) {
-		for (Message m : holdbackQueue) {
-			if (m.getSource() == host && m.getMessageID() == messageID) {
+	private MulticastMessage findMessageInHoldbackQueue(int host, int messageID) {
+		for (MulticastMessage m : holdbackQueue) {
+			if (m.getPeerID() == host && m.getMessageID() == messageID) {
 				return m;
 			}
 		}

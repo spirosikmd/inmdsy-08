@@ -53,10 +53,10 @@ public class FindingPeersApp {
 					System.out.println("List all the files");
 				} else if ("test".equals(message)) {
 					for (int i = 0; i < 100; i++) {
-						group.sendMessage(String.valueOf(i).getBytes());
+						group.announce(String.valueOf(i).getBytes());
 					}
 				} else {
-					group.sendMessage(message.getBytes());
+					group.announce(message.getBytes());
 				}
 			} while (alive);
 
@@ -65,8 +65,8 @@ public class FindingPeersApp {
 		}
 	}
 	/*
-	 * public void sendObject(Serializable object) { Message outgoing = new
-	 * Message(); synchronized (this) { outgoing.setNumber(++messageCounter); }
+	 * public void sendObject(Serializable object) { MulticastMessage outgoing = new
+	 * MulticastMessage(); synchronized (this) { outgoing.setNumber(++messageCounter); }
 	 * outgoing.setSource(id); outgoing.setPayload(object);
 	 * outgoing.setCommand(Command.SEND);
 	 * 

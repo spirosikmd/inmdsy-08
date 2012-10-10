@@ -10,9 +10,9 @@ abstract class MessageHandler {
 		handler.put(messagetype, mh);
 	}
 	
-	static void handle(Message m) {
+	static void handle(MulticastMessage m) {
 		handler.get(m.getCommand()).processMessage(m);
 	}
 	
-	abstract void processMessage(Message m);
+	abstract void processMessage(MulticastMessage m);
 }

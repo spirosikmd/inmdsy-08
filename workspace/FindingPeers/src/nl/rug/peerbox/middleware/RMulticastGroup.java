@@ -58,21 +58,23 @@ public class RMulticastGroup implements MulticastGroup {
 	}
 
 	
-	public void sendMessage(byte[] payload) {
+	public void announce(byte[] payload) {
 		
-		if (payload.length > Message.MAX_PAYLOAD_SIZE) {
+		if (payload.length > MulticastMessage.MAX_PAYLOAD_SIZE) {
 			throw new RuntimeException("Payload too large");
 		}
-		Message outgoing = Message.send(id, messageCounter.incrementAndGet(),
+		MulticastMessage outgoing = MulticastMessage.send(id, messageCounter.incrementAndGet(),
 				payload);
 		sendMessage(outgoing);
 	}
 
-	void sendMessage(Message outgoing) {
+	void sendMessage(MulticastMessage outgoing) {
 		sender.pushMessage(outgoing);
 	}
 	
-	void rdeliver(Message m) {
+	void rdeliver(MulticastMessage m) {
+		//iterate over listerners and spawn new thread
+		//call  receivedMessage on listener
 		logger.debug("Consumed: " + m.toString());
 	}
 
@@ -118,5 +120,10 @@ public class RMulticastGroup implements MulticastGroup {
 			socket.close();
 		}
 		
+	}
+
+	@Override
+	public void addMessageListener(MessageListener ml) {
+		// TODO Auto-generated method stub
 	}
 }
