@@ -11,9 +11,6 @@ import org.apache.log4j.Logger;
 
 public class RMulticastGroup implements MulticastGroup {
 	
-	static final int MAX_MESSAGE_SIZE = 4069;
-	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - Message.HEADER_SIZE;
-
 	static Logger logger = Logger.getLogger(RMulticastGroup.class);
 
 	private final int id = new Random().nextInt(Integer.MAX_VALUE);
@@ -24,6 +21,7 @@ public class RMulticastGroup implements MulticastGroup {
 	private final HashMap<Integer, Peer> peers = new HashMap<Integer, Peer>();
 	private Sender sender;
 	private Receiver receiver;
+	private Listener listener;
 	
 	private final AtomicInteger messageCounter = new AtomicInteger(0);
 
@@ -33,7 +31,7 @@ public class RMulticastGroup implements MulticastGroup {
 		this.socket = socket;
 	}
 
-	public static RMulticastGroup createPeer(InetAddress address, int port) {
+	public static MulticastGroup createPeer(InetAddress address, int port) {
 		try {
 			MulticastSocket socket = new MulticastSocket(port);
 			socket.setTimeToLive(5);
@@ -42,22 +40,17 @@ public class RMulticastGroup implements MulticastGroup {
 			final RMulticastGroup group = new RMulticastGroup(address, port, socket);
 			group.sender = new Sender(group);
 			group.receiver = new Receiver(group);
+			group.listener = new Listener(group);
 			
 						
-			Thread senderThread = new Thread(group.sender);
-			senderThread.setName("Sender");
-			senderThread.setDaemon(true);
-			senderThread.start();
+			group.sender.start();
 			
 			Thread receiverThread = new Thread(group.receiver);
 			receiverThread.setName("Receiver");
 			receiverThread.setDaemon(true);
 			receiverThread.start();
 			
-			Thread listener = new Thread(new Listener(group));
-			listener.setName("Listener");
-			listener.setDaemon(true);
-			listener.start();
+			group.listener.startListener();
 			
 			return group;
 
@@ -70,7 +63,7 @@ public class RMulticastGroup implements MulticastGroup {
 	
 	public void sendMessage(byte[] payload) {
 		
-		if (payload.length > MAX_PAYLOAD_SIZE) {
+		if (payload.length > Message.MAX_PAYLOAD_SIZE) {
 			throw new RuntimeException("Payload too large");
 		}
 		Message outgoing = Message.send(id, messageCounter.incrementAndGet(),
@@ -118,5 +111,21 @@ public class RMulticastGroup implements MulticastGroup {
 	
 	public HashMap<Integer, Peer> getPeers() {
 		return peers;
+	}
+
+	@Override
+	public void shutdown() {
+		logger.debug("Shutdown Multicast group");
+		sender.shutdown();
+		
+		try {
+			socket.leaveGroup(address);
+		} catch (IOException e) {
+			logger.error(e);
+		} finally {
+			socket.close();
+		}
+		
+		
 	}
 }

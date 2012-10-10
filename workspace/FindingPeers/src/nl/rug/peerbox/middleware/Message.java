@@ -17,13 +17,16 @@ final class Message {
 	static final byte NACK = 4;
 
 	static final int HEADER_SIZE = 19;
-
+	static final int MAX_MESSAGE_SIZE = 4069;
+	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
+	
 	private byte command;
 	private int source;
 	private int messageID;
 	private long checksum;
 	private short length;
 	private byte[] payload = new byte[0];
+
 
 	private Message() {
 	}
@@ -39,11 +42,12 @@ final class Message {
 		return m;
 	}
 
-	static Message ack(int destination, int r_piggyback) {
+	static Message ack(int destination, int r_piggyback, int source) {
 		Message m = new Message();
 		m.command = ACK;
 		m.source = destination;
 		m.messageID = r_piggyback;
+		m.payload = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(source).array();
 		return m;
 
 	}

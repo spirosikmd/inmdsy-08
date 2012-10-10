@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import nl.rug.peerbox.middleware.MulticastGroup;
 import nl.rug.peerbox.middleware.RMulticastGroup;
 
 import org.apache.log4j.Logger;
@@ -17,40 +18,45 @@ public class FindingPeersApp {
 	/**
 	 * @param args
 	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException,
+			InterruptedException {
 		Thread.currentThread().setName("Main");
 		PropertyConfigurator.configure("log4j.properties");
 
 		try {
-			InetAddress group = InetAddress.getByName("239.1.2.4");
+			InetAddress address = InetAddress.getByName("239.1.2.4");
 			int port = 1567;
 
 			logger.info(" (m)Starting app to find peers in group "
-					+ group.getHostAddress() + ":" + port);
+					+ address.getHostAddress() + ":" + port);
 
-			RMulticastGroup peer = RMulticastGroup.createPeer(group, port);
+			MulticastGroup group = RMulticastGroup.createPeer(address, port);
 
 			String message;
 			Scanner scanner = new Scanner(System.in);
-
+			boolean alive = true;
 			do {
 				message = scanner.nextLine();
 				if ("close".equals(message)) {
-					break;
+					alive = false;
+					group.shutdown();
+					logger.info("Stop mgroup");
 				} else if ("list".equals(message)) {
 					System.out.println("List all the files");
 				} else if ("test".equals(message)) {
-					for (int i = 0 ; i < 100 ; i++) {
-						peer.sendMessage(String.valueOf(i).getBytes());
+					for (int i = 0; i < 100; i++) {
+						group.sendMessage(String.valueOf(i).getBytes());
 						Thread.sleep(10);
 					}
 				} else {
-					peer.sendMessage(message.getBytes());
+					group.sendMessage(message.getBytes());
 				}
-			} while (true);
+			} while (alive);
 			scanner.close();
+			
+			Thread.currentThread().getThreadGroup().list();
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
