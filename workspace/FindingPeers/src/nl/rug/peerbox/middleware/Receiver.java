@@ -10,11 +10,13 @@ import org.apache.log4j.Logger;
 
 final class Receiver {
 
+	private static final int RECEIVE_QUEUE_SIZE = 1024;
+
 	private final static Logger logger = Logger.getLogger(Receiver.class);
 
 	private final Queue<Message> holdbackQueue = new ConcurrentLinkedQueue<Message>();
 	private final BlockingQueue<DatagramPacket> receivedDataQueue = new ArrayBlockingQueue<DatagramPacket>(
-			1024);
+			RECEIVE_QUEUE_SIZE);
 
 	private RMulticastGroup group;
 
@@ -74,7 +76,7 @@ final class Receiver {
 		switch (m.getCommand()) {
 		case Message.MESSAGE:
 
-			if (m.getSource() == group.getId())
+			if (m.getSource() == group.getPeerId())
 				return;
 
 			Peer p = null;
@@ -98,9 +100,11 @@ final class Receiver {
 
 			if (s == r + 1) {
 				logger.debug("Received: " + m.toString());
+
 				p.setReceivedMessageID(++r);
+
+				// group.sendMessage(m);
 				sendAck(m);
-				
 				group.rdeliver(m);
 
 				Message stored = findMessageInHoldbackQueue(p.getHostID(),
@@ -126,15 +130,22 @@ final class Receiver {
 			break;
 
 		case Message.NACK:
-			if (m.getSource() != group.getId())
+			if (m.getSource() != group.getPeerId())
 				return;
 			logger.debug(m.toString());
 			group.getSender().resendMessage(m.getMessageID());
+
+		case Message.ACK:
+			if (m.getSource() != group.getPeerId()) {
+				logger.debug("Acked: " + m.toString());
+			}
+			
 		}
 	}
 
 	private void sendAck(Message m) {
-		Message ack = Message.ack(m.getSource(), m.getMessageID(), group.getId());
+		Message ack = Message.ack(m.getSource(), m.getMessageID(),
+				group.getPeerId());
 		group.sendMessage(ack);
 	}
 
@@ -142,7 +153,7 @@ final class Receiver {
 		Message miss = Message.nack(peer, message_id);
 		group.sendMessage(miss);
 	}
-	
+
 	private Message findMessageInHoldbackQueue(int host, int messageID) {
 		for (Message m : holdbackQueue) {
 			if (m.getSource() == host && m.getMessageID() == messageID) {

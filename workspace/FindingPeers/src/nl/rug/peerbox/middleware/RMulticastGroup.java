@@ -88,7 +88,7 @@ public class RMulticastGroup implements MulticastGroup {
 		return port;
 	}
 
-	public  int getId() {
+	public  int getPeerId() {
 		return id;
 	}
 	
