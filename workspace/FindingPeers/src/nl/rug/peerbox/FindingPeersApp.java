@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.middleware.MulticastGroup;
 import nl.rug.peerbox.middleware.RMulticastGroup;
 
@@ -24,51 +25,50 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		//BasicConfigurator.configure();
+		// BasicConfigurator.configure();
 		PropertyConfigurator.configure("log4j.properties");
 
 		try {
 			InetAddress address = InetAddress.getByName("239.1.2.4");
 			int port = 1567;
 
-			logger.info(" (m)Starting app to find peers in group "
+			logger.info("Starting app to find peers in group "
 					+ address.getHostAddress() + ":" + port);
-
-			MulticastGroup group = RMulticastGroup.createPeer(address, port);
+			Peerbox peerbox = new Peerbox(address, port);
+			peerbox.join();
 
 			String message;
 			Scanner scanner = new Scanner(System.in);
 			boolean alive = true;
 			do {
 				message = scanner.nextLine();
-				if ("shutdown".equals(message)) {
-					group.shutdown();
-				} else if ("close".equals(message)) {
-					alive=false;
+				if ("leave".equals(message)) {
+					peerbox.leave();
+					alive = false;
 					scanner.close();
-					System.exit(0);
+
 				} else if ("threads".equals(message)) {
 					Thread.currentThread().getThreadGroup().list();
 				} else if ("list".equals(message)) {
-					System.out.println("List all the files");
+					peerbox.listFiles();
+				} else if ("get".equals(message)) {
+					peerbox.getFile(1);
 				} else if ("test".equals(message)) {
-					for (int i = 0; i < 100; i++) {
-						group.announce(String.valueOf(i).getBytes());
-					}
-				} else {
-					group.announce(message.getBytes());
+					peerbox.testBulkData();
 				}
 			} while (alive);
 
+			System.exit(0);
+			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 	}
 	/*
-	 * public void sendObject(Serializable object) { MulticastMessage outgoing = new
-	 * MulticastMessage(); synchronized (this) { outgoing.setNumber(++messageCounter); }
-	 * outgoing.setSource(id); outgoing.setPayload(object);
-	 * outgoing.setCommand(Command.SEND);
+	 * public void sendObject(Serializable object) { MulticastMessage outgoing =
+	 * new MulticastMessage(); synchronized (this) {
+	 * outgoing.setNumber(++messageCounter); } outgoing.setSource(id);
+	 * outgoing.setPayload(object); outgoing.setCommand(Command.SEND);
 	 * 
 	 * try { ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	 * ObjectOutputStream os = new ObjectOutputStream(baos);
