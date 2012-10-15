@@ -45,6 +45,12 @@ public class FindingPeersApp {
 			boolean alive = true;
 			do {
 				message = scanner.nextLine();
+				String[] parts = message.split(" ");
+				String command = parts[0];
+				String arg  = "";
+				if (parts.length == 2) {
+					arg = parts[1];
+				}
 				if ("leave".equals(message)) {
 					peerbox.leave();
 					alive = false;
@@ -55,8 +61,8 @@ public class FindingPeersApp {
 					peerbox.listFiles();
 				} else if ("request".equals(message)) {
 					peerbox.requestFiles();
-				} else if ("get".equals(message)) {
-					peerbox.getFile(1);
+				} else if ("get".equals(command)) {
+					peerbox.getFile(arg);
 				} else if ("test".equals(message)) {
 					peerbox.testBulkData();
 				}
