@@ -60,32 +60,5 @@ public class FindingPeersApp {
 			e.printStackTrace();
 		}
 	}
-	/*
-	 * public void sendObject(Serializable object) { MulticastMessage outgoing =
-	 * new MulticastMessage(); synchronized (this) {
-	 * outgoing.setNumber(++messageCounter); } outgoing.setSource(id);
-	 * outgoing.setPayload(object); outgoing.setCommand(Command.SEND);
-	 * 
-	 * try { ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	 * ObjectOutputStream os = new ObjectOutputStream(baos);
-	 * os.writeObject(outgoing); byte[] data = baos.toByteArray(); long checksum
-	 * = calculateChecksum(data);
-	 * 
-	 * if (data.length > MAX_PAYLOAD_SIZE) { throw new
-	 * RuntimeException("Payload too large"); }
-	 * 
-	 * ByteBuffer tmpBuffer = ByteBuffer.allocate(MAX_MESSAGE_SIZE);
-	 * tmpBuffer.putLong(checksum); tmpBuffer.putShort((short) data.length);
-	 * tmpBuffer.put(data);
-	 * 
-	 * byte[] completeMessage = tmpBuffer.array(); DatagramPacket outgoingPacket
-	 * = new DatagramPacket(completeMessage, MAX_MESSAGE_SIZE, group, port);
-	 * 
-	 * socket.send(outgoingPacket); } catch (IOException e) {
-	 * e.printStackTrace(); }
-	 * 
-	 * // send
-	 * 
-	 * }
-	 */
+	
 }
