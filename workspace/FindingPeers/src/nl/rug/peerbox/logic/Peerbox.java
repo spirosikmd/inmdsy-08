@@ -1,5 +1,6 @@
 package nl.rug.peerbox.logic;
 
+import java.io.File;
 import java.net.InetAddress;
 
 import nl.rug.peerbox.middleware.Message;
@@ -29,7 +30,10 @@ public class Peerbox implements MessageListener {
 	}
 
 	public void listFiles() {
-		group.announce("sendmeyourfilelist".getBytes());
+		PeerboxMessage message = new PeerboxMessage();
+		message.put("COMMAND", "LIST");
+		
+		group.announce(message.serialize());
 	}
 
 	public void getFile(int fileid) {
@@ -54,7 +58,21 @@ public class Peerbox implements MessageListener {
 
 		if (message != null) {
 			
-			
+			if (message.get("COMMAND").equals("JOIN")) {
+				
+			} else if(message.get("COMMAND").equals("LIST")) {
+				String[] files = new String[0];
+				File directory = new File(".");
+				if (directory.isDirectory()) {
+					files = directory.list();
+				}
+				
+				PeerboxMessage reply = new PeerboxMessage();
+				reply.put("COMMAND", "LISTREPLY");
+				reply.put("FILES", files);
+				
+				group.announce(reply.serialize());
+			}
 			// react on someone joining the group
 			logger.info("Received a message in logic " + message.get("COMMAND"));
 			// react on someone requesting filelist
