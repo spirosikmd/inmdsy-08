@@ -6,11 +6,9 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import nl.rug.peerbox.logic.Peerbox;
-import nl.rug.peerbox.middleware.MulticastGroup;
-import nl.rug.peerbox.middleware.RMulticastGroup;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -25,8 +23,8 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		// BasicConfigurator.configure();
-		PropertyConfigurator.configure("log4j.properties");
+		BasicConfigurator.configure();
+		//PropertyConfigurator.configure("log4j.properties");
 
 		try {
 			InetAddress address = InetAddress.getByName("239.1.2.4");
@@ -46,9 +44,10 @@ public class FindingPeersApp {
 					peerbox.leave();
 					alive = false;
 					scanner.close();
-
 				} else if ("threads".equals(message)) {
 					Thread.currentThread().getThreadGroup().list();
+				} else if ("join".equals(message)) {
+					peerbox.join();
 				} else if ("list".equals(message)) {
 					peerbox.listFiles();
 				} else if ("get".equals(message)) {
@@ -59,7 +58,6 @@ public class FindingPeersApp {
 			} while (alive);
 
 
-			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
