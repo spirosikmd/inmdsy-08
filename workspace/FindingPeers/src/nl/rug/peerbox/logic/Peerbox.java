@@ -48,29 +48,33 @@ public class Peerbox implements MessageListener {
 			@Override
 			public void run() {
 				try (ServerSocket server = new ServerSocket(serverPort)) {
-					try (Socket s = server.accept()) {
+					
+					while (true) {
+						try (Socket s = server.accept()) {
 
-						BufferedReader st = new BufferedReader(
-								new InputStreamReader(s.getInputStream()));
-						String fileid = st.readLine();
-						System.out.println("The requested file is : " + path
-								+ "/" + fileid);
-						File myFile = new File(path + "/" + fileid);
-						byte[] mybytearray = new byte[(int) myFile.length()];
+							BufferedReader st = new BufferedReader(
+									new InputStreamReader(s.getInputStream()));
+							String fileid = st.readLine();
+							System.out.println("The requested file is : "
+									+ path + "/" + fileid);
+							File myFile = new File(path + "/" + fileid);
+							byte[] mybytearray = new byte[(int) myFile.length()];
 
-						BufferedInputStream bis = new BufferedInputStream(
-								new FileInputStream(myFile));
+							BufferedInputStream bis = new BufferedInputStream(
+									new FileInputStream(myFile));
 
-						bis.read(mybytearray, 0, mybytearray.length);
+							bis.read(mybytearray, 0, mybytearray.length);
 
-						OutputStream os = s.getOutputStream();
-						os.write(mybytearray, 0, mybytearray.length);
-						os.flush();
-						bis.close();
+							OutputStream os = s.getOutputStream();
+							os.write(mybytearray, 0, mybytearray.length);
+							os.flush();
+							bis.close();
 
-					} catch (IOException e) {
-						logger.error(e);
+						} catch (IOException e) {
+							logger.error(e);
+						}
 					}
+					
 				} catch (IOException e) {
 					logger.error(e);
 				}
