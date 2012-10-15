@@ -1,11 +1,15 @@
 package nl.rug.peerbox.logic;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -46,22 +50,24 @@ public class Peerbox implements MessageListener {
 				try (ServerSocket server = new ServerSocket(serverPort)) {
 					try (Socket s = server.accept()) {
 
-						PrintWriter put = new PrintWriter(s.getOutputStream(),
-								true);
 						BufferedReader st = new BufferedReader(
 								new InputStreamReader(s.getInputStream()));
 						String fileid = st.readLine();
-						System.out.println("The requested file is : " + path + "/" + fileid);
-						try (FileReader fstream = new FileReader(path + "/" + fileid)) {
-							int c;
-							while ((c = fstream.read())  != -1) {
-								s.getOutputStream().write(c);
-							}
-							s.getOutputStream().flush();
-							System.out.println("File transfered");
-						} catch (IOException e) {
-							logger.error(e);
-						}
+						System.out.println("The requested file is : " + path
+								+ "/" + fileid);
+						File myFile = new File(path + "/" + fileid);
+						byte[] mybytearray = new byte[(int) myFile.length()];
+
+						BufferedInputStream bis = new BufferedInputStream(
+								new FileInputStream(myFile));
+
+						bis.read(mybytearray, 0, mybytearray.length);
+
+						OutputStream os = s.getOutputStream();
+						os.write(mybytearray, 0, mybytearray.length);
+						os.flush();
+						bis.close();
+
 					} catch (IOException e) {
 						logger.error(e);
 					}
@@ -98,22 +104,24 @@ public class Peerbox implements MessageListener {
 	}
 
 	public void getFile(String filename) {
-		
+
 		Host h = findHostThatServesTheFileHelper(filename);
-		
 		try (Socket s = new Socket(h.address, h.port)) {
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
-			int c;
-			try (FileOutputStream fs = new FileOutputStream(new File(filename))) {
-				while ((c = s.getInputStream().read()) != -1) {
-					fs.write(c);
-				}
+			byte[] mybytearray = new byte[1024];
+			InputStream is = s.getInputStream();
+			FileOutputStream fos = new FileOutputStream(filename);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			int bytesRead;
+			while ((bytesRead = is.read(mybytearray, 0, mybytearray.length)) != -1) {
+				bos.write(mybytearray, 0, bytesRead);
 			}
-
+			bos.close();
 		} catch (IOException e) {
 			logger.error(e);
 		}
+
 	}
 
 	private Host findHostThatServesTheFileHelper(String filename) {
