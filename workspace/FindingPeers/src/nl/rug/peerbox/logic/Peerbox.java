@@ -16,6 +16,7 @@ public class Peerbox implements MessageListener {
 
 	public Peerbox(InetAddress address, int port) {
 		group = RMulticastGroup.createPeer(address, port);
+		group.addMessageListener(this);
 	}
 
 	public void join() {
@@ -44,7 +45,7 @@ public class Peerbox implements MessageListener {
 	@Override
 	public void receivedMessage(Message m) {
 		// react on someone joining the group
-
+		logger.info("Received a message in logic");
 		// react on someone requesting filelist
 
 		// react on someone updating his filelist

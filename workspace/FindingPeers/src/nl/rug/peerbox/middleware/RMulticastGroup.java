@@ -3,8 +3,11 @@ package nl.rug.peerbox.middleware;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -24,6 +27,8 @@ public class RMulticastGroup implements MulticastGroup {
 	private MulticastSocket socket;
 	private Receiver receiver;
 	private Listener listener;
+	
+	private ArrayList<MessageListener> observer = new ArrayList<MessageListener>();
 	
 	private final AtomicInteger messageCounter = new AtomicInteger(0);
 
@@ -73,8 +78,7 @@ public class RMulticastGroup implements MulticastGroup {
 	}
 	
 	void rdeliver(MulticastMessage m) {
-		//iterate over listerners and spawn new thread
-		//call  receivedMessage on listener
+		notifyListener(m);
 		logger.debug("Consumed: " + m.toString());
 	}
 
@@ -121,9 +125,21 @@ public class RMulticastGroup implements MulticastGroup {
 		}
 		
 	}
+	
+	ExecutorService pool = Executors.newSingleThreadExecutor();
+	private void notifyListener(final Message about) {		
+		pool.submit(new Runnable() {
+			@Override
+			public void run() {
+				for (MessageListener ml : observer) {
+					ml.receivedMessage(about);
+				}
+			}
+		});
+	}
 
 	@Override
 	public void addMessageListener(MessageListener ml) {
-		// TODO Auto-generated method stub
+		observer.add(ml);
 	}
 }

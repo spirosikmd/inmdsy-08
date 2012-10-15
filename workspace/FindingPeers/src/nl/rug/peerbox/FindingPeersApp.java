@@ -46,8 +46,6 @@ public class FindingPeersApp {
 					scanner.close();
 				} else if ("threads".equals(message)) {
 					Thread.currentThread().getThreadGroup().list();
-				} else if ("join".equals(message)) {
-					peerbox.join();
 				} else if ("list".equals(message)) {
 					peerbox.listFiles();
 				} else if ("get".equals(message)) {
