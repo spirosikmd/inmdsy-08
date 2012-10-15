@@ -51,21 +51,20 @@ public class Peerbox implements MessageListener {
 						BufferedReader st = new BufferedReader(
 								new InputStreamReader(s.getInputStream()));
 						String fileid = st.readLine();
-						System.out.println("The requested file is : " + fileid);
+						System.out.println("The requested file is : " + path + "/" + fileid);
 						try (FileReader fstream = new FileReader(path + "/" + fileid)) {
-							BufferedReader d = new BufferedReader(new FileReader(fileid));
-							String line;
-							while ((line = d.readLine()) != null) {
-								put.write(line);
-								put.flush();
+							int c;
+							while ((c = fstream.read())  != -1) {
+								s.getOutputStream().write(c);
 							}
-							d.close();
+							s.getOutputStream().flush();
 							System.out.println("File transfered");
-						} finally {
+						} catch (IOException e) {
+							logger.error(e);
 						}
 					} catch (IOException e) {
+						logger.error(e);
 					}
-
 				} catch (IOException e) {
 					logger.error(e);
 				}
@@ -103,21 +102,17 @@ public class Peerbox implements MessageListener {
 		Host h = findHostThatServesTheFileHelper(filename);
 		
 		try (Socket s = new Socket(h.address, h.port)) {
-			BufferedReader get = new BufferedReader(new InputStreamReader(
-					s.getInputStream()));
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
-			String u;
-			File f1 = new File(filename);
-			try (FileOutputStream fs = new FileOutputStream(f1)) {
-				while ((u = get.readLine()) != null) {
-					byte jj[] = u.getBytes();
-					fs.write(jj);
+			int c;
+			try (FileOutputStream fs = new FileOutputStream(new File(filename))) {
+				while ((c = s.getInputStream().read()) != -1) {
+					fs.write((char)c);
 				}
 			}
 
-		} catch (Exception e) {
-			System.exit(0);
+		} catch (IOException e) {
+			logger.error(e);
 		}
 	}
 
