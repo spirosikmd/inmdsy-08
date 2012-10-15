@@ -9,6 +9,7 @@ import nl.rug.peerbox.logic.Peerbox;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -23,8 +24,8 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		BasicConfigurator.configure();
-		//PropertyConfigurator.configure("log4j.properties");
+		// BasicConfigurator.configure();
+		PropertyConfigurator.configure("log4j.properties");
 
 		try {
 			InetAddress address = InetAddress.getByName("239.1.2.4");
@@ -32,11 +33,15 @@ public class FindingPeersApp {
 
 			logger.info("Starting app to find peers in group "
 					+ address.getHostAddress() + ":" + port);
-			Peerbox peerbox = new Peerbox(address, port);
-			peerbox.join();
 
 			String message;
 			Scanner scanner = new Scanner(System.in);
+			System.out.print("Set Peerbox Path: ");
+			String path = scanner.nextLine();
+
+			Peerbox peerbox = new Peerbox(address, port, path);
+			peerbox.join();
+
 			boolean alive = true;
 			do {
 				message = scanner.nextLine();
@@ -48,6 +53,8 @@ public class FindingPeersApp {
 					Thread.currentThread().getThreadGroup().list();
 				} else if ("list".equals(message)) {
 					peerbox.listFiles();
+				} else if ("request".equals(message)) {
+					peerbox.requestFiles();
 				} else if ("get".equals(message)) {
 					peerbox.getFile(1);
 				} else if ("test".equals(message)) {
@@ -55,10 +62,9 @@ public class FindingPeersApp {
 				}
 			} while (alive);
 
-
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 }
