@@ -107,7 +107,7 @@ public class Peerbox implements MessageListener {
 			int c;
 			try (FileOutputStream fs = new FileOutputStream(new File(filename))) {
 				while ((c = s.getInputStream().read()) != -1) {
-					fs.write((char)c);
+					fs.write(c);
 				}
 			}
 
