@@ -33,7 +33,7 @@ public class Peerbox implements MessageListener {
 
 	private final int serverPort = 6666;
 
-	public Peerbox(InetAddress address, int port, String path) {
+	public Peerbox(InetAddress address, int port, final String path) {
 		group = RMulticastGroup.createPeer(address, port);
 		group.addMessageListener(this);
 		this.path = path;
@@ -52,7 +52,7 @@ public class Peerbox implements MessageListener {
 								new InputStreamReader(s.getInputStream()));
 						String fileid = st.readLine();
 						System.out.println("The requested file is : " + fileid);
-						try (FileReader fstream = new FileReader(fileid)) {
+						try (FileReader fstream = new FileReader(path + "/" + fileid)) {
 							BufferedReader d = new BufferedReader(new FileReader(fileid));
 							String line;
 							while ((line = d.readLine()) != null) {
@@ -108,7 +108,7 @@ public class Peerbox implements MessageListener {
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
 			String u;
-			File f1 = new File("");
+			File f1 = new File(filename);
 			try (FileOutputStream fs = new FileOutputStream(f1)) {
 				while ((u = get.readLine()) != null) {
 					byte jj[] = u.getBytes();
