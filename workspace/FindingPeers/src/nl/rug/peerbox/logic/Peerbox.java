@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import nl.rug.peerbox.logic.handler.MessageHandler;
 import nl.rug.peerbox.middleware.Message;
 import nl.rug.peerbox.middleware.MessageListener;
 import nl.rug.peerbox.middleware.MulticastGroup;
@@ -20,6 +21,7 @@ import org.apache.log4j.Logger;
 
 public class Peerbox implements MessageListener {
 
+	public static final String KEY_COMMAND = "COMMAND";
 	private final MulticastGroup group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
@@ -44,7 +46,7 @@ public class Peerbox implements MessageListener {
 
 	public void join() {
 		PeerboxMessage message = new PeerboxMessage();
-		message.put("COMMAND", "JOIN");
+		message.put(KEY_COMMAND, "JOIN");
 		group.announce(message.serialize());
 	}
 
@@ -61,16 +63,15 @@ public class Peerbox implements MessageListener {
 
 	public void requestFiles() {
 		PeerboxMessage message = new PeerboxMessage();
-		message.put("COMMAND", "LIST");
+		message.put(KEY_COMMAND, "LIST");
 		group.announce(message.serialize());
 	}
 
 	public void getFile(final String filename) {
 
 		final Host h = findHostThatServesTheFileHelper(filename);
-
 		Future<File> future = pool.submit(new FileDownloader(h, filename));
-		
+		//submit future to future observer to create a process list
 	}
 
 	private Host findHostThatServesTheFileHelper(String filename) {
@@ -98,15 +99,17 @@ public class Peerbox implements MessageListener {
 
 	@Override
 	public void receivedMessage(Message m) {
-
+		
 		PeerboxMessage message = PeerboxMessage.deserialize(m.getPayload());
+		logger.info("Received a message in logic " + message.get(KEY_COMMAND));
+		MessageHandler.process(message);
 
 		if (message != null) {
-			logger.info("Received a message in logic " + message.get("COMMAND"));
-			if (message.get("COMMAND").equals("JOIN")) {
+			
+			if (message.get(KEY_COMMAND).equals("JOIN")) {
 				PeerboxMessage reply = new PeerboxMessage();
-				reply.put("COMMAND", "WELCOME");
-			} else if (message.get("COMMAND").equals("LIST")) {
+				reply.put(KEY_COMMAND, "WELCOME");
+			} else if (message.get(KEY_COMMAND).equals("LIST")) {
 
 				try {
 					String[] files = new String[0];
@@ -118,7 +121,7 @@ public class Peerbox implements MessageListener {
 					byte[] ipAddr = addr.getAddress();
 
 					PeerboxMessage reply = new PeerboxMessage();
-					reply.put("COMMAND", "LISTREPLY");
+					reply.put(KEY_COMMAND, "LISTREPLY");
 					reply.put("FILES", files);
 					reply.put("IP", ipAddr);
 					reply.put("PORT", serverPort);
@@ -127,7 +130,7 @@ public class Peerbox implements MessageListener {
 				} catch (UnknownHostException e) {
 				}
 
-			} else if (message.get("COMMAND").equals("LISTREPLY")) {
+			} else if (message.get(KEY_COMMAND).equals("LISTREPLY")) {
 				logger.info("List files from remote host");
 				String[] files = (String[]) message.get("FILES");
 
@@ -135,7 +138,6 @@ public class Peerbox implements MessageListener {
 				int port = (int) message.get("PORT");
 
 				filelist.put(Host.byIpAndPort(ip, port), files);
-
 			}
 
 			// react on someone joining the group
