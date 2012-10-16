@@ -11,14 +11,14 @@ import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
-final class FileDownloader implements Callable<File> {
+final class FileRequest implements Callable<File> {
 	
-	private static final Logger logger = Logger.getLogger(FileDownloader.class);
+	private static final Logger logger = Logger.getLogger(FileRequest.class);
 	
 	private final Host h;
 	private final String filename;
 	
-	FileDownloader(Host h, String filename) {
+	FileRequest(Host h, String filename) {
 		this.h = h;
 		this.filename = filename;
 	}
