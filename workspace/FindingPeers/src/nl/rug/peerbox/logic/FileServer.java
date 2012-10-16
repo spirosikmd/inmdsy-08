@@ -19,9 +19,9 @@ final class FileServer implements Runnable {
 
 	private static final Logger logger = Logger.getLogger(FileServer.class);
 	
-	FileServer(String path, int port) {
-		this.path = path;
-		this.port = port;
+	FileServer(Context ctx) {
+		this.path = ctx.getPathToPeerbox();
+		this.port = ctx.getPort();
 	}
 
 	@Override

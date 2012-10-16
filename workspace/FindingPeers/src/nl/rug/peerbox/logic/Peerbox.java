@@ -43,7 +43,7 @@ public class Peerbox implements MessageListener, Context {
 			e.printStackTrace();
 		}
 
-		pool.execute(new FileServer(path, serverPort));
+		pool.execute(new FileServer(this));
 
 	}
 
