@@ -47,7 +47,7 @@ public class FindingPeersApp {
 				message = scanner.nextLine();
 				String[] parts = message.split(" ");
 				String command = parts[0];
-				String arg  = "";
+				String arg = "";
 				if (parts.length == 2) {
 					arg = parts[1];
 				}
