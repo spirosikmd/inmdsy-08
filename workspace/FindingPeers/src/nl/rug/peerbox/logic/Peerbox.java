@@ -1,25 +1,15 @@
 package nl.rug.peerbox.logic;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import nl.rug.peerbox.middleware.Message;
 import nl.rug.peerbox.middleware.MessageListener;
@@ -33,54 +23,22 @@ public class Peerbox implements MessageListener {
 	private final MulticastGroup group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
-	private Map<Host, String[]> filelist = new HashMap<Host, String[]>();
+	private Map<Host, String[]> filelist;
 
-	private final int serverPort = 6666;
+	private final ExecutorService pool;
+
+	final int serverPort = 6666;
 
 	public Peerbox(InetAddress address, int port, final String path) {
 		group = RMulticastGroup.createPeer(address, port);
 		group.addMessageListener(this);
 		this.path = path;
-
-		ExecutorService es = Executors.newSingleThreadExecutor();
-		es.execute(new Runnable() {
-
-			@Override
-			public void run() {
-				try (ServerSocket server = new ServerSocket(serverPort)) {
-					
-					while (true) {
-						try (Socket s = server.accept()) {
-
-							BufferedReader st = new BufferedReader(
-									new InputStreamReader(s.getInputStream()));
-							String fileid = st.readLine();
-							System.out.println("The requested file is : "
-									+ path + "/" + fileid);
-							File myFile = new File(path + "/" + fileid);
-							byte[] mybytearray = new byte[(int) myFile.length()];
-
-							BufferedInputStream bis = new BufferedInputStream(
-									new FileInputStream(myFile));
-
-							bis.read(mybytearray, 0, mybytearray.length);
-
-							OutputStream os = s.getOutputStream();
-							os.write(mybytearray, 0, mybytearray.length);
-							os.flush();
-							bis.close();
-
-						} catch (IOException e) {
-							logger.error(e);
-						}
-					}
-					
-				} catch (IOException e) {
-					logger.error(e);
-				}
-
-			}
-		});
+		
+		filelist = new HashMap<Host, String[]>();
+		pool = Executors.newFixedThreadPool(5);
+		
+		
+		pool.execute(new FileServer(path,serverPort));
 
 	}
 
@@ -107,25 +65,12 @@ public class Peerbox implements MessageListener {
 		group.announce(message.serialize());
 	}
 
-	public void getFile(String filename) {
+	public void getFile(final String filename) {
 
-		Host h = findHostThatServesTheFileHelper(filename);
-		try (Socket s = new Socket(h.address, h.port)) {
-			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
-			put.println(filename);
-			byte[] mybytearray = new byte[1024];
-			InputStream is = s.getInputStream();
-			FileOutputStream fos = new FileOutputStream(filename);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			int bytesRead;
-			while ((bytesRead = is.read(mybytearray, 0, mybytearray.length)) != -1) {
-				bos.write(mybytearray, 0, bytesRead);
-			}
-			bos.close();
-		} catch (IOException e) {
-			logger.error(e);
-		}
+		final Host h = findHostThatServesTheFileHelper(filename);
 
+		Future<File> future = pool.submit(new FileDownloader(h, filename));
+		
 	}
 
 	private Host findHostThatServesTheFileHelper(String filename) {
