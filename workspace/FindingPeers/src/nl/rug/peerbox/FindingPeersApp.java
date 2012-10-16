@@ -50,20 +50,19 @@ public class FindingPeersApp {
 				if (parts.length == 2) {
 					arg = parts[1];
 				}
-				if ("leave".equals(message)) {
+			
+				if ("leave".equals(command)) {
 					peerbox.leave();
 					alive = false;
 					scanner.close();
-				} else if ("threads".equals(message)) {
+				} else if ("threads".equals(command)) {
 					Thread.currentThread().getThreadGroup().list();
-				} else if ("list".equals(message)) {
+				} else if ("list".equals(command)) {
 					peerbox.listFiles();
-				} else if ("request".equals(message)) {
+				} else if ("request".equals(command)) {
 					peerbox.requestFiles();
 				} else if ("get".equals(command)) {
 					peerbox.getFile(arg);
-				} else if ("test".equals(message)) {
-					peerbox.testBulkData();
 				}
 			} while (alive);
 

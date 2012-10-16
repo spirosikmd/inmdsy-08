@@ -1,15 +1,12 @@
 package nl.rug.peerbox.logic;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import nl.rug.peerbox.logic.handler.MessageHandler;
 import nl.rug.peerbox.middleware.Message;
@@ -19,7 +16,7 @@ import nl.rug.peerbox.middleware.RMulticastGroup;
 
 import org.apache.log4j.Logger;
 
-public class Peerbox implements MessageListener {
+public class Peerbox implements MessageListener, Context {
 
 	public static final String KEY_COMMAND = "COMMAND";
 	private final MulticastGroup group;
@@ -30,17 +27,23 @@ public class Peerbox implements MessageListener {
 	private final ExecutorService pool;
 
 	final int serverPort = 6666;
+	private byte[] ip;
 
 	public Peerbox(InetAddress address, int port, final String path) {
 		group = RMulticastGroup.createPeer(address, port);
 		group.addMessageListener(this);
 		this.path = path;
-		
+
 		filelist = new HashMap<Host, String[]>();
 		pool = Executors.newFixedThreadPool(5);
-		
-		
-		pool.execute(new FileServer(path,serverPort));
+
+		try {
+			this.ip = InetAddress.getLocalHost().getAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+
+		pool.execute(new FileServer(path, serverPort));
 
 	}
 
@@ -70,8 +73,9 @@ public class Peerbox implements MessageListener {
 	public void getFile(final String filename) {
 
 		final Host h = findHostThatServesTheFileHelper(filename);
-		Future<File> future = pool.submit(new FileDownloader(h, filename));
-		//submit future to future observer to create a process list
+		pool.submit(new FileDownloader(h, filename));
+		//Future<File> future = 
+		// submit future to future observer to create a process list
 	}
 
 	private Host findHostThatServesTheFileHelper(String filename) {
@@ -89,63 +93,44 @@ public class Peerbox implements MessageListener {
 	public void leave() {
 		group.announce("I left".getBytes());
 		group.shutdown();
-	}
-
-	public void testBulkData() {
-		for (int i = 0; i < 100; i++) {
-			group.announce(String.valueOf(i).getBytes());
-		}
+		pool.shutdownNow();
 	}
 
 	@Override
 	public void receivedMessage(Message m) {
-		
+
 		PeerboxMessage message = PeerboxMessage.deserialize(m.getPayload());
-		logger.info("Received a message in logic " + message.get(KEY_COMMAND));
-		MessageHandler.process(message);
 
 		if (message != null) {
-			
-			if (message.get(KEY_COMMAND).equals("JOIN")) {
-				PeerboxMessage reply = new PeerboxMessage();
-				reply.put(KEY_COMMAND, "WELCOME");
-			} else if (message.get(KEY_COMMAND).equals("LIST")) {
-
-				try {
-					String[] files = new String[0];
-					File directory = new File(path);
-					if (directory.isDirectory()) {
-						files = directory.list();
-					}
-					InetAddress addr = InetAddress.getLocalHost();
-					byte[] ipAddr = addr.getAddress();
-
-					PeerboxMessage reply = new PeerboxMessage();
-					reply.put(KEY_COMMAND, "LISTREPLY");
-					reply.put("FILES", files);
-					reply.put("IP", ipAddr);
-					reply.put("PORT", serverPort);
-					group.announce(reply.serialize());
-
-				} catch (UnknownHostException e) {
-				}
-
-			} else if (message.get(KEY_COMMAND).equals("LISTREPLY")) {
-				logger.info("List files from remote host");
-				String[] files = (String[]) message.get("FILES");
-
-				byte[] ip = (byte[]) message.get("IP");
-				int port = (int) message.get("PORT");
-
-				filelist.put(Host.byIpAndPort(ip, port), files);
-			}
-
-			// react on someone joining the group
-
-			// react on someone requesting filelist
-			// react on someone updating his filelist
-			// react on someone requesting file
+			logger.info("Received a message in logic "
+					+ message.get(KEY_COMMAND));
+			MessageHandler.process(message, this);
 		}
+	}
+
+	@Override
+	public MulticastGroup getMulticastGroup() {
+		return group;
+	}
+
+	@Override
+	public String getPathToPeerbox() {
+		return path;
+	}
+
+	@Override
+	public byte[] getIP() {
+		return ip;
+	}
+
+	@Override
+	public int getPort() {
+		return serverPort;
+	}
+
+	@Override
+	public Map<Host, String[]> getVirtualFilesystem() {
+		return filelist;
 	}
 
 }
