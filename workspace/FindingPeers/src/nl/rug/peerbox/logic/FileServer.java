@@ -69,6 +69,7 @@ final class FileServer implements Runnable {
 			while (Thread.currentThread().isInterrupted()) {
 				try {
 					final Socket s = server.accept();
+					logger.debug("Accepted incoming connection from " + s.getRemoteSocketAddress());
 					pool.execute(new SendFileTask(s, ctx));
 				} catch (IOException e) {
 					logger.error(e);

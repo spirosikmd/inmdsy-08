@@ -18,18 +18,13 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
-	private static final String PROPERTY_SERVER_PORT = "peerbox.server.port";
-	private static final String PROPERTY_MULTICAST_ADDRESS = "peerbox.multicast.address";
-	private static final String PROPERTY_PATH = "peerbox.path";
-	private static final String PROPERTY_MULTICAST_PORT = "peerbox.multicast.port";
-	
+
 	private static final String PEERBOX_PROPERTIES_FILE = "peerbox.properties";
 	private static final String DEFAULT_PROPERTIES_FILE = "default.properties";
 	private static final String LOGGER_PROPERTIES_FILE = "logger.properties";
 
 	private static Logger logger = Logger.getLogger(FindingPeersApp.class);
-	static Properties properties;
-
+	
 	/**
 	 * @param args
 	 * @throws IOException
@@ -39,8 +34,8 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		 BasicConfigurator.configure();
-		 //PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
+		//BasicConfigurator.configure();
+		PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
 		Properties defaultProperties = new Properties();
 		if (!new File(DEFAULT_PROPERTIES_FILE).exists()) {
@@ -49,57 +44,47 @@ public class FindingPeersApp {
 			loadDefaults(defaultProperties);
 		}
 
-		properties = new Properties(defaultProperties);
+		Properties properties = new Properties(defaultProperties);
 		if (new File(PEERBOX_PROPERTIES_FILE).exists()) {
-			try (FileInputStream in = new FileInputStream(PEERBOX_PROPERTIES_FILE)) {
+			try (FileInputStream in = new FileInputStream(
+					PEERBOX_PROPERTIES_FILE)) {
 				properties.load(in);
 			} catch (FileNotFoundException fnfe) {
 				logger.error(fnfe);
 			}
 		}
 
-		try {
-			InetAddress address = InetAddress.getByName(properties.getProperty(PROPERTY_MULTICAST_ADDRESS));
-			int port = Integer.parseInt(properties.getProperty(PROPERTY_MULTICAST_PORT));
-			
+		String message;
+		Scanner scanner = new Scanner(System.in);
 
-			logger.info("Starting app to find peers in group "
-					+ address.getHostAddress() + ":" + port);
+		Peerbox peerbox = new Peerbox(properties);
+		peerbox.join();
 
-			String message;
-			Scanner scanner = new Scanner(System.in);
+		boolean alive = true;
+		do {
+			message = scanner.nextLine();
+			String[] parts = message.split(" ");
+			String command = parts[0];
+			String arg = "";
+			if (parts.length == 2) {
+				arg = parts[1];
+			}
 
-			Peerbox peerbox = new Peerbox(address, port, properties.getProperty(PROPERTY_PATH));
-			peerbox.join();
+			if ("leave".equals(command)) {
+				peerbox.leave();
+				alive = false;
+				scanner.close();
+			} else if ("threads".equals(command)) {
+				Thread.currentThread().getThreadGroup().list();
+			} else if ("list".equals(command)) {
+				peerbox.listFiles();
+			} else if ("request".equals(command)) {
+				peerbox.requestFiles();
+			} else if ("get".equals(command)) {
+				peerbox.getFile(arg);
+			}
+		} while (alive);
 
-			boolean alive = true;
-			do {
-				message = scanner.nextLine();
-				String[] parts = message.split(" ");
-				String command = parts[0];
-				String arg = "";
-				if (parts.length == 2) {
-					arg = parts[1];
-				}
-
-				if ("leave".equals(command)) {
-					peerbox.leave();
-					alive = false;
-					scanner.close();
-				} else if ("threads".equals(command)) {
-					Thread.currentThread().getThreadGroup().list();
-				} else if ("list".equals(command)) {
-					peerbox.listFiles();
-				} else if ("request".equals(command)) {
-					peerbox.requestFiles();
-				} else if ("get".equals(command)) {
-					peerbox.getFile(arg);
-				}
-			} while (alive);
-
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private static void loadDefaults(Properties properties) {
@@ -112,11 +97,12 @@ public class FindingPeersApp {
 
 	private static void createDefaults(Properties properties) {
 		String homeDirectory = System.getProperty("user.home");
-		properties.setProperty(PROPERTY_PATH, homeDirectory + "/Peerbox");
-		properties.setProperty(PROPERTY_MULTICAST_ADDRESS, "239.1.2.4");
-		properties.setProperty(PROPERTY_MULTICAST_PORT, "1567");
-		properties.setProperty(PROPERTY_SERVER_PORT, "6666");
-		try (FileOutputStream out = new FileOutputStream(DEFAULT_PROPERTIES_FILE)) {
+		properties.setProperty(Property.PATH, homeDirectory + "/Peerbox");
+		properties.setProperty(Property.MULTICAST_ADDRESS, "239.1.2.4");
+		properties.setProperty(Property.MULTICAST_PORT, "1567");
+		properties.setProperty(Property.SERVER_PORT, "6666");
+		try (FileOutputStream out = new FileOutputStream(
+				DEFAULT_PROPERTIES_FILE)) {
 			properties.store(out, "");
 		} catch (IOException e) {
 			logger.error(e);

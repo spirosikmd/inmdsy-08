@@ -6,9 +6,11 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.rug.peerbox.Property;
 import nl.rug.peerbox.logic.handler.MessageHandler;
 import nl.rug.peerbox.middleware.Message;
 import nl.rug.peerbox.middleware.MessageListener;
@@ -27,13 +29,25 @@ public class Peerbox implements MessageListener, Context {
 
 	private final ExecutorService pool;
 
-	final int serverPort = 6666;
+	final int serverPort;
 	private byte[] ip;
 
-	public Peerbox(InetAddress address, int port, final String path) {
+	public Peerbox(Properties properties) {
+		InetAddress address = null;
+		try {
+			address = InetAddress.getByName(properties
+					.getProperty(Property.MULTICAST_ADDRESS));
+		} catch (UnknownHostException e) {
+			logger.error(e);
+		}
+		int port = Integer.parseInt(properties
+				.getProperty(Property.MULTICAST_PORT));
 		group = RMulticastGroup.createPeer(address, port);
 		group.addMessageListener(this);
-		this.path = path;
+
+		this.serverPort = Integer.parseInt(properties
+				.getProperty(Property.MULTICAST_PORT));
+		this.path = properties.getProperty(Property.PATH);
 
 		filelist = new HashMap<Host, String[]>();
 		pool = Executors.newFixedThreadPool(5);
