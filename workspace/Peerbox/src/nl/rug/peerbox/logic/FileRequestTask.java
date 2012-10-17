@@ -43,6 +43,7 @@ final class FileRequestTask implements Callable<File> {
 			}
 			bos.close();
 			put.close();
+			logger.info("File " + filename + " has been received");
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);

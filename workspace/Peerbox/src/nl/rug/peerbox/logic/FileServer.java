@@ -20,7 +20,7 @@ final class FileServer implements Runnable {
 	private final Context ctx;
 
 	private static final Logger logger = Logger.getLogger(FileServer.class);
-	private final ExecutorService pool = Executors.newCachedThreadPool();
+	private final ExecutorService pool = Executors.newFixedThreadPool(5);
 
 	FileServer(Context ctx) {
 		this.ctx = ctx;
@@ -79,6 +79,10 @@ final class FileServer implements Runnable {
 				os.write(mybytearray, 0, mybytearray.length);
 				os.flush();
 				bis.close();
+				os.close();
+				st.close();
+				s.close();
+				logger.info("File " + fileid + " has been transmitted");
 			} catch (IOException e) {
 				logger.error(e);
 			}
