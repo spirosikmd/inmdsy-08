@@ -5,6 +5,7 @@ import java.util.Map;
 
 import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Message;
+import nl.rug.peerbox.logic.Message.Command;
 import nl.rug.peerbox.logic.Message.Key;
 
 import org.apache.log4j.Logger;
@@ -15,8 +16,8 @@ public abstract class MessageHandler {
 	private static final Logger logger = Logger.getLogger(MessageHandler.class);
 
 	static {
-		registerHandler(new ReplyToListMessageHandler(), "LISTREPLY");
-		registerHandler(new ListMessageHandler(), "LIST");
+		registerHandler(new ReplyToListMessageHandler(), Command.Reply.List);
+		registerHandler(new ListMessageHandler(), Command.Request.List);
 	}
 	
 	static void registerHandler(final MessageHandler handler,

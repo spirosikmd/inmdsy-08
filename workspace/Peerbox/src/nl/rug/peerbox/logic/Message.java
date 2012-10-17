@@ -22,10 +22,16 @@ public class Message implements Serializable {
 	private final Map<Key, Object> dictionary = new HashMap<Key, Object>();
 
 	public static enum Key {
-		Command,
-		Files,
-		IP,
-		Port
+		Command, Files, IP, Port
+	}
+
+	public static interface Command {
+		public enum Request {
+			Join, List;
+		}
+		public enum Reply {
+			List
+		}
 	}
 
 	public void put(Key key, Object obj) {
@@ -41,7 +47,7 @@ public class Message implements Serializable {
 	}
 
 	public byte[] serialize() {
-		byte[] data = new byte[0]; 
+		byte[] data = new byte[0];
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream os = new ObjectOutputStream(baos);
@@ -52,7 +58,7 @@ public class Message implements Serializable {
 		}
 		return data;
 	}
-	
+
 	public static Message deserialize(byte[] data) {
 		Message message = null;
 		try {
@@ -60,7 +66,7 @@ public class Message implements Serializable {
 			ObjectInputStream is = new ObjectInputStream(bais);
 			Object o = is.readObject();
 			if (o instanceof Message) {
-				message = (Message)o;
+				message = (Message) o;
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			logger.error(e);
