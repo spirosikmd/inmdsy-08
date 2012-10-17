@@ -3,9 +3,6 @@ package nl.rug.peerbox.logic;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,29 +22,27 @@ public class Peerbox implements MessageListener, Context {
 	private final Multicast group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
-	private Map<Peer, String[]> filelist;
+	// private Map<Peer, String[]> filelist;
 
 	private final ExecutorService pool;
 	private final Peer peer;
 	private final VirtualFileSystem fs;
 
 	public Peerbox(Properties properties) {
-		
+
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
 				.getProperty(Property.MULTICAST_PORT));
 		int serverPort = Integer.parseInt(properties
 				.getProperty(Property.SERVER_PORT));
 		path = properties.getProperty(Property.PATH);
-		
+
 		String name = properties.getProperty(Property.NAME);
-		
+
 		group = ReliableMulticast.createPeer(address, port);
 		group.addMessageListener(this);
 
-		
-
-		filelist = new HashMap<Peer, String[]>();
+		// filelist = new HashMap<Peer, String[]>();
 		pool = Executors.newFixedThreadPool(5);
 
 		// check if folder exists
@@ -55,19 +50,17 @@ public class Peerbox implements MessageListener, Context {
 		if (!folder.exists()) {
 			folder.mkdirs();
 		}
-		
-		
+
 		fs = new VirtualFileSystem();
 
-		byte[] ip = new byte[]{};
+		byte[] ip = new byte[] {};
 		try {
 			ip = InetAddress.getLocalHost().getAddress();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 		peer = Peer.createPeer(ip, serverPort, name);
-		
-		
+
 		pool.execute(new FileServer(this));
 
 	}
@@ -80,11 +73,10 @@ public class Peerbox implements MessageListener, Context {
 
 	public void listFiles() {
 		System.out.println("===FILE LIST BEGIN===");
-		for (Entry<Peer, String[]> entry : filelist.entrySet()) {
-			Peer h = entry.getKey();
-			for (String f : entry.getValue()) {
-				System.out.println(f + "  @" + h.getName() + " \t\t("+h+")");
-			}
+		for (FileDescriptor entry : fs.getFileList()) {
+			Peer h = entry.getOwner();
+			String f = entry.getFilename();
+			System.out.println(f + "  @" + h.getName() + " \t\t(" + h + ")");
 		}
 		System.out.println("===FILE LIST END===");
 	}
@@ -104,12 +96,10 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	private Peer findHostThatServesTheFileHelper(String filename) {
-		for (Entry<Peer, String[]> entry : filelist.entrySet()) {
-			Peer h = entry.getKey();
-			for (String f : entry.getValue()) {
-				if (filename.equals(f)) {
-					return h;
-				}
+		for (FileDescriptor entry : fs.getFileList()) {
+			String f = entry.getFilename();
+			if (filename.equals(f)) {
+				return entry.getOwner();
 			}
 		}
 		return null;
@@ -145,7 +135,6 @@ public class Peerbox implements MessageListener, Context {
 	public String getPathToPeerbox() {
 		return path;
 	}
-
 
 	@Override
 	public VirtualFileSystem getVirtualFilesystem() {
