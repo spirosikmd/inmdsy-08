@@ -3,13 +3,13 @@ package nl.rug.peerbox.logic;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class Host {
+public class Peer {
 	
 	public InetAddress address;
 	public int port;
 	
-	public static Host byIpAndPort(byte[] ip, int port) {
-		Host h = new Host();
+	public static Peer byIpAndPort(byte[] ip, int port) {
+		Peer h = new Peer();
 		try {
 			h.address = InetAddress.getByAddress(ip);
 		} catch (UnknownHostException e) {
@@ -21,11 +21,11 @@ public class Host {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Host)) {
+		if (obj == null || !(obj instanceof Peer)) {
 			return false;
 		}
 		
-		Host other = (Host)obj;
+		Peer other = (Peer)obj;
 		
 		return (address.equals(other.address) && port == other.port);
 	}

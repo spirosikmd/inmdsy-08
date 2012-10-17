@@ -79,11 +79,11 @@ final class Receiver {
 			if (m.getPeerID() == group.getPeerId())
 				return;
 
-			Peer p = null;
+			RemoteHost p = null;
 			if (!group.getPeers().containsKey(m.getPeerID())) {
 				logger.debug("Detected group " + m.getPeerID()
 						+ " with piggyback " + (m.getMessageID() - 1));
-				p = new Peer();
+				p = new RemoteHost();
 				p.setHostID(m.getPeerID());
 				p.setSeenMessageID(m.getMessageID() - 1);
 				p.setReceivedMessageID(m.getMessageID() - 1);

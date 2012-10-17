@@ -1,4 +1,4 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.handler;
 
 public class UnsupportedCommandException extends Exception {
 

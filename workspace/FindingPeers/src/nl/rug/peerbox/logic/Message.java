@@ -11,14 +11,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public class PeerboxMessage implements Serializable {
+public class Message implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	public static final Object NULLOBJ = new Object();
-	private static final Logger logger = Logger.getLogger(PeerboxMessage.class);
+	private static final Logger logger = Logger.getLogger(Message.class);
 	private final Map<Key, Object> dictionary = new HashMap<Key, Object>();
 
 	public static enum Key {
@@ -53,14 +53,14 @@ public class PeerboxMessage implements Serializable {
 		return data;
 	}
 	
-	public static PeerboxMessage deserialize(byte[] data) {
-		PeerboxMessage message = null;
+	public static Message deserialize(byte[] data) {
+		Message message = null;
 		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(data);
 			ObjectInputStream is = new ObjectInputStream(bais);
 			Object o = is.readObject();
-			if (o instanceof PeerboxMessage) {
-				message = (PeerboxMessage)o;
+			if (o instanceof Message) {
+				message = (Message)o;
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			logger.error(e);

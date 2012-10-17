@@ -10,8 +10,9 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.rug.peerbox.logic.PeerboxMessage.Key;
+import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.handler.MessageHandler;
+import nl.rug.peerbox.logic.handler.UnsupportedCommandException;
 import nl.rug.peerbox.middleware.MessageListener;
 import nl.rug.peerbox.middleware.Multicast;
 import nl.rug.peerbox.middleware.ReliableMulticast;
@@ -23,7 +24,7 @@ public class Peerbox implements MessageListener, Context {
 	private final Multicast group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
-	private Map<Host, String[]> filelist;
+	private Map<Peer, String[]> filelist;
 
 	private final ExecutorService pool;
 
@@ -44,7 +45,7 @@ public class Peerbox implements MessageListener, Context {
 
 		
 
-		filelist = new HashMap<Host, String[]>();
+		filelist = new HashMap<Peer, String[]>();
 		pool = Executors.newFixedThreadPool(5);
 
 		// check if folder exists
@@ -64,15 +65,15 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	public void join() {
-		PeerboxMessage message = new PeerboxMessage();
+		Message message = new Message();
 		message.put(Key.Command, "JOIN");
 		group.announce(message.serialize());
 	}
 
 	public void listFiles() {
 		System.out.println("===FILE LIST BEGIN===");
-		for (Entry<Host, String[]> entry : filelist.entrySet()) {
-			Host h = entry.getKey();
+		for (Entry<Peer, String[]> entry : filelist.entrySet()) {
+			Peer h = entry.getKey();
 			for (String f : entry.getValue()) {
 				System.out.println(f + "  @" + h);
 			}
@@ -81,22 +82,22 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	public void requestFiles() {
-		PeerboxMessage message = new PeerboxMessage();
+		Message message = new Message();
 		message.put(Key.Command, "LIST");
 		group.announce(message.serialize());
 	}
 
 	public void getFile(final String filename) {
 
-		final Host h = findHostThatServesTheFileHelper(filename);
+		final Peer h = findHostThatServesTheFileHelper(filename);
 		pool.submit(new FileRequestTask(h, filename));
 		// Future<File> future =
 		// submit future to future observer to create a process list
 	}
 
-	private Host findHostThatServesTheFileHelper(String filename) {
-		for (Entry<Host, String[]> entry : filelist.entrySet()) {
-			Host h = entry.getKey();
+	private Peer findHostThatServesTheFileHelper(String filename) {
+		for (Entry<Peer, String[]> entry : filelist.entrySet()) {
+			Peer h = entry.getKey();
 			for (String f : entry.getValue()) {
 				if (filename.equals(f)) {
 					return h;
@@ -115,7 +116,7 @@ public class Peerbox implements MessageListener, Context {
 	@Override
 	public void receivedMessage(byte[] data) {
 
-		PeerboxMessage message = PeerboxMessage.deserialize(data);
+		Message message = Message.deserialize(data);
 
 		if (message != null) {
 			try {
@@ -148,7 +149,7 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	@Override
-	public Map<Host, String[]> getVirtualFilesystem() {
+	public Map<Peer, String[]> getVirtualFilesystem() {
 		return filelist;
 	}
 

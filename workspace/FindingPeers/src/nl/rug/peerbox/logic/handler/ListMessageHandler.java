@@ -3,14 +3,14 @@ package nl.rug.peerbox.logic.handler;
 import java.io.File;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.PeerboxMessage;
-import nl.rug.peerbox.logic.PeerboxMessage.Key;
+import nl.rug.peerbox.logic.Message;
+import nl.rug.peerbox.logic.Message.Key;
 
 final class ListMessageHandler extends MessageHandler {
 
 
 	@Override
-	void handle(PeerboxMessage message, Context ctx) {
+	void handle(Message message, Context ctx) {
 
 		String[] files = new String[0];
 		File directory = new File(ctx.getPathToPeerbox());
@@ -18,7 +18,7 @@ final class ListMessageHandler extends MessageHandler {
 			files = directory.list();
 		}
 
-		PeerboxMessage reply = new PeerboxMessage();
+		Message reply = new Message();
 		reply.put(Key.Command, "LISTREPLY");
 		reply.put(Key.Files, files);
 		reply.put(Key.IP, ctx.getIP());

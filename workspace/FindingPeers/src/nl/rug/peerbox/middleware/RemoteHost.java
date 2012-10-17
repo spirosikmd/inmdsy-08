@@ -1,13 +1,13 @@
 package nl.rug.peerbox.middleware;
 
-class Peer {
+class RemoteHost {
 
 	private int hostID;
 	private int processedMessageID;
 	private int actualMessageID;
 
-	static Peer find(int hostID) {
-		Peer p  = new Peer();
+	static RemoteHost find(int hostID) {
+		RemoteHost p  = new RemoteHost();
 		p.setHostID(hostID);
 		return p;
 	}
@@ -38,8 +38,8 @@ class Peer {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof Peer) {
-			Peer other = (Peer)obj;
+		if (obj != null && obj instanceof RemoteHost) {
+			RemoteHost other = (RemoteHost)obj;
 			return this.hostID == other.hostID;
 		}
 		return false;

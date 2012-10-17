@@ -15,10 +15,10 @@ final class FileRequestTask implements Callable<File> {
 	
 	private static final Logger logger = Logger.getLogger(FileRequestTask.class);
 	
-	private final Host h;
+	private final Peer h;
 	private final String filename;
 	
-	FileRequestTask(Host h, String filename) {
+	FileRequestTask(Peer h, String filename) {
 		this.h = h;
 		this.filename = filename;
 	}

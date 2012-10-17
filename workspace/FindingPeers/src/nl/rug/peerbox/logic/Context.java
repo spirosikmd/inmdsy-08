@@ -14,6 +14,6 @@ public interface Context {
 
 	public int getPort();
 	
-	public Map<Host, String[]> getVirtualFilesystem();
+	public Map<Peer, String[]> getVirtualFilesystem();
 	
 }

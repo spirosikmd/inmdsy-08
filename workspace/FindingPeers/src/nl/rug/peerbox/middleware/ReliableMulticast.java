@@ -21,7 +21,7 @@ public class ReliableMulticast implements Multicast {
 	private final int port;
 	private final InetAddress address;
 
-	private final HashMap<Integer, Peer> peers = new HashMap<Integer, Peer>();
+	private final HashMap<Integer, RemoteHost> peers = new HashMap<Integer, RemoteHost>();
 
 	private Sender sender;
 	private MulticastSocket socket;
@@ -109,7 +109,7 @@ public class ReliableMulticast implements Multicast {
 		return receiver;
 	}
 
-	public HashMap<Integer, Peer> getPeers() {
+	public HashMap<Integer, RemoteHost> getPeers() {
 		return peers;
 	}
 
