@@ -12,10 +12,7 @@ public interface Context {
 	
 	public Peer getLocalPeer();
 	
-
-	//public ArrayList<FileDescriptor> getVirtualFilesystem(); // Map<Host, String[]>
-
-	public Map<Peer, String[]> getVirtualFilesystem();
+	public VirtualFileSystem getVirtualFilesystem();
 
 	
 }

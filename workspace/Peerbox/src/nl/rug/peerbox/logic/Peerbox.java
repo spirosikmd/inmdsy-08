@@ -29,6 +29,7 @@ public class Peerbox implements MessageListener, Context {
 
 	private final ExecutorService pool;
 	private final Peer peer;
+	private final VirtualFileSystem fs;
 
 	public Peerbox(Properties properties) {
 		
@@ -54,6 +55,9 @@ public class Peerbox implements MessageListener, Context {
 		if (!folder.exists()) {
 			folder.mkdirs();
 		}
+		
+		
+		fs = new VirtualFileSystem();
 
 		byte[] ip = new byte[]{};
 		try {
@@ -144,8 +148,8 @@ public class Peerbox implements MessageListener, Context {
 
 
 	@Override
-	public Map<Peer, String[]> getVirtualFilesystem() {
-		return filelist;
+	public VirtualFileSystem getVirtualFilesystem() {
+		return fs;
 	}
 
 	@Override

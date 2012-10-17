@@ -18,6 +18,9 @@ final class ListMessageHandler extends MessageHandler {
 		if (directory.isDirectory()) {
 			files = directory.list();
 		}
+		
+		
+		ctx.getVirtualFilesystem().getFileList();
 
 		Message reply = new Message();
 		reply.put(Key.Command, Command.Reply.List);
