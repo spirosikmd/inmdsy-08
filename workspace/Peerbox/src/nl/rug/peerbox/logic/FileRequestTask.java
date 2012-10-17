@@ -17,15 +17,17 @@ final class FileRequestTask implements Callable<File> {
 	
 	private final Peer h;
 	private final String filename;
+	private final Context ctx;
 	
-	FileRequestTask(Peer h, String filename) {
+	FileRequestTask(Peer h, String filename, Context ctx) {
 		this.h = h;
 		this.filename = filename;
+		this.ctx = ctx;
 	}
 
 	@Override
 	public File call() throws Exception {
-		File sharedFile = new File(filename);
+		File sharedFile = new File(ctx.getPathToPeerbox() + "/" + filename);
 		
 		try (Socket s = new Socket(h.address, h.port)) {
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
