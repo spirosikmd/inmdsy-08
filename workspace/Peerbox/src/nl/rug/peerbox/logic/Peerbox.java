@@ -38,7 +38,7 @@ public class Peerbox implements MessageListener, Context {
 		int port = Integer.parseInt(properties
 				.getProperty(Property.MULTICAST_PORT));
 		this.serverPort = Integer.parseInt(properties
-				.getProperty(Property.MULTICAST_PORT));
+				.getProperty(Property.SERVER_PORT));
 		this.path = properties.getProperty(Property.PATH);
 		
 		group = ReliableMulticast.createPeer(address, port);

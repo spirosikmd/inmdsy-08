@@ -44,6 +44,7 @@ final class FileRequestTask implements Callable<File> {
 			bos.close();
 			put.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 			logger.error(e);
 			sharedFile.delete();
 			sharedFile = null;
