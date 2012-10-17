@@ -1,18 +1,34 @@
 package nl.rug.peerbox;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Properties;
 import java.util.Scanner;
 
 import nl.rug.peerbox.logic.Peerbox;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
-	static Logger logger = Logger.getLogger(FindingPeersApp.class);
+	private static final String PROPERTY_SERVER_PORT = "peerbox.server.port";
+	private static final String PROPERTY_MULTICAST_ADDRESS = "peerbox.multicast.address";
+	private static final String PROPERTY_PATH = "peerbox.path";
+	private static final String PROPERTY_MULTICAST_PORT = "peerbox.multicast.port";
+	
+	private static final String PEERBOX_PROPERTIES_FILE = "peerbox.properties";
+	private static final String DEFAULT_PROPERTIES_FILE = "default.properties";
+	private static final String LOGGER_PROPERTIES_FILE = "logger.properties";
+
+	private static Logger logger = Logger.getLogger(FindingPeersApp.class);
+	static Properties properties;
 
 	/**
 	 * @param args
@@ -23,22 +39,37 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		// BasicConfigurator.configure();
-		PropertyConfigurator.configure("log4j.properties");
+		 BasicConfigurator.configure();
+		 //PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
+
+		Properties defaultProperties = new Properties();
+		if (!new File(DEFAULT_PROPERTIES_FILE).exists()) {
+			createDefaults(defaultProperties);
+		} else {
+			loadDefaults(defaultProperties);
+		}
+
+		properties = new Properties(defaultProperties);
+		if (new File(PEERBOX_PROPERTIES_FILE).exists()) {
+			try (FileInputStream in = new FileInputStream(PEERBOX_PROPERTIES_FILE)) {
+				properties.load(in);
+			} catch (FileNotFoundException fnfe) {
+				logger.error(fnfe);
+			}
+		}
 
 		try {
-			InetAddress address = InetAddress.getByName("239.1.2.4");
-			int port = 1567;
+			InetAddress address = InetAddress.getByName(properties.getProperty(PROPERTY_MULTICAST_ADDRESS));
+			int port = Integer.parseInt(properties.getProperty(PROPERTY_MULTICAST_PORT));
+			
 
 			logger.info("Starting app to find peers in group "
 					+ address.getHostAddress() + ":" + port);
 
 			String message;
 			Scanner scanner = new Scanner(System.in);
-			System.out.print("Set Peerbox Path: ");
-			String path = scanner.nextLine();
 
-			Peerbox peerbox = new Peerbox(address, port, path);
+			Peerbox peerbox = new Peerbox(address, port, properties.getProperty(PROPERTY_PATH));
 			peerbox.join();
 
 			boolean alive = true;
@@ -50,7 +81,7 @@ public class FindingPeersApp {
 				if (parts.length == 2) {
 					arg = parts[1];
 				}
-			
+
 				if ("leave".equals(command)) {
 					peerbox.leave();
 					alive = false;
@@ -68,6 +99,27 @@ public class FindingPeersApp {
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void loadDefaults(Properties properties) {
+		try (FileInputStream in = new FileInputStream(DEFAULT_PROPERTIES_FILE)) {
+			properties.load(in);
+		} catch (IOException e) {
+			logger.error(e);
+		}
+	}
+
+	private static void createDefaults(Properties properties) {
+		String homeDirectory = System.getProperty("user.home");
+		properties.setProperty(PROPERTY_PATH, homeDirectory + "/Peerbox");
+		properties.setProperty(PROPERTY_MULTICAST_ADDRESS, "239.1.2.4");
+		properties.setProperty(PROPERTY_MULTICAST_PORT, "1567");
+		properties.setProperty(PROPERTY_SERVER_PORT, "6666");
+		try (FileOutputStream out = new FileOutputStream(DEFAULT_PROPERTIES_FILE)) {
+			properties.store(out, "");
+		} catch (IOException e) {
+			logger.error(e);
 		}
 	}
 

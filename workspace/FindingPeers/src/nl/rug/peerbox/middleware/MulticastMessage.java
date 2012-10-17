@@ -133,7 +133,11 @@ final class MulticastMessage implements Message {
 	@Override
 	public String toString() {
 		return cmdToText(command) + " " + peerID + "(" + messageID + ")  => "
-				+ byteToText(payload);
+				+ first20(byteToText(payload));
+	}
+	
+	private String first20(String text) {
+		return text.substring(0, text.length()<20?text.length():20);
 	}
 
 	private String byteToText(byte[] bytes) {

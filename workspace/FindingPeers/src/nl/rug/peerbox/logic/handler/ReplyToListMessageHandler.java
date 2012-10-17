@@ -8,9 +8,6 @@ import nl.rug.peerbox.logic.PeerboxMessage;
 
 final class ReplyToListMessageHandler extends MessageHandler {
 	
-	static {
-		registerHandler(new ReplyToListMessageHandler(), "LISTREPLY");
-	}
 	
 	@Override
 	final void handle(PeerboxMessage message, Context ctx) {

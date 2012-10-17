@@ -1,5 +1,6 @@
 package nl.rug.peerbox.logic;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -36,6 +37,12 @@ public class Peerbox implements MessageListener, Context {
 
 		filelist = new HashMap<Host, String[]>();
 		pool = Executors.newFixedThreadPool(5);
+
+		// check if folder exists
+		File folder = new File(path);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
 
 		try {
 			this.ip = InetAddress.getLocalHost().getAddress();
@@ -74,7 +81,7 @@ public class Peerbox implements MessageListener, Context {
 
 		final Host h = findHostThatServesTheFileHelper(filename);
 		pool.submit(new FileRequest(h, filename));
-		//Future<File> future = 
+		// Future<File> future =
 		// submit future to future observer to create a process list
 	}
 
@@ -102,9 +109,12 @@ public class Peerbox implements MessageListener, Context {
 		PeerboxMessage message = PeerboxMessage.deserialize(m.getPayload());
 
 		if (message != null) {
-			logger.info("Received a message in logic "
-					+ message.get(KEY_COMMAND));
-			MessageHandler.process(message, this);
+			try {
+				MessageHandler.process(message, this);
+			} catch (UnsupportedCommandException e) {
+				logger.error("Unsupported command " + e.getUnsupportedCommand());
+				logger.error(e);
+			}
 		}
 	}
 
