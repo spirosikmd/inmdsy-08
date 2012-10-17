@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -15,6 +13,7 @@ import nl.rug.peerbox.logic.Property;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -33,9 +32,6 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		BasicConfigurator.configure();
-		// PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
-
 		Properties defaultProperties = new Properties();
 		createDefaults(defaultProperties);
 
@@ -48,6 +44,9 @@ public class FindingPeersApp {
 				logger.error(fnfe);
 			}
 		}
+		
+		BasicConfigurator.configure();
+		PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
 		String message;
 		Scanner scanner = new Scanner(System.in);
