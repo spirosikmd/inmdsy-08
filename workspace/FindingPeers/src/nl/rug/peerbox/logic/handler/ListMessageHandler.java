@@ -27,7 +27,9 @@ final class ListMessageHandler extends MessageHandler {
 		reply.put("IP", ctx.getIP());
 		reply.put("PORT", ctx.getPort());
 		ctx.getMulticastGroup().announce(reply.serialize());
-
+		
+		
+		
 	}
 
 }
