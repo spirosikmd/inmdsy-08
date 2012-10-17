@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Scanner;
 
 import nl.rug.peerbox.logic.Peerbox;
+import nl.rug.peerbox.logic.Property;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;

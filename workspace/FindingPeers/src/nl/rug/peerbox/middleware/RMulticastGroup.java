@@ -38,11 +38,15 @@ public class RMulticastGroup implements MulticastGroup {
 		this.socket = socket;
 	}
 
-	public static MulticastGroup createPeer(InetAddress address, int port) {
+	public static MulticastGroup createPeer(String ip, int port) {
 		try {
+			
+			InetAddress	address = InetAddress.getByName(ip);
+			
 			MulticastSocket socket = new MulticastSocket(port);
 			socket.setTimeToLive(5);
 			socket.joinGroup(address);
+		
 
 			final RMulticastGroup group = new RMulticastGroup(address, port, socket);
 			group.sender = new Sender(group);
