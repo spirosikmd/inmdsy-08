@@ -26,3 +26,5 @@
 *.prefs
 .metadata
 
+
+workspace/Peerbox/peerbox.properties
