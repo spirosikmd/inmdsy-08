@@ -15,9 +15,15 @@ final class ReplyToListMessageHandler extends MessageHandler {
 
 		ArrayList<FileDescriptor> files = (ArrayList<FileDescriptor>) message
 				.get(Key.Files);
+		ArrayList<FileDescriptor> localfilelist = ctx.getVirtualFilesystem().getFileList();
+		
 		Object obj = message.get(Key.Peer);
 		if (obj instanceof Peer) {
-			ctx.getVirtualFilesystem().getFileList().addAll(files);
+			for (FileDescriptor file : files) {
+				if (! localfilelist.contains(file)) {
+					localfilelist.add(file);
+				}
+			}
 		}
 
 	}

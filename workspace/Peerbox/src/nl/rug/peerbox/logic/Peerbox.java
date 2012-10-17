@@ -22,7 +22,6 @@ public class Peerbox implements MessageListener, Context {
 	private final Multicast group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
-	// private Map<Peer, String[]> filelist;
 
 	private final ExecutorService pool;
 	private final Peer peer;
@@ -42,7 +41,6 @@ public class Peerbox implements MessageListener, Context {
 		group = ReliableMulticast.createPeer(address, port);
 		group.addMessageListener(this);
 
-		// filelist = new HashMap<Peer, String[]>();
 		pool = Executors.newFixedThreadPool(5);
 
 		// check if folder exists
@@ -51,8 +49,6 @@ public class Peerbox implements MessageListener, Context {
 			folder.mkdirs();
 		}
 
-		fs = new VirtualFileSystem();
-
 		byte[] ip = new byte[] {};
 		try {
 			ip = InetAddress.getLocalHost().getAddress();
@@ -60,6 +56,8 @@ public class Peerbox implements MessageListener, Context {
 			e.printStackTrace();
 		}
 		peer = Peer.createPeer(ip, serverPort, name);
+
+		fs = VirtualFileSystem.initVirtualFileSystem(this);
 
 		pool.execute(new FileServer(this));
 
