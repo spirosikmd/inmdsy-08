@@ -11,8 +11,8 @@ import java.util.Scanner;
 import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.Property;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 
@@ -32,8 +32,8 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		//BasicConfigurator.configure();
-		PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
+		BasicConfigurator.configure();
+		//PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
 		Properties defaultProperties = new Properties();
 		if (!new File(DEFAULT_PROPERTIES_FILE).exists()) {

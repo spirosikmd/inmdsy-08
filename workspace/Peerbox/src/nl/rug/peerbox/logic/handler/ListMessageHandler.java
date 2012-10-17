@@ -4,6 +4,7 @@ import java.io.File;
 
 import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Message;
+import nl.rug.peerbox.logic.Message.Command;
 import nl.rug.peerbox.logic.Message.Key;
 
 final class ListMessageHandler extends MessageHandler {
@@ -19,7 +20,7 @@ final class ListMessageHandler extends MessageHandler {
 		}
 
 		Message reply = new Message();
-		reply.put(Key.Command, "LISTREPLY");
+		reply.put(Key.Command, Command.Reply.List);
 		reply.put(Key.Files, files);
 		reply.put(Key.IP, ctx.getIP());
 		reply.put(Key.Port, ctx.getPort());

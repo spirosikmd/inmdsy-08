@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.rug.peerbox.logic.Message.Command;
 import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.handler.MessageHandler;
 import nl.rug.peerbox.logic.handler.UnsupportedCommandException;
@@ -83,7 +84,7 @@ public class Peerbox implements MessageListener, Context {
 
 	public void requestFiles() {
 		Message message = new Message();
-		message.put(Key.Command, "LIST");
+		message.put(Key.Command, Command.Request.List);
 		group.announce(message.serialize());
 	}
 
