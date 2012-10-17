@@ -6,12 +6,14 @@ import java.util.ArrayList;
 public class VirtualFileSystem {
 
 	private static ArrayList<FileDescriptor> filelist = new ArrayList<FileDescriptor>();
+	private final Context ctx;
 
-	private VirtualFileSystem() {
-	}
+	private VirtualFileSystem(Context ctx) {
+		this.ctx = ctx;
+	};
 
 	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
-		VirtualFileSystem vfs = new VirtualFileSystem();
+		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
 
 		File directory = new File(ctx.getPathToPeerbox());
 		if (directory.isDirectory()) {
