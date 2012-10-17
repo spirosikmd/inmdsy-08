@@ -1,6 +1,6 @@
 package nl.rug.peerbox.logic;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 import nl.rug.peerbox.middleware.MulticastGroup;
 
@@ -14,6 +14,6 @@ public interface Context {
 
 	public int getPort();
 	
-	public Map<Host, String[]> getVirtualFilesystem();
+	public ArrayList<FileDescriptor> getVirtualFilesystem(); // Map<Host, String[]>
 	
 }

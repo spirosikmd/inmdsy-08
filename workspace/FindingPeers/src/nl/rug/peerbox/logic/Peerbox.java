@@ -2,9 +2,7 @@ package nl.rug.peerbox.logic;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,7 +20,7 @@ public class Peerbox implements MessageListener, Context {
 	private final MulticastGroup group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
-	private Map<Host, String[]> filelist;
+	private VirtualFileSystem vfs;
 
 	private final ExecutorService pool;
 
@@ -34,7 +32,7 @@ public class Peerbox implements MessageListener, Context {
 		group.addMessageListener(this);
 		this.path = path;
 
-		filelist = new HashMap<Host, String[]>();
+		vfs = new VirtualFileSystem();
 		pool = Executors.newFixedThreadPool(5);
 
 		try {
@@ -55,11 +53,10 @@ public class Peerbox implements MessageListener, Context {
 
 	public void listFiles() {
 		System.out.println("===FILE LIST BEGIN===");
-		for (Entry<Host, String[]> entry : filelist.entrySet()) {
-			Host h = entry.getKey();
-			for (String f : entry.getValue()) {
-				System.out.println(f + "  @" + h);
-			}
+		for (FileDescriptor fd : vfs.getFilelist()) {
+			Host h = fd.getFileOwner();
+			String f = fd.getFilename();
+			System.out.println(f + "  @" + h);
 		}
 		System.out.println("===FILE LIST END===");
 	}
@@ -74,17 +71,15 @@ public class Peerbox implements MessageListener, Context {
 
 		final Host h = findHostThatServesTheFileHelper(filename);
 		pool.submit(new FileRequest(h, filename));
-		//Future<File> future = 
+		// Future<File> future =
 		// submit future to future observer to create a process list
 	}
 
 	private Host findHostThatServesTheFileHelper(String filename) {
-		for (Entry<Host, String[]> entry : filelist.entrySet()) {
-			Host h = entry.getKey();
-			for (String f : entry.getValue()) {
-				if (filename.equals(f)) {
-					return h;
-				}
+		for (FileDescriptor fd : vfs.getFilelist()) {
+			String f = fd.getFilename();
+			if (filename.equals(f)) {
+				return fd.getFileOwner();
 			}
 		}
 		return null;
@@ -129,8 +124,8 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	@Override
-	public Map<Host, String[]> getVirtualFilesystem() {
-		return filelist;
+	public ArrayList<FileDescriptor> getVirtualFilesystem() {
+		return vfs.getFilelist();
 	}
 
 }

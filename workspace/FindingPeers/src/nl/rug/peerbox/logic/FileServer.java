@@ -13,12 +13,12 @@ import java.net.Socket;
 import org.apache.log4j.Logger;
 
 final class FileServer implements Runnable {
-	
+
 	private final String path;
 	private final int port;
 
 	private static final Logger logger = Logger.getLogger(FileServer.class);
-	
+
 	FileServer(Context ctx) {
 		this.path = ctx.getPathToPeerbox();
 		this.port = ctx.getPort();
@@ -34,8 +34,8 @@ final class FileServer implements Runnable {
 					BufferedReader st = new BufferedReader(
 							new InputStreamReader(s.getInputStream()));
 					String fileid = st.readLine();
-					System.out.println("The requested file is : "
-							+ path + "/" + fileid);
+					System.out.println("The requested file is : " + path + "/"
+							+ fileid);
 					File myFile = new File(path + "/" + fileid);
 					byte[] mybytearray = new byte[(int) myFile.length()];
 
