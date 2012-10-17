@@ -28,18 +28,18 @@ public class Peerbox implements MessageListener, Context {
 	private Map<Peer, String[]> filelist;
 
 	private final ExecutorService pool;
-
-	final int serverPort;
-	private byte[] ip;
+	private final Peer peer;
 
 	public Peerbox(Properties properties) {
 		
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
 				.getProperty(Property.MULTICAST_PORT));
-		this.serverPort = Integer.parseInt(properties
+		int serverPort = Integer.parseInt(properties
 				.getProperty(Property.SERVER_PORT));
-		this.path = properties.getProperty(Property.PATH);
+		path = properties.getProperty(Property.PATH);
+		
+		String name = properties.getProperty(Property.NAME);
 		
 		group = ReliableMulticast.createPeer(address, port);
 		group.addMessageListener(this);
@@ -55,12 +55,15 @@ public class Peerbox implements MessageListener, Context {
 			folder.mkdirs();
 		}
 
+		byte[] ip = new byte[]{};
 		try {
-			this.ip = InetAddress.getLocalHost().getAddress();
+			ip = InetAddress.getLocalHost().getAddress();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-
+		peer = Peer.createPeer(ip, serverPort, name);
+		
+		
 		pool.execute(new FileServer(this));
 
 	}
@@ -76,7 +79,7 @@ public class Peerbox implements MessageListener, Context {
 		for (Entry<Peer, String[]> entry : filelist.entrySet()) {
 			Peer h = entry.getKey();
 			for (String f : entry.getValue()) {
-				System.out.println(f + "  @" + h);
+				System.out.println(f + "  @" + h.getName() + " \t\t("+h+")");
 			}
 		}
 		System.out.println("===FILE LIST END===");
@@ -139,19 +142,15 @@ public class Peerbox implements MessageListener, Context {
 		return path;
 	}
 
-	@Override
-	public byte[] getIP() {
-		return ip;
-	}
-
-	@Override
-	public int getPort() {
-		return serverPort;
-	}
 
 	@Override
 	public Map<Peer, String[]> getVirtualFilesystem() {
 		return filelist;
+	}
+
+	@Override
+	public Peer getLocalPeer() {
+		return peer;
 	}
 
 }

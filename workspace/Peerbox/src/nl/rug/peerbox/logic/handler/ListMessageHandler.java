@@ -22,8 +22,7 @@ final class ListMessageHandler extends MessageHandler {
 		Message reply = new Message();
 		reply.put(Key.Command, Command.Reply.List);
 		reply.put(Key.Files, files);
-		reply.put(Key.IP, ctx.getIP());
-		reply.put(Key.Port, ctx.getPort());
+		reply.put(Key.Peer, ctx.getLocalPeer());
 		ctx.getMulticastGroup().announce(reply.serialize());
 		
 		

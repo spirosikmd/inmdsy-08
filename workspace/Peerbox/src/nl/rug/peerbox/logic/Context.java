@@ -9,10 +9,8 @@ public interface Context {
 	public Multicast getMulticastGroup();
 	
 	public String getPathToPeerbox();
-
-	public byte[] getIP();
-
-	public int getPort();
+	
+	public Peer getLocalPeer();
 	
 
 	//public ArrayList<FileDescriptor> getVirtualFilesystem(); // Map<Host, String[]>

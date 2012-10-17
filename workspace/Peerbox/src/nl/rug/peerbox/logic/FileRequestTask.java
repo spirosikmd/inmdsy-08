@@ -29,7 +29,7 @@ final class FileRequestTask implements Callable<File> {
 	public File call() throws Exception {
 		File sharedFile = new File(ctx.getPathToPeerbox() + "/" + filename);
 		
-		try (Socket s = new Socket(h.address, h.port)) {
+		try (Socket s = new Socket(h.getAddress(), h.getPort())) {
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
 			byte[] mybytearray = new byte[1024];

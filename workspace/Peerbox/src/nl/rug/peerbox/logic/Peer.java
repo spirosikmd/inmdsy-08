@@ -11,10 +11,11 @@ public class Peer implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public InetAddress address;
-	public int port;
+	private InetAddress address;
+	private int port;
+	private String name;
 
-	public static Peer byIpAndPort(byte[] ip, int port) {
+	public static Peer createPeer(byte[] ip, int port, String name) {
 		Peer h = new Peer();
 		try {
 			h.address = InetAddress.getByAddress(ip);
@@ -22,6 +23,7 @@ public class Peer implements Serializable {
 			e.printStackTrace();
 		}
 		h.port = port;
+		h.name = name;
 		return h;
 	}
 
@@ -35,6 +37,21 @@ public class Peer implements Serializable {
 
 		return (address.equals(other.address) && port == other.port);
 	}
+	
+	
+
+	InetAddress getAddress() {
+		return address;
+	}
+
+	int getPort() {
+		return port;
+	}
+
+	String getName() {
+		return name;
+	}
+
 
 	@Override
 	public int hashCode() {
