@@ -13,7 +13,8 @@ final class ListMessageHandler extends MessageHandler {
 	@Override
 	void handle(Message message, Context ctx) {
 
-		ArrayList<FileDescriptor> files = ctx.getVirtualFilesystem().getFileList();
+		ArrayList<FileDescriptor> files = ctx.getVirtualFilesystem()
+				.getFileList();
 
 		Message reply = new Message();
 		reply.put(Key.Command, Command.Reply.List);

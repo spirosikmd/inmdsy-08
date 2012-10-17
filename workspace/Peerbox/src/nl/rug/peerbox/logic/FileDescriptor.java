@@ -10,6 +10,7 @@ public class FileDescriptor implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private UUID ufid;
+	private int version;
 	private String filename;
 	private Peer owner;
 
@@ -18,9 +19,13 @@ public class FileDescriptor implements Serializable {
 		this.filename = filename;
 		this.owner = owner;
 	}
-	
+
 	public UUID getUFID() {
 		return ufid;
+	}
+	
+	public int getVersion() {
+		return version;
 	}
 
 	public String getFilename() {
@@ -30,7 +35,7 @@ public class FileDescriptor implements Serializable {
 	public Peer getOwner() {
 		return owner;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof FileDescriptor)) {
@@ -38,8 +43,8 @@ public class FileDescriptor implements Serializable {
 		}
 
 		FileDescriptor otherfile = (FileDescriptor) obj;
-		
-		return ufid.equals(otherfile.getUFID());
-	}
 
+		return (ufid.equals(otherfile.getUFID()) && filename.equals(otherfile
+				.getFilename()));
+	}
 }
