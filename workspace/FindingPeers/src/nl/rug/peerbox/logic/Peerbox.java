@@ -80,7 +80,7 @@ public class Peerbox implements MessageListener, Context {
 	public void getFile(final String filename) {
 
 		final Host h = findHostThatServesTheFileHelper(filename);
-		pool.submit(new FileRequest(h, filename));
+		pool.submit(new FileRequestTask(h, filename));
 		// Future<File> future =
 		// submit future to future observer to create a process list
 	}
