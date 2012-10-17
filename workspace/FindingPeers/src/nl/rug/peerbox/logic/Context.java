@@ -2,11 +2,11 @@ package nl.rug.peerbox.logic;
 
 import java.util.Map;
 
-import nl.rug.peerbox.middleware.MulticastGroup;
+import nl.rug.peerbox.middleware.Multicast;
 
 public interface Context {
 	
-	public MulticastGroup getMulticastGroup();
+	public Multicast getMulticastGroup();
 	
 	public String getPathToPeerbox();
 

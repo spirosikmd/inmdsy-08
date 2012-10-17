@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.PeerboxMessage;
 import nl.rug.peerbox.logic.UnsupportedCommandException;
+import nl.rug.peerbox.logic.PeerboxMessage.Key;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +27,7 @@ public abstract class MessageHandler {
 	}
 
 	public static void process(final PeerboxMessage message, final Context ctx) throws UnsupportedCommandException {
-		Object command = message.get(Peerbox.KEY_COMMAND);
+		Object command = message.get(Key.Command);
 		if (command != PeerboxMessage.NULLOBJ) {
 			if (handlers.containsKey(command)) {
 				logger.debug("Process command " + command);

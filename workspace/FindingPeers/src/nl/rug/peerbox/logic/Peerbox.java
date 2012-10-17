@@ -10,18 +10,17 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.rug.peerbox.logic.PeerboxMessage.Key;
 import nl.rug.peerbox.logic.handler.MessageHandler;
-import nl.rug.peerbox.middleware.Message;
 import nl.rug.peerbox.middleware.MessageListener;
-import nl.rug.peerbox.middleware.MulticastGroup;
-import nl.rug.peerbox.middleware.RMulticastGroup;
+import nl.rug.peerbox.middleware.Multicast;
+import nl.rug.peerbox.middleware.ReliableMulticast;
 
 import org.apache.log4j.Logger;
 
 public class Peerbox implements MessageListener, Context {
 
-	public static final String KEY_COMMAND = "COMMAND";
-	private final MulticastGroup group;
+	private final Multicast group;
 	private final String path;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
 	private Map<Host, String[]> filelist;
@@ -40,7 +39,7 @@ public class Peerbox implements MessageListener, Context {
 				.getProperty(Property.MULTICAST_PORT));
 		this.path = properties.getProperty(Property.PATH);
 		
-		group = RMulticastGroup.createPeer(address, port);
+		group = ReliableMulticast.createPeer(address, port);
 		group.addMessageListener(this);
 
 		
@@ -66,7 +65,7 @@ public class Peerbox implements MessageListener, Context {
 
 	public void join() {
 		PeerboxMessage message = new PeerboxMessage();
-		message.put(KEY_COMMAND, "JOIN");
+		message.put(Key.Command, "JOIN");
 		group.announce(message.serialize());
 	}
 
@@ -83,7 +82,7 @@ public class Peerbox implements MessageListener, Context {
 
 	public void requestFiles() {
 		PeerboxMessage message = new PeerboxMessage();
-		message.put(KEY_COMMAND, "LIST");
+		message.put(Key.Command, "LIST");
 		group.announce(message.serialize());
 	}
 
@@ -114,9 +113,9 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	@Override
-	public void receivedMessage(Message m) {
+	public void receivedMessage(byte[] data) {
 
-		PeerboxMessage message = PeerboxMessage.deserialize(m.getPayload());
+		PeerboxMessage message = PeerboxMessage.deserialize(data);
 
 		if (message != null) {
 			try {
@@ -129,7 +128,7 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	@Override
-	public MulticastGroup getMulticastGroup() {
+	public Multicast getMulticastGroup() {
 		return group;
 	}
 

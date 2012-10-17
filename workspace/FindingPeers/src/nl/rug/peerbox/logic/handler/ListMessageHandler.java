@@ -3,8 +3,8 @@ package nl.rug.peerbox.logic.handler;
 import java.io.File;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.PeerboxMessage;
+import nl.rug.peerbox.logic.PeerboxMessage.Key;
 
 final class ListMessageHandler extends MessageHandler {
 
@@ -19,10 +19,10 @@ final class ListMessageHandler extends MessageHandler {
 		}
 
 		PeerboxMessage reply = new PeerboxMessage();
-		reply.put(Peerbox.KEY_COMMAND, "LISTREPLY");
-		reply.put("FILES", files);
-		reply.put("IP", ctx.getIP());
-		reply.put("PORT", ctx.getPort());
+		reply.put(Key.Command, "LISTREPLY");
+		reply.put(Key.Files, files);
+		reply.put(Key.IP, ctx.getIP());
+		reply.put(Key.Port, ctx.getPort());
 		ctx.getMulticastGroup().announce(reply.serialize());
 		
 		

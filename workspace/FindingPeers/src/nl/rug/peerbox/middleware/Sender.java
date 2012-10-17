@@ -13,19 +13,19 @@ import org.apache.log4j.Logger;
 
 final class Sender {
 
-	private final Queue<MulticastMessage> sentMessagesList = new ConcurrentLinkedQueue<MulticastMessage>();
-	private final BlockingQueue<MulticastMessage> waitingForSendQueue = new ArrayBlockingQueue<MulticastMessage>(
+	private final Queue<Announcement> sentMessagesList = new ConcurrentLinkedQueue<Announcement>();
+	private final BlockingQueue<Announcement> waitingForSendQueue = new ArrayBlockingQueue<Announcement>(
 			1024);
 	private final TimedSemaphore semaphore = new TimedSemaphore(100,
 			TimeUnit.MILLISECONDS, 1);
 
 	private static final Logger logger = Logger.getLogger(Sender.class);
 
-	private final RMulticastGroup group;
+	private final ReliableMulticast group;
 	private Thread thread;
 	private volatile boolean alive = true;
 
-	Sender(RMulticastGroup group) {
+	Sender(ReliableMulticast group) {
 		this.group = group;
 	}
 
@@ -39,9 +39,9 @@ final class Sender {
 						// limit bandwidth
 						semaphore.acquire();
 						// get message from queue, if no message in queue wait
-						MulticastMessage message = waitingForSendQueue.take();
+						Announcement message = waitingForSendQueue.take();
 
-						RMulticastGroup.logger.debug("Send: " + message);
+						ReliableMulticast.logger.debug("Send: " + message);
 
 						byte[] data = message.toByte();
 						DatagramPacket outgoingPacket = new DatagramPacket(
@@ -49,7 +49,7 @@ final class Sender {
 								group.getPort());
 
 						group.getSocket().send(outgoingPacket);
-						if (message.getCommand() == MulticastMessage.MESSAGE) {
+						if (message.getCommand() == Announcement.MESSAGE) {
 							if (!sentMessagesList.contains(message)) {
 								sentMessagesList.add(message);
 							}
@@ -76,7 +76,7 @@ final class Sender {
 	}
 
 	void resendMessage(int messageID) {
-		for (MulticastMessage stored : sentMessagesList) {
+		for (Announcement stored : sentMessagesList) {
 			if (stored.getMessageID() == messageID) {
 				pushMessage(stored);
 				return;
@@ -84,12 +84,12 @@ final class Sender {
 		}
 	}
 
-	void pushMessage(MulticastMessage toBeDeliverd) {
+	void pushMessage(Announcement toBeDeliverd) {
 		try {
 			if (!waitingForSendQueue.contains(toBeDeliverd)) {
 				waitingForSendQueue.put(toBeDeliverd);
 			} else {
-				RMulticastGroup.logger
+				ReliableMulticast.logger
 						.debug("Discarded duplicate message in send queue");
 			}
 		} catch (InterruptedException e) {

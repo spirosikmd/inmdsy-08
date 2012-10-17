@@ -17,18 +17,22 @@ public class PeerboxMessage implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
 	public static final Object NULLOBJ = new Object();
-	
 	private static final Logger logger = Logger.getLogger(PeerboxMessage.class);
-	
-	private final Map<String, Object> dictionary = new HashMap<String, Object>();
+	private final Map<Key, Object> dictionary = new HashMap<Key, Object>();
 
-	public void put(String key, Object obj) {
+	public static enum Key {
+		Command,
+		Files,
+		IP,
+		Port
+	}
+
+	public void put(Key key, Object obj) {
 		dictionary.put(key, obj);
 	}
 
-	public Object get(String key) {
+	public Object get(Key key) {
 		Object result = NULLOBJ;
 		if (dictionary.containsKey(key)) {
 			result = dictionary.get(key);

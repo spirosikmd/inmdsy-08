@@ -14,13 +14,13 @@ final class Receiver {
 
 	private final static Logger logger = Logger.getLogger(Receiver.class);
 
-	private final Queue<MulticastMessage> holdbackQueue = new ConcurrentLinkedQueue<MulticastMessage>();
+	private final Queue<Announcement> holdbackQueue = new ConcurrentLinkedQueue<Announcement>();
 	private final BlockingQueue<DatagramPacket> receivedDataQueue = new ArrayBlockingQueue<DatagramPacket>(
 			RECEIVE_QUEUE_SIZE);
 
-	private RMulticastGroup group;
+	private ReliableMulticast group;
 
-	public Receiver(RMulticastGroup group) {
+	public Receiver(ReliableMulticast group) {
 		this.group = group;
 	}
 
@@ -62,19 +62,19 @@ final class Receiver {
 	}
 
 	private void processMessage(byte[] bytes) {
-		MulticastMessage m = null;
+		Announcement m = null;
 		try {
-			m = MulticastMessage.fromByte(bytes);
+			m = Announcement.fromByte(bytes);
 			receiveMessage(m);
 		} catch (ChecksumFailedException e) {
 			logger.warn("Checksum failed");
 		}
 	}
 
-	private void receiveMessage(MulticastMessage m) {
+	private void receiveMessage(Announcement m) {
 
 		switch (m.getCommand()) {
-		case MulticastMessage.MESSAGE:
+		case Announcement.MESSAGE:
 
 			if (m.getPeerID() == group.getPeerId())
 				return;
@@ -105,7 +105,7 @@ final class Receiver {
 				//sendAck(m);
 				group.rdeliver(m);
 
-				MulticastMessage stored = findMessageInHoldbackQueue(p.getHostID(),
+				Announcement stored = findMessageInHoldbackQueue(p.getHostID(),
 						s + 1);
 				if (stored != null) {
 					holdbackQueue.remove(stored);
@@ -127,13 +127,13 @@ final class Receiver {
 			}
 			break;
 
-		case MulticastMessage.NACK:
+		case Announcement.NACK:
 			if (m.getPeerID() != group.getPeerId())
 				return;
 			logger.debug(m.toString());
 			group.getSender().resendMessage(m.getMessageID());
 
-		case MulticastMessage.ACK:
+		case Announcement.ACK:
 			if (m.getPeerID() != group.getPeerId()) {
 				logger.debug("Acked: " + m.toString());
 			}
@@ -142,12 +142,12 @@ final class Receiver {
 	}
 
 	void sendMiss(int peer, int message_id) {
-		MulticastMessage miss = MulticastMessage.nack(peer, message_id);
+		Announcement miss = Announcement.nack(peer, message_id);
 		group.sendMessage(miss);
 	}
 
-	private MulticastMessage findMessageInHoldbackQueue(int host, int messageID) {
-		for (MulticastMessage m : holdbackQueue) {
+	private Announcement findMessageInHoldbackQueue(int host, int messageID) {
+		for (Announcement m : holdbackQueue) {
 			if (m.getPeerID() == host && m.getMessageID() == messageID) {
 				return m;
 			}

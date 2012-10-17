@@ -10,7 +10,7 @@ import java.util.zip.CRC32;
  * @author cm
  * 
  */
-final class MulticastMessage implements Message {
+final class Announcement {
 
 	static final byte MESSAGE = 1;
 	static final byte ACK = 2;
@@ -19,7 +19,7 @@ final class MulticastMessage implements Message {
 	static final int HEADER_SIZE = 19;
 	static final int MAX_MESSAGE_SIZE = 4069;
 	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
-	
+
 	private byte command;
 	private int peerID;
 	private int messageID;
@@ -27,12 +27,11 @@ final class MulticastMessage implements Message {
 	private short length;
 	private byte[] payload = new byte[0];
 
-
-	private MulticastMessage() {
+	private Announcement() {
 	}
 
-	static MulticastMessage send(int source, int s_piggyback, byte[] payload) {
-		MulticastMessage m = new MulticastMessage();
+	static Announcement send(int source, int s_piggyback, byte[] payload) {
+		Announcement m = new Announcement();
 		m.command = MESSAGE;
 		m.payload = payload;
 		m.length = (short) m.payload.length;
@@ -42,32 +41,33 @@ final class MulticastMessage implements Message {
 		return m;
 	}
 
-	static MulticastMessage ack(int destination, int messageID, int acknowledger) {
-		MulticastMessage m = new MulticastMessage();
+	static Announcement ack(int destination, int messageID, int acknowledger) {
+		Announcement m = new Announcement();
 		m.command = ACK;
 		m.peerID = destination;
 		m.messageID = messageID;
-		m.payload = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(acknowledger).array();
-		m.length = (short)m.payload.length;
+		m.payload = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE)
+				.putInt(acknowledger).array();
+		m.length = (short) m.payload.length;
 		m.checksum = m.calculateChecksum(m.payload);
 		return m;
 
 	}
 
-	static MulticastMessage nack(int destination, int messageID) {
-		MulticastMessage m = new MulticastMessage();
+	static Announcement nack(int destination, int messageID) {
+		Announcement m = new Announcement();
 		m.command = NACK;
 		m.peerID = destination;
 		m.messageID = messageID;
-		m.length = (short)m.payload.length;
+		m.length = (short) m.payload.length;
 		m.checksum = m.calculateChecksum(m.payload);
 		return m;
 	}
 
-	static MulticastMessage fromByte(byte[] bytes) throws ChecksumFailedException {
+	static Announcement fromByte(byte[] bytes) throws ChecksumFailedException {
 
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		MulticastMessage tmp = new MulticastMessage();
+		Announcement tmp = new Announcement();
 		tmp.command = buffer.get();
 		tmp.peerID = buffer.getInt();
 		tmp.messageID = buffer.getInt();
@@ -84,7 +84,6 @@ final class MulticastMessage implements Message {
 		return tmp;
 	}
 
-
 	byte[] toByte() {
 		ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE + length);
 		buffer.put(command);
@@ -100,11 +99,11 @@ final class MulticastMessage implements Message {
 		return command;
 	}
 
-	public int getPeerID() {
+	int getPeerID() {
 		return peerID;
 	}
 
-	public int getMessageID() {
+	int getMessageID() {
 		return messageID;
 	}
 
@@ -116,7 +115,7 @@ final class MulticastMessage implements Message {
 		return length;
 	}
 
-	public byte[] getPayload() {
+	byte[] getPayload() {
 		return payload;
 	}
 
@@ -135,9 +134,9 @@ final class MulticastMessage implements Message {
 		return cmdToText(command) + " " + peerID + "(" + messageID + ")  => "
 				+ first20(byteToText(payload));
 	}
-	
+
 	private String first20(String text) {
-		return text.substring(0, text.length()<20?text.length():20);
+		return text.substring(0, text.length() < 20 ? text.length() : 20);
 	}
 
 	private String byteToText(byte[] bytes) {
@@ -163,11 +162,11 @@ final class MulticastMessage implements Message {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof MulticastMessage)) {
+		if (obj == null || !(obj instanceof Announcement)) {
 			return false;
-		} 
-		
-		MulticastMessage other = (MulticastMessage) obj;
+		}
+
+		Announcement other = (Announcement) obj;
 		return (command == other.command && peerID == other.peerID
 				&& messageID == other.messageID && checksum == other.checksum
 				&& length == other.length && Arrays.equals(payload,

@@ -10,9 +10,9 @@ final class Listener {
 
 	private static final Logger logger = Logger.getLogger(Listener.class);
 	
-	private final RMulticastGroup group;
+	private final ReliableMulticast group;
 
-	Listener(RMulticastGroup group) {
+	Listener(ReliableMulticast group) {
 		this.group = group;
 	}
 
@@ -26,8 +26,8 @@ final class Listener {
 					logger.info("Start listening for incoming packages");
 					while (!Thread.interrupted()) {
 						DatagramPacket incoming = new DatagramPacket(
-								new byte[MulticastMessage.MAX_MESSAGE_SIZE],
-								MulticastMessage.MAX_MESSAGE_SIZE);
+								new byte[Announcement.MAX_MESSAGE_SIZE],
+								Announcement.MAX_MESSAGE_SIZE);
 						group.getSocket().receive(incoming);
 						group.getReceiver().pushDataPacket(incoming);
 					}
