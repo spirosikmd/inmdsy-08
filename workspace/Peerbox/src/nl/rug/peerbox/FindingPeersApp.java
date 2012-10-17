@@ -46,7 +46,7 @@ public class FindingPeersApp {
 		}
 		
 		BasicConfigurator.configure();
-		PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
+		//PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
 		String message;
 		Scanner scanner = new Scanner(System.in);
