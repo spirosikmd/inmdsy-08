@@ -16,6 +16,38 @@ import org.apache.log4j.Logger;
 
 final class FileServer implements Runnable {
 
+
+	private final Context ctx;
+
+	private static final Logger logger = Logger.getLogger(FileServer.class);
+	private final ExecutorService pool = Executors.newCachedThreadPool();
+
+	FileServer(Context ctx) {
+		this.ctx = ctx;
+	}
+
+	@Override
+	public void run() {
+		try (ServerSocket server = new ServerSocket(ctx.getPort())) {
+			while (true) {
+				logger.info("Waiting for incoming connection");
+				try {
+					final Socket s = server.accept();
+					logger.debug("Accepted incoming connection from " + s.getRemoteSocketAddress());
+					pool.execute(new SendFileTask(s, ctx));
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+
+		} catch (IOException e) {
+			logger.error(e);
+		}
+
+	}
+	
+	
+	
 	private final class SendFileTask implements Runnable {
 		private final Socket s;
 		private final Context ctx;
@@ -52,33 +84,5 @@ final class FileServer implements Runnable {
 			}
 		}
 	}
-
-	private final Context ctx;
-
-	private static final Logger logger = Logger.getLogger(FileServer.class);
-	private final ExecutorService pool = Executors.newCachedThreadPool();
-
-	FileServer(Context ctx) {
-		this.ctx = ctx;
-	}
-
-	@Override
-	public void run() {
-		try (ServerSocket server = new ServerSocket(ctx.getPort())) {
-
-			while (Thread.currentThread().isInterrupted()) {
-				try {
-					final Socket s = server.accept();
-					logger.debug("Accepted incoming connection from " + s.getRemoteSocketAddress());
-					pool.execute(new SendFileTask(s, ctx));
-				} catch (IOException e) {
-					logger.error(e);
-				}
-			}
-
-		} catch (IOException e) {
-			logger.error(e);
-		}
-
-	}
+	
 }
