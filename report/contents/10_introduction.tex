@@ -3,15 +3,9 @@
 \subsection{Idea}
 %manni
 
-Christian, Divya, and Spyros are three students who work on a project in Security Systems. The ideal for them is to work together. This means that they need to share their work with each other. However, access to the internet is not always given or the internet does not work reliably. Nevertheless, the students need to work effectively by sharing their work --- this means that they should be able to access files that are stored on another computer.
+Christian, Divya and Spyros are three students who work on a project based on Security Systems. The ideal thing for them is to work together to meet their goals. This involves sharing their work with each other. However, there may be some situations where internet cannot be accessed, which may in turn delay their project assignment. Nevertheless, the students need to work effectively by sharing their work - this means that they should be able to access files that are stored on another computer. This can be accomplished by combining the computers in a Virtual File System (VFS) that automatically adds files. This VFS uses a peer-to-peer scheme for adding the peers automatically.
 
-computers are combined in a virtual fs that automatically adds files.
-
-this vfs uses a peer-2-peer scheme in order to automatically add peers to the vfs. 
-
-The proposed solution should be able to work across network boundaries, creating a flexible structure and thus the peer do not have to be physically connected to each other. 
-
-this way, every student does not need to transmit ownership of a file because the file is stored locally on his computer and filesharing is possible with minimal configuration. 
+Implementing the proposed solution, would  enable them to work across network boundaries, creating a flexible file structure and thus the peers does not have to be physically connected to each other. In this way, every student will not need to transmit ownership of a file because the file is stored locally on his computer and filesharing is possible with minimal configuration. 
 
 
 
@@ -20,6 +14,8 @@ Figures showing three computers that build a vfs.
 
 \subsection{Context}
 %manni
+The main goal of the Peerbox system is to enable file sharing among different peers by joing the network. Here, the process of multicasting is used where a set of data packets are transmitted to  multiple hosts who have joined the multicast group simultaneously. The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer. After joining the group, the peer can request for the list of files, create files, update the files as well as delete files. It also helps to avoid unwanted message transmission and prevents clogging of networks and conserves bandwidth. Also, as messages are UDP, there is no need for connection set-up or teardown. The Peerbox system can be used across WAN.  
+
 
 \subsection{State of the Art}
 %spyros
