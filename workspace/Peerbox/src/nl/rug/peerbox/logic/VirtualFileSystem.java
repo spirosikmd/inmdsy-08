@@ -15,17 +15,15 @@ import java.util.List;
 public class VirtualFileSystem {
 
 	private static ArrayList<FileDescriptor> filelist = new ArrayList<FileDescriptor>();
-	private final Context ctx;
 
 	private VirtualFileSystem(Context ctx) {
-		this.ctx = ctx;
+
 		FileSystem fs = FileSystems.getDefault();
 
 		try {
 			Path path = fs.getPath(ctx.getPathToPeerbox());
 			final WatchService watcher = fs.newWatchService();
-			path.register(watcher,
-					StandardWatchEventKinds.ENTRY_CREATE,
+			path.register(watcher, StandardWatchEventKinds.ENTRY_CREATE,
 					StandardWatchEventKinds.ENTRY_DELETE,
 					StandardWatchEventKinds.ENTRY_MODIFY);
 
@@ -40,7 +38,7 @@ public class VirtualFileSystem {
 							System.out.println("got one");
 							List<WatchEvent<?>> events = watckKey.pollEvents();
 
-							for (WatchEvent event : events) {
+							for (WatchEvent<?> event : events) {
 								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 									System.out.println("Created: "
 											+ event.context().toString());
@@ -60,12 +58,11 @@ public class VirtualFileSystem {
 					} finally {
 						System.out.println("finished");
 					}
-					
+
 				}
 			}).start();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	};
@@ -75,8 +72,9 @@ public class VirtualFileSystem {
 
 		File directory = new File(ctx.getPathToPeerbox());
 		if (directory.isDirectory()) {
-			for (String file : directory.list()) {
-				filelist.add(new FileDescriptor(file, ctx.getLocalPeer()));
+			for (File file : directory.listFiles()) {
+				filelist.add(new FileDescriptor(file.getName(), ctx
+						.getLocalPeer()));
 			}
 		}
 

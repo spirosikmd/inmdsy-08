@@ -13,7 +13,6 @@ import nl.rug.peerbox.logic.Property;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 public class FindingPeersApp {
 

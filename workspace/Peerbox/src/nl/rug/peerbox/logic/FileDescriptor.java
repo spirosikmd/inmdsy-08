@@ -1,7 +1,6 @@
 package nl.rug.peerbox.logic;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 public class FileDescriptor implements Serializable {
 
@@ -9,21 +8,21 @@ public class FileDescriptor implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private UUID ufid;
+	private int ufid;
 	private int version;
 	private String filename;
 	private Peer owner;
 
 	public FileDescriptor(String filename, Peer owner) {
-		this.ufid = UUID.randomUUID();
 		this.filename = filename;
+		this.ufid = filename.hashCode();
 		this.owner = owner;
 	}
 
-	public UUID getUFID() {
+	public int getUFID() {
 		return ufid;
 	}
-	
+
 	public int getVersion() {
 		return version;
 	}
@@ -44,7 +43,7 @@ public class FileDescriptor implements Serializable {
 
 		FileDescriptor otherfile = (FileDescriptor) obj;
 
-		return (ufid.equals(otherfile.getUFID()) && filename.equals(otherfile
-				.getFilename()));
+		return (ufid == otherfile.getUFID())
+				&& filename.equals(otherfile.getFilename());
 	}
 }
