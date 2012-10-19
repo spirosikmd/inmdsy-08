@@ -1,10 +1,13 @@
 package nl.rug.peerbox.logic;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class UFID {
+public class UFID implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	private String fileid;
 	private String owner;
 

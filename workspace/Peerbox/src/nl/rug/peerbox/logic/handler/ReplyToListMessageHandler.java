@@ -8,6 +8,8 @@ import nl.rug.peerbox.logic.Message;
 import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.Peer;
 import nl.rug.peerbox.logic.PeerboxFile;
+import nl.rug.peerbox.logic.Property;
+import nl.rug.peerbox.logic.UFID;
 
 final class ReplyToListMessageHandler extends MessageHandler {
 
@@ -19,13 +21,15 @@ final class ReplyToListMessageHandler extends MessageHandler {
 
 		Object obj = message.get(Key.Peer);
 		if (obj instanceof Peer) {
-			for (Entry<String, PeerboxFile> entry : messageFilelist.entrySet()) {
+			for (Entry<UFID, PeerboxFile> entry : messageFilelist.entrySet()) {
 				if (!localfilelist.containsValue(entry.getValue())) {
 					localfilelist.put(entry.getKey(), entry.getValue());
 				}
 			}
-			localfilelist.serialize(ctx);
-			System.out.println("serialized after update from request");
+			String datafile = ctx.getProperties().getProperty(
+					Property.DATAFILE_NAME);
+			String path = ctx.getProperties().getProperty(Property.PATH);
+			localfilelist.serialize(datafile, path);
 		}
 
 	}

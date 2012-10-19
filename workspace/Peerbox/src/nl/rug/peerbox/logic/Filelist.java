@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
+public class Filelist extends ConcurrentHashMap<UFID, PeerboxFile> {
 
 	/**
 	 * 
@@ -30,11 +30,9 @@ public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 		super(INITIAL_CAPACITY, LOAD_FACTOR, CONCURRENCY_LEVEL);
 	}
 
-	public void serialize(Context ctx) {
+	public void serialize(String datafile, String path) {
 		try {
-			String path = ctx.getPathToPeerbox();
-			OutputStream file = new FileOutputStream(path
-					+ ctx.getProperties().getProperty(Property.DATAFILE_NAME));
+			OutputStream file = new FileOutputStream(path + "/" + datafile);
 			OutputStream buffer = new BufferedOutputStream(file);
 			try (ObjectOutput output = new ObjectOutputStream(buffer)) {
 				output.writeObject(this);
@@ -44,12 +42,10 @@ public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 		}
 	}
 
-	public Filelist deserialize(Context ctx) {
+	public Filelist deserialize(String datafile, String path) {
 		Filelist filelist = null;
 		try {
-			String path = ctx.getPathToPeerbox();
-			InputStream file = new FileInputStream(path
-					+ ctx.getProperties().getProperty(Property.DATAFILE_NAME));
+			InputStream file = new FileInputStream(path + "/" + datafile);
 			InputStream buffer = new BufferedInputStream(file);
 			try (ObjectInput input = new ObjectInputStream(buffer)) {
 				filelist = (Filelist) input.readObject();
