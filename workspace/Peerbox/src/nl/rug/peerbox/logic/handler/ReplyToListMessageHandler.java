@@ -26,7 +26,7 @@ final class ReplyToListMessageHandler extends MessageHandler {
 					localfilelist.put(entry.getKey(), entry.getValue());
 				}
 			}
-			ctx.getVirtualFilesystem().serializeFilelist();
+			ctx.getVirtualFilesystem().getFileList().serialize(ctx);
 		}
 
 	}
