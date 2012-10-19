@@ -36,7 +36,7 @@ public class VirtualFileSystem {
 							WatchKey watckKey = watcher.take();
 							System.out.println("got one");
 							List<WatchEvent<?>> events = watckKey.pollEvents();
-
+							// send list of events in one message
 							for (WatchEvent<?> event : events) {
 								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 									System.out.println("Created: "
