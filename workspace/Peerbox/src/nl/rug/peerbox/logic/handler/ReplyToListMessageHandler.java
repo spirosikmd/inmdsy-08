@@ -13,18 +13,19 @@ final class ReplyToListMessageHandler extends MessageHandler {
 	@Override
 	final void handle(Message message, Context ctx) {
 
-		ArrayList<FileDescriptor> files = (ArrayList<FileDescriptor>) message
+		ArrayList<FileDescriptor> messageFilelist = (ArrayList<FileDescriptor>) message
 				.get(Key.Files);
 		ArrayList<FileDescriptor> localfilelist = ctx.getVirtualFilesystem()
 				.getFileList();
 
 		Object obj = message.get(Key.Peer);
 		if (obj instanceof Peer) {
-			for (FileDescriptor file : files) {
+			for (FileDescriptor file : messageFilelist) {
 				if (!localfilelist.contains(file)) {
 					localfilelist.add(file);
 				}
 			}
+			ctx.getVirtualFilesystem().serializeFilelist();
 		}
 
 	}
