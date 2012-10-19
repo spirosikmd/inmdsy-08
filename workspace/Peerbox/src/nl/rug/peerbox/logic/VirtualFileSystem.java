@@ -13,7 +13,7 @@ import java.util.List;
 
 public class VirtualFileSystem {
 
-	private static Filelist filelist;
+	private Filelist filelist;
 
 	private VirtualFileSystem(Context ctx) {
 
@@ -69,28 +69,28 @@ public class VirtualFileSystem {
 	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
 		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
 
-		filelist = Filelist.initFilelist(ctx);
+		vfs.filelist = new Filelist();
 
 		File directory = new File(ctx.getPathToPeerbox());
 
 		File f = new File(directory.getAbsolutePath()
 				+ ctx.getProperties().getProperty(Property.DATAFILE_NAME));
 		if (f.exists()) {
-			filelist.deserialize(ctx);
+			vfs.filelist.deserialize(ctx);
 		}
 
 		if (directory.isDirectory()) {
 			for (String filename : directory.list()) {
-				if (!filelist.containsValue(filename)
+				if (!vfs.filelist.containsValue(filename)
 						&& !filename.equals(ctx.getProperties().getProperty(
 								Property.DATAFILE_NAME))
 						&& !filename.startsWith(".")) {
-					filelist.put(filename,
+					vfs.filelist.put(filename,
 							new PeerboxFile(filename, ctx.getLocalPeer()));
 				}
 			}
 		}
-		filelist.serialize(ctx);
+		vfs.filelist.serialize(ctx);
 
 		return vfs;
 	}

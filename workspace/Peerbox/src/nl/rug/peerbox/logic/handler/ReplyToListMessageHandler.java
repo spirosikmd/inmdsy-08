@@ -1,9 +1,9 @@
 package nl.rug.peerbox.logic.handler;
 
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import nl.rug.peerbox.logic.Context;
+import nl.rug.peerbox.logic.Filelist;
 import nl.rug.peerbox.logic.Message;
 import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.Peer;
@@ -14,10 +14,8 @@ final class ReplyToListMessageHandler extends MessageHandler {
 	@Override
 	final void handle(Message message, Context ctx) {
 
-		ConcurrentHashMap<String, PeerboxFile> messageFilelist = 
-				(ConcurrentHashMap<String, PeerboxFile>) message.get(Key.Files);
-		ConcurrentHashMap<String, PeerboxFile> localfilelist = 
-				ctx.getVirtualFilesystem().getFileList();
+		Filelist messageFilelist = (Filelist) message.get(Key.Files);
+		Filelist localfilelist = ctx.getVirtualFilesystem().getFileList();
 
 		Object obj = message.get(Key.Peer);
 		if (obj instanceof Peer) {
@@ -26,7 +24,8 @@ final class ReplyToListMessageHandler extends MessageHandler {
 					localfilelist.put(entry.getKey(), entry.getValue());
 				}
 			}
-			ctx.getVirtualFilesystem().getFileList().serialize(ctx);
+			localfilelist.serialize(ctx);
+			System.out.println("serialized after update from request");
 		}
 
 	}

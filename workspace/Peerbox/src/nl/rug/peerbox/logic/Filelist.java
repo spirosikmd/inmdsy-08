@@ -26,14 +26,8 @@ public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 	private final static long serialVersionUID = 1L;
 	private final static Logger logger = Logger.getLogger(Filelist.class);
 
-	private Filelist(Context ctx) {
+	public Filelist() {
 		super(INITIAL_CAPACITY, LOAD_FACTOR, CONCURRENCY_LEVEL);
-	}
-
-	public static Filelist initFilelist(Context ctx) {
-		Filelist filelist = new Filelist(ctx);
-
-		return filelist;
 	}
 
 	public void serialize(Context ctx) {
