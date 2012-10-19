@@ -19,14 +19,14 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
 public class VirtualFileSystem {
 
-	private static ArrayList<FileDescriptor> filelist;
+	private static ConcurrentHashMap<String, PeerboxFile> filelist;
 	private final static Logger logger = Logger.getLogger(Peerbox.class);
 	private final Context ctx;
 
@@ -85,7 +85,7 @@ public class VirtualFileSystem {
 	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
 		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
 
-		filelist = new ArrayList<FileDescriptor>();
+		filelist = new ConcurrentHashMap<String, PeerboxFile>();
 
 		File directory = new File(ctx.getPathToPeerbox());
 
@@ -96,9 +96,8 @@ public class VirtualFileSystem {
 
 		if (directory.isDirectory()) {
 			for (String filename : directory.list()) {
-				if (!filelist.contains(filename)) {
-					filelist.add(new FileDescriptor(filename, ctx
-							.getLocalPeer()));
+				if (!filelist.containsValue(filename)) {
+					filelist.put(filename, new PeerboxFile(filename, ctx.getLocalPeer()));
 				}
 			}
 		}
@@ -107,7 +106,7 @@ public class VirtualFileSystem {
 		return vfs;
 	}
 
-	public ArrayList<FileDescriptor> getFileList() {
+	public ConcurrentHashMap<String, PeerboxFile> getFileList() {
 		return filelist;
 	}
 
@@ -134,7 +133,7 @@ public class VirtualFileSystem {
 			InputStream buffer = new BufferedInputStream(file);
 			ObjectInput input = new ObjectInputStream(buffer);
 			try {
-				filelist = (ArrayList<FileDescriptor>) input.readObject();
+				filelist = (ConcurrentHashMap<String, PeerboxFile>) input.readObject();
 			} finally {
 				input.close();
 			}

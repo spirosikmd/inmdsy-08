@@ -1,19 +1,19 @@
 package nl.rug.peerbox.logic.handler;
 
-import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.FileDescriptor;
 import nl.rug.peerbox.logic.Message;
 import nl.rug.peerbox.logic.Message.Command;
 import nl.rug.peerbox.logic.Message.Key;
+import nl.rug.peerbox.logic.PeerboxFile;
 
 final class ListMessageHandler extends MessageHandler {
 
 	@Override
 	void handle(Message message, Context ctx) {
 
-		ArrayList<FileDescriptor> files = ctx.getVirtualFilesystem()
+		ConcurrentHashMap<String, PeerboxFile> files = ctx.getVirtualFilesystem()
 				.getFileList();
 
 		Message reply = new Message();

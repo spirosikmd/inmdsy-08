@@ -1,8 +1,8 @@
 package nl.rug.peerbox.logic;
 
-import java.io.Serializable;
+import java.io.File;
 
-public class FileDescriptor implements Serializable {
+public class PeerboxFile extends File {
 
 	/**
 	 * 
@@ -10,11 +10,10 @@ public class FileDescriptor implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int ufid;
 	private int version;
-	private String filename;
 	private Peer owner;
 
-	public FileDescriptor(String filename, Peer owner) {
-		this.filename = filename;
+	public PeerboxFile(String filename, Peer owner) {
+		super(filename);
 		this.ufid = filename.hashCode();
 		this.owner = owner;
 	}
@@ -27,23 +26,19 @@ public class FileDescriptor implements Serializable {
 		return version;
 	}
 
-	public String getFilename() {
-		return filename;
-	}
-
 	public Peer getOwner() {
 		return owner;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof FileDescriptor)) {
+		if (obj == null || !(obj instanceof PeerboxFile)) {
 			return false;
 		}
 
-		FileDescriptor otherfile = (FileDescriptor) obj;
+		PeerboxFile otherfile = (PeerboxFile) obj;
 
 		return (ufid == otherfile.getUFID())
-				&& filename.equals(otherfile.getFilename());
+				&& this.getName().equals(otherfile.getName());
 	}
 }

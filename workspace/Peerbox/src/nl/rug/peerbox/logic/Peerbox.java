@@ -3,6 +3,7 @@ package nl.rug.peerbox.logic;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,9 +72,9 @@ public class Peerbox implements MessageListener, Context {
 
 	public void listFiles() {
 		System.out.println("===FILE LIST BEGIN===");
-		for (FileDescriptor entry : fs.getFileList()) {
-			Peer h = entry.getOwner();
-			String f = entry.getFilename();
+		for (Entry<String, PeerboxFile> entry : fs.getFileList().entrySet()) {
+			Peer h = entry.getValue().getOwner();
+			String f = entry.getKey();
 			System.out.println(f + "  @" + h.getName() + " \t\t(" + h + ")");
 		}
 		System.out.println("===FILE LIST END===");
@@ -94,10 +95,10 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	private Peer findHostThatServesTheFileHelper(String filename) {
-		for (FileDescriptor entry : fs.getFileList()) {
-			String f = entry.getFilename();
+		for (Entry<String, PeerboxFile> entry : fs.getFileList().entrySet()) {
+			String f = entry.getKey();
 			if (filename.equals(f)) {
-				return entry.getOwner();
+				return entry.getValue().getOwner();
 			}
 		}
 		return null;
