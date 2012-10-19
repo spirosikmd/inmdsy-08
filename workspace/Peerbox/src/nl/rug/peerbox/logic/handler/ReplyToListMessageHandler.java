@@ -22,7 +22,7 @@ final class ReplyToListMessageHandler extends MessageHandler {
 		Object obj = message.get(Key.Peer);
 		if (obj instanceof Peer) {
 			for (Entry<String, PeerboxFile> entry : messageFilelist.entrySet()) {
-				if (!localfilelist.contains(entry.getValue())) {
+				if (!localfilelist.containsValue(entry.getValue())) {
 					localfilelist.put(entry.getKey(), entry.getValue());
 				}
 			}

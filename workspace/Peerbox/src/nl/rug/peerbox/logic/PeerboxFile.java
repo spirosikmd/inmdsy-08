@@ -25,6 +25,10 @@ public class PeerboxFile extends File {
 	public int getVersion() {
 		return version;
 	}
+	
+	public void setVersion(int version) {
+		this.version = version;
+	}
 
 	public Peer getOwner() {
 		return owner;

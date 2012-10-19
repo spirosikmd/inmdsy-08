@@ -85,7 +85,7 @@ public class VirtualFileSystem {
 	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
 		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
 
-		filelist = new ConcurrentHashMap<String, PeerboxFile>();
+		filelist = new ConcurrentHashMap<String, PeerboxFile>(8, 0.9f, 1);
 
 		File directory = new File(ctx.getPathToPeerbox());
 
@@ -96,8 +96,10 @@ public class VirtualFileSystem {
 
 		if (directory.isDirectory()) {
 			for (String filename : directory.list()) {
-				if (!filelist.containsValue(filename)) {
-					filelist.put(filename, new PeerboxFile(filename, ctx.getLocalPeer()));
+				if (!filelist.containsValue(filename)
+						&& !filename.equals("data.pbx")) {
+					filelist.put(filename,
+							new PeerboxFile(filename, ctx.getLocalPeer()));
 				}
 			}
 		}
@@ -113,13 +115,12 @@ public class VirtualFileSystem {
 	public void serializeFilelist() {
 		try {
 			String path = ctx.getPathToPeerbox();
-			OutputStream file = new FileOutputStream(path + "/data.pbx");
+			OutputStream file = new FileOutputStream(path
+					+ this.ctx.getProperties().getProperty(
+							Property.DATAFILE_NAME));
 			OutputStream buffer = new BufferedOutputStream(file);
-			ObjectOutput output = new ObjectOutputStream(buffer);
-			try {
+			try (ObjectOutput output = new ObjectOutputStream(buffer)) {
 				output.writeObject(filelist);
-			} finally {
-				output.close();
 			}
 		} catch (IOException e) {
 			logger.error(e);
@@ -129,13 +130,12 @@ public class VirtualFileSystem {
 	public void deserializeFilelist() {
 		try {
 			String path = ctx.getPathToPeerbox();
-			InputStream file = new FileInputStream(path + "/data.pbx");
+			InputStream file = new FileInputStream(path
+					+ ctx.getProperties().getProperty(Property.DATAFILE_NAME));
 			InputStream buffer = new BufferedInputStream(file);
-			ObjectInput input = new ObjectInputStream(buffer);
-			try {
-				filelist = (ConcurrentHashMap<String, PeerboxFile>) input.readObject();
-			} finally {
-				input.close();
+			try (ObjectInput input = new ObjectInputStream(buffer)) {
+				filelist = (ConcurrentHashMap<String, PeerboxFile>) input
+						.readObject();
 			}
 		} catch (ClassNotFoundException e) {
 			logger.error(e);

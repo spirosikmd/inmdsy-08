@@ -89,6 +89,7 @@ public class FindingPeersApp {
 		properties.setProperty(Property.MULTICAST_PORT, "1567");
 		properties.setProperty(Property.SERVER_PORT, "6666");
 		properties.setProperty(Property.NAME, computerName);
+		properties.setProperty(Property.DATAFILE_NAME, "data.pbx");
 		try (FileOutputStream out = new FileOutputStream(
 				DEFAULT_PROPERTIES_FILE)) {
 			properties.store(out, "");

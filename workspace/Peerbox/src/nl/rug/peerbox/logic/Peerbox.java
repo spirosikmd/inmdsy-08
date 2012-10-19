@@ -27,8 +27,12 @@ public class Peerbox implements MessageListener, Context {
 	private final ExecutorService pool;
 	private final Peer peer;
 	private final VirtualFileSystem fs;
+	
+	private final Properties properties;
 
 	public Peerbox(Properties properties) {
+		
+		this.properties = properties;
 
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
@@ -143,6 +147,10 @@ public class Peerbox implements MessageListener, Context {
 	@Override
 	public Peer getLocalPeer() {
 		return peer;
+	}
+	
+	public Properties getProperties() {
+		return properties;
 	}
 
 }
