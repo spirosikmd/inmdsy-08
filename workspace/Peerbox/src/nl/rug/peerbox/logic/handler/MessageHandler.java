@@ -18,6 +18,7 @@ public abstract class MessageHandler {
 	static {
 		registerHandler(new ReplyToListMessageHandler(), Command.Reply.List);
 		registerHandler(new ListMessageHandler(), Command.Request.List);
+		registerHandler(new EventsMessageHandler(), Command.Info.Events);
 	}
 	
 	static void registerHandler(final MessageHandler handler,

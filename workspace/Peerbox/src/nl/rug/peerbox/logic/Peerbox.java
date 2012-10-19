@@ -1,8 +1,12 @@
 package nl.rug.peerbox.logic;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.WatchEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -105,6 +109,13 @@ public class Peerbox implements MessageListener, Context {
 			}
 		}
 		return null;
+	}
+	
+	public void sendEvents(List<WatchEvent<?>> events) {
+		Message message = new Message();
+		message.put(Key.Command, "EVENTS");
+		message.put(Key.Events, events);
+		group.announce(message.serialize());
 	}
 
 	public void leave() {

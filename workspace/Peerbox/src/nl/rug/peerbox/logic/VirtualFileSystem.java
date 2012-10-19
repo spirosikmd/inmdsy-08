@@ -9,13 +9,14 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualFileSystem {
 
 	private Filelist filelist;
 
-	private VirtualFileSystem(Context ctx) {
+	private VirtualFileSystem(final Peerbox ctx) {
 
 		FileSystem fs = FileSystems.getDefault();
 
@@ -37,6 +38,8 @@ public class VirtualFileSystem {
 							System.out.println("got one");
 							List<WatchEvent<?>> events = watckKey.pollEvents();
 							// send list of events in one message
+							ctx.sendEvents(events);
+							// update own vfs with the events
 							for (WatchEvent<?> event : events) {
 								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 									System.out.println("Created: "
@@ -66,7 +69,7 @@ public class VirtualFileSystem {
 		}
 	};
 
-	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
+	public static VirtualFileSystem initVirtualFileSystem(Peerbox ctx) {
 		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
 
 		vfs.filelist = new Filelist();
