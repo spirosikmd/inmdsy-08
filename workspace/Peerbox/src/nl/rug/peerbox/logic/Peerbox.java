@@ -27,12 +27,9 @@ public class Peerbox implements MessageListener, Context {
 	private final ExecutorService pool;
 	private final Peer peer;
 	private final VirtualFileSystem fs;
-	
-	private final Properties properties;
+	private final String datafile;
 
 	public Peerbox(Properties properties) {
-		
-		this.properties = properties;
 
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
@@ -40,8 +37,10 @@ public class Peerbox implements MessageListener, Context {
 		int serverPort = Integer.parseInt(properties
 				.getProperty(Property.SERVER_PORT));
 		path = properties.getProperty(Property.PATH);
+		datafile = properties.getProperty(Property.DATAFILE_NAME);
 
 		String name = properties.getProperty(Property.NAME);
+		
 
 		group = ReliableMulticast.createPeer(address, port);
 		group.addMessageListener(this);
@@ -149,8 +148,9 @@ public class Peerbox implements MessageListener, Context {
 		return peer;
 	}
 	
-	public Properties getProperties() {
-		return properties;
+	@Override
+	public String getDatafileName() {
+		return datafile;
 	}
 
 }

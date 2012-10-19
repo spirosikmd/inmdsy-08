@@ -1,7 +1,5 @@
 package nl.rug.peerbox.logic;
 
-import java.util.Properties;
-
 import nl.rug.peerbox.middleware.Multicast;
 
 public interface Context {
@@ -14,6 +12,6 @@ public interface Context {
 
 	public VirtualFileSystem getVirtualFilesystem();
 	
-	public Properties getProperties();
+	public String getDatafileName();
 
 }
