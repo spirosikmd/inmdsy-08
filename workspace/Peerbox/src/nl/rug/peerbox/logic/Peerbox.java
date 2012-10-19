@@ -1,11 +1,9 @@
 package nl.rug.peerbox.logic;
 
 import java.io.File;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.WatchEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
