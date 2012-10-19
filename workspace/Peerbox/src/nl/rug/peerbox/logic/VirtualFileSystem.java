@@ -77,17 +77,17 @@ public class VirtualFileSystem {
 
 		File f = new File(directory.getAbsolutePath() + "/" + datafile);
 		if (f.exists()) {
-			vfs.filelist.deserialize(datafile, path);
+			vfs.filelist = Filelist.deserialize(datafile, path);
 		}
 
 		if (directory.isDirectory()) {
 			for (String filename : directory.list()) {
-				if (!vfs.filelist.containsValue(filename)
+				PeerboxFile pbxf = new PeerboxFile(filename, ctx.getLocalPeer());
+				String ufid = pbxf.getUFID().toString();
+				if (!vfs.filelist.containsKey(ufid)
 						&& !filename.equals(datafile)
 						&& !filename.startsWith(".")) {
-					PeerboxFile pbxf = new PeerboxFile(filename,
-							ctx.getLocalPeer());
-					vfs.filelist.put(pbxf.getUFID(), pbxf);
+					vfs.filelist.put(ufid, pbxf);
 				}
 			}
 		}

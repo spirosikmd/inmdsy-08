@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class UFID implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 	private String fileid;
 	private String owner;
@@ -14,6 +14,15 @@ public class UFID implements Serializable {
 	public UFID(String filename, Peer owner) {
 		this.fileid = md5(filename);
 		this.owner = md5(owner.getName());
+		// plus md5 of data
+	}
+
+	public String getFileid() {
+		return fileid;
+	}
+
+	public String getOwner() {
+		return owner;
 	}
 
 	private String md5(String input) {
@@ -36,14 +45,6 @@ public class UFID implements Serializable {
 		return md5;
 	}
 
-	public String getFileid() {
-		return fileid;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof UFID)) {
@@ -54,5 +55,10 @@ public class UFID implements Serializable {
 
 		return fileid.equals(otherUFID.getFileid())
 				&& owner.equals(otherUFID.getOwner());
+	}
+
+	@Override
+	public String toString() {
+		return fileid.concat(owner);
 	}
 }

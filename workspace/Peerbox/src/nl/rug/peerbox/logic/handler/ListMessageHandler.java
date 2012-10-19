@@ -7,14 +7,13 @@ import nl.rug.peerbox.logic.Message;
 import nl.rug.peerbox.logic.Message.Command;
 import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.UFID;
 
 final class ListMessageHandler extends MessageHandler {
 
 	@Override
 	void handle(Message message, Context ctx) {
 
-		ConcurrentHashMap<UFID, PeerboxFile> files = ctx.getVirtualFilesystem()
+		ConcurrentHashMap<String, PeerboxFile> files = ctx.getVirtualFilesystem()
 				.getFileList();
 
 		Message reply = new Message();

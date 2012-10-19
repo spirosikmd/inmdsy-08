@@ -8,7 +8,6 @@ import nl.rug.peerbox.logic.Message;
 import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.Peer;
 import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.UFID;
 
 final class ReplyToListMessageHandler extends MessageHandler {
 
@@ -20,8 +19,8 @@ final class ReplyToListMessageHandler extends MessageHandler {
 
 		Object obj = message.get(Key.Peer);
 		if (obj instanceof Peer) {
-			for (Entry<UFID, PeerboxFile> entry : messageFilelist.entrySet()) {
-				if (!localfilelist.containsValue(entry.getValue())) {
+			for (Entry<String, PeerboxFile> entry : messageFilelist.entrySet()) {
+				if (!localfilelist.containsKey(entry.getValue())) {
 					localfilelist.put(entry.getKey(), entry.getValue());
 				}
 			}

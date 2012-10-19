@@ -75,7 +75,7 @@ public class Peerbox implements MessageListener, Context {
 
 	public void listFiles() {
 		System.out.println("===FILE LIST BEGIN===");
-		for (Entry<UFID, PeerboxFile> entry : fs.getFileList().entrySet()) {
+		for (Entry<String, PeerboxFile> entry : fs.getFileList().entrySet()) {
 			Peer h = entry.getValue().getOwner();
 			String f = entry.getValue().getFilename();
 			System.out.println(f + "  @" + h.getName() + " \t\t(" + h + ")");
@@ -98,7 +98,7 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	private Peer findHostThatServesTheFileHelper(String filename) {
-		for (Entry<UFID, PeerboxFile> entry : fs.getFileList().entrySet()) {
+		for (Entry<String, PeerboxFile> entry : fs.getFileList().entrySet()) {
 			String f = entry.getValue().getFilename();
 			if (filename.equals(f)) {
 				return entry.getValue().getOwner();

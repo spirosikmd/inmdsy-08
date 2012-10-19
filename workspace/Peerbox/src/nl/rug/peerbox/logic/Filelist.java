@@ -15,11 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-public class Filelist extends ConcurrentHashMap<UFID, PeerboxFile> {
+public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 
-	/**
-	 * 
-	 */
 	private final static int INITIAL_CAPACITY = 1;
 	private final static float LOAD_FACTOR = 0.9f;
 	private final static int CONCURRENCY_LEVEL = 1;
@@ -42,7 +39,7 @@ public class Filelist extends ConcurrentHashMap<UFID, PeerboxFile> {
 		}
 	}
 
-	public Filelist deserialize(String datafile, String path) {
+	public static Filelist deserialize(String datafile, String path) {
 		Filelist filelist = null;
 		try {
 			InputStream file = new FileInputStream(path + "/" + datafile);
