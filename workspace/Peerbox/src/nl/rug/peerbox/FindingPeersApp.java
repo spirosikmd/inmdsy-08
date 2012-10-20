@@ -13,6 +13,8 @@ import nl.rug.peerbox.logic.Property;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public class FindingPeersApp {
 
@@ -50,9 +52,21 @@ public class FindingPeersApp {
 		String message;
 		Scanner scanner = new Scanner(System.in);
 
+		Display display = new Display();
+		Shell shell = new Shell(display);
+		shell.setText("Hello World");
+		shell.open();
+		
+		while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+        display.dispose();
+        
 		Peerbox peerbox = new Peerbox(properties);
 		peerbox.join();
-
+		
 		boolean alive = true;
 		do {
 			message = scanner.nextLine();
