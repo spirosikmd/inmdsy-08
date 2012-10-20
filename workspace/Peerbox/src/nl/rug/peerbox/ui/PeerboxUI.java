@@ -34,6 +34,7 @@ public class PeerboxUI implements DisposeListener, Listener {
 	private MenuButton logButton;
 	private MenuButton filesButton;
 	private MenuButton peersButton;
+	private MenuButton changeButton;
 
 	public PeerboxUI(Peerbox peerbox, Display display, int style) {
 		shell = new Shell(display, style);
@@ -116,6 +117,11 @@ public class PeerboxUI implements DisposeListener, Listener {
 		peersButton.setText("Peers");
 		peersButton.setLayoutData(createButtonGridData());
 		peersButton.addListener(SWT.Selection, this);
+		
+		changeButton = new MenuButton(menu, SWT.NONE);
+		changeButton.setText("Changes");
+		changeButton.setLayoutData(createButtonGridData());
+		changeButton.addListener(SWT.Selection, this);
 
 		logButton = new MenuButton(menu, SWT.NONE);
 		logButton.setText("Log");
