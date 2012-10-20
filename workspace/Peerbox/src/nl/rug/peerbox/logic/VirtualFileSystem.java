@@ -26,7 +26,7 @@ public class VirtualFileSystem {
 					StandardWatchEventKinds.ENTRY_DELETE,
 					StandardWatchEventKinds.ENTRY_MODIFY);
 
-			new Thread(new Runnable() {
+			Thread peerboxObserver = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -61,7 +61,9 @@ public class VirtualFileSystem {
 					}
 
 				}
-			}).start();
+			});
+			peerboxObserver.setDaemon(true);
+			peerboxObserver.start();
 
 		} catch (IOException e) {
 			e.printStackTrace();
