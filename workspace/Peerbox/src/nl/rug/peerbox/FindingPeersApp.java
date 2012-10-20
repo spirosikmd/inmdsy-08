@@ -55,6 +55,7 @@ public class FindingPeersApp {
 
 		Display.setAppName("Peerbox");
 		Display display = new Display();
+
 		
 		PeerboxUI view = new PeerboxUI(peerbox, display);
 		view.getShell().setText("Peerbox");
@@ -70,43 +71,15 @@ public class FindingPeersApp {
 		display.dispose();
 		peerbox.leave();
 		System.exit(0);
-        
-        
-//        
-//		
-//		
-//		boolean alive = true;
-//		do {
-//			message = scanner.nextLine();
-//			String[] parts = message.split(" ");
-//			String command = parts[0];
-//			String arg = "";
-//			if (parts.length == 2) {
-//				arg = parts[1];
-//			}
-//
-//			if ("leave".equals(command)) {
-//				
-//				alive = false;
-//				scanner.close();
-//			} else if ("threads".equals(command)) {
-//				Thread.currentThread().getThreadGroup().list();
-//			} else if ("list".equals(command)) {
-//				peerbox.listFiles();
-//			} else if ("request".equals(command)) {
-//				peerbox.requestFiles();
-//			} else if ("get".equals(command)) {
-//				peerbox.getFile(arg);
-//			}
-//		} while (alive);
-
 	}
 
 	private static void createDefaults(Properties properties) {
 		String homeDirectory = System.getProperty("user.home");
 		String computerName = System.getProperty("user.name");
 
-		properties.setProperty(Property.PATH, homeDirectory + "/Peerbox");
+		properties.setProperty(Property.PATH,
+				homeDirectory + System.getProperty("file.separator")
+						+ "Peerbox");
 		properties.setProperty(Property.MULTICAST_ADDRESS, "239.1.2.4");
 		properties.setProperty(Property.MULTICAST_PORT, "1567");
 		properties.setProperty(Property.SERVER_PORT, "6666");
