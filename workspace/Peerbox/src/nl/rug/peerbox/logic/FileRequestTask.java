@@ -12,13 +12,14 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 final class FileRequestTask implements Callable<File> {
-	
-	private static final Logger logger = Logger.getLogger(FileRequestTask.class);
-	
+
+	private static final Logger logger = Logger
+			.getLogger(FileRequestTask.class);
+
 	private final Peer h;
 	private final String filename;
 	private final Context ctx;
-	
+
 	FileRequestTask(Peer h, String filename, Context ctx) {
 		this.h = h;
 		this.filename = filename;
@@ -27,20 +28,20 @@ final class FileRequestTask implements Callable<File> {
 
 	@Override
 	public File call() throws Exception {
-		File sharedFile = new File(ctx.getPathToPeerbox() + "/" + filename);
-		
+		File sharedFile = new File(ctx.getPathToPeerbox()
+				+ System.getProperty("file.separator") + filename);
+
 		try (Socket s = new Socket(h.getAddress(), h.getPort())) {
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
 			byte[] mybytearray = new byte[1024];
 			InputStream is = s.getInputStream();
-			
+
 			FileOutputStream fos = new FileOutputStream(sharedFile);
 			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			
+
 			int bytesRead;
-			while ((bytesRead = is.read(mybytearray, 0,
-					mybytearray.length)) != -1) {
+			while ((bytesRead = is.read(mybytearray, 0, mybytearray.length)) != -1) {
 				bos.write(mybytearray, 0, bytesRead);
 			}
 			bos.close();

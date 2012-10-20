@@ -77,7 +77,8 @@ public class VirtualFileSystem {
 		File directory = new File(path);
 		String datafile = ctx.getDatafileName();
 
-		File f = new File(directory.getAbsolutePath() + "/" + datafile);
+		File f = new File(directory.getAbsolutePath()
+				+ System.getProperty("file.separator") + datafile);
 		if (f.exists()) {
 			vfs.filelist = Filelist.deserialize(datafile, path);
 		}

@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 
 final class FileServer implements Runnable {
 
-
 	private final Context ctx;
 
 	private static final Logger logger = Logger.getLogger(FileServer.class);
@@ -28,12 +27,14 @@ final class FileServer implements Runnable {
 
 	@Override
 	public void run() {
-		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {
+		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer()
+				.getPort())) {
 			while (true) {
 				logger.info("Waiting for incoming connection");
 				try {
 					final Socket s = server.accept();
-					logger.debug("Accepted incoming connection from " + s.getRemoteSocketAddress());
+					logger.debug("Accepted incoming connection from "
+							+ s.getRemoteSocketAddress());
 					pool.execute(new SendFileTask(s, ctx));
 				} catch (IOException e) {
 					logger.error(e);
@@ -45,9 +46,7 @@ final class FileServer implements Runnable {
 		}
 
 	}
-	
-	
-	
+
 	private final class SendFileTask implements Runnable {
 		private final Socket s;
 		private final Context ctx;
@@ -60,15 +59,13 @@ final class FileServer implements Runnable {
 		@Override
 		public void run() {
 			try {
-				BufferedReader st = new BufferedReader(
-						new InputStreamReader(s
-								.getInputStream()));
+				BufferedReader st = new BufferedReader(new InputStreamReader(
+						s.getInputStream()));
 				String fileid = st.readLine();
-				logger.info("File " + fileid
-						+ " has been requested.");
-				File myFile = new File(ctx.getPathToPeerbox() + "/" + fileid);
-				byte[] mybytearray = new byte[(int) myFile
-						.length()];
+				logger.info("File " + fileid + " has been requested.");
+				File myFile = new File(ctx.getPathToPeerbox()
+						+ System.getProperty("file.separator") + fileid);
+				byte[] mybytearray = new byte[(int) myFile.length()];
 
 				BufferedInputStream bis = new BufferedInputStream(
 						new FileInputStream(myFile));
@@ -88,5 +85,5 @@ final class FileServer implements Runnable {
 			}
 		}
 	}
-	
+
 }

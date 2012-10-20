@@ -56,17 +56,17 @@ public class FindingPeersApp {
 		Shell shell = new Shell(display);
 		shell.setText("Hello World");
 		shell.open();
-		
+
 		while (!shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
-        }
-        display.dispose();
-        
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		display.dispose();
+
 		Peerbox peerbox = new Peerbox(properties);
 		peerbox.join();
-		
+
 		boolean alive = true;
 		do {
 			message = scanner.nextLine();
@@ -98,7 +98,9 @@ public class FindingPeersApp {
 		String homeDirectory = System.getProperty("user.home");
 		String computerName = System.getProperty("user.name");
 
-		properties.setProperty(Property.PATH, homeDirectory + "/Peerbox");
+		properties.setProperty(Property.PATH,
+				homeDirectory + System.getProperty("file.separator")
+						+ "Peerbox");
 		properties.setProperty(Property.MULTICAST_ADDRESS, "239.1.2.4");
 		properties.setProperty(Property.MULTICAST_PORT, "1567");
 		properties.setProperty(Property.SERVER_PORT, "6666");

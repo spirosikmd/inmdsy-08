@@ -29,7 +29,8 @@ public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 
 	public void serialize(String datafile, String path) {
 		try {
-			OutputStream file = new FileOutputStream(path + "/" + datafile);
+			OutputStream file = new FileOutputStream(path
+					+ System.getProperty("file.separator") + datafile);
 			OutputStream buffer = new BufferedOutputStream(file);
 			try (ObjectOutput output = new ObjectOutputStream(buffer)) {
 				output.writeObject(this);
@@ -42,7 +43,8 @@ public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 	public static Filelist deserialize(String datafile, String path) {
 		Filelist filelist = null;
 		try {
-			InputStream file = new FileInputStream(path + "/" + datafile);
+			InputStream file = new FileInputStream(path
+					+ System.getProperty("file.separator") + datafile);
 			InputStream buffer = new BufferedInputStream(file);
 			try (ObjectInput input = new ObjectInputStream(buffer)) {
 				filelist = (Filelist) input.readObject();
