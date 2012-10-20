@@ -6,21 +6,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.Scanner;
 
 import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.Property;
+import nl.rug.peerbox.ui.PeerboxUI;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 public class FindingPeersApp {
 
 	private static final String PEERBOX_PROPERTIES_FILE = "peerbox.properties";
 	private static final String DEFAULT_PROPERTIES_FILE = "default.properties";
-	private static final String LOGGER_PROPERTIES_FILE = "logger.properties";
+	public static final String LOGGER_PROPERTIES_FILE = "logger.properties";
 
 	private static Logger logger = Logger.getLogger(FindingPeersApp.class);
 
@@ -47,50 +46,59 @@ public class FindingPeersApp {
 		}
 
 		BasicConfigurator.configure();
-		// PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
+		//PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
-		String message;
-		Scanner scanner = new Scanner(System.in);
-
-		Display display = new Display();
-		Shell shell = new Shell(display);
-		shell.setText("Hello World");
-		shell.open();
 		
-		while (!shell.isDisposed()) {
+		Peerbox peerbox = new Peerbox(properties);
+		peerbox.join();
+		
+
+		Display.setAppName("Peerbox");
+		Display display = new Display();
+		
+		PeerboxUI view = new PeerboxUI(peerbox, display);
+		view.getShell().setText("Peerbox");
+		
+		
+		view.getShell().open();
+		
+		while (!view.getShell().isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
-        display.dispose();
+		display.dispose();
+		peerbox.leave();
+		System.exit(0);
         
-		Peerbox peerbox = new Peerbox(properties);
-		peerbox.join();
-		
-		boolean alive = true;
-		do {
-			message = scanner.nextLine();
-			String[] parts = message.split(" ");
-			String command = parts[0];
-			String arg = "";
-			if (parts.length == 2) {
-				arg = parts[1];
-			}
-
-			if ("leave".equals(command)) {
-				peerbox.leave();
-				alive = false;
-				scanner.close();
-			} else if ("threads".equals(command)) {
-				Thread.currentThread().getThreadGroup().list();
-			} else if ("list".equals(command)) {
-				peerbox.listFiles();
-			} else if ("request".equals(command)) {
-				peerbox.requestFiles();
-			} else if ("get".equals(command)) {
-				peerbox.getFile(arg);
-			}
-		} while (alive);
+        
+//        
+//		
+//		
+//		boolean alive = true;
+//		do {
+//			message = scanner.nextLine();
+//			String[] parts = message.split(" ");
+//			String command = parts[0];
+//			String arg = "";
+//			if (parts.length == 2) {
+//				arg = parts[1];
+//			}
+//
+//			if ("leave".equals(command)) {
+//				
+//				alive = false;
+//				scanner.close();
+//			} else if ("threads".equals(command)) {
+//				Thread.currentThread().getThreadGroup().list();
+//			} else if ("list".equals(command)) {
+//				peerbox.listFiles();
+//			} else if ("request".equals(command)) {
+//				peerbox.requestFiles();
+//			} else if ("get".equals(command)) {
+//				peerbox.getFile(arg);
+//			}
+//		} while (alive);
 
 	}
 

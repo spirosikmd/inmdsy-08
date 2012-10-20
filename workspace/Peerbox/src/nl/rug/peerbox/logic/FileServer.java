@@ -29,7 +29,7 @@ final class FileServer implements Runnable {
 	@Override
 	public void run() {
 		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {
-			while (true) {
+			while (Thread.currentThread().isInterrupted()) {
 				logger.info("Waiting for incoming connection");
 				try {
 					final Socket s = server.accept();
@@ -39,6 +39,7 @@ final class FileServer implements Runnable {
 					logger.error(e);
 				}
 			}
+			pool.shutdownNow();
 
 		} catch (IOException e) {
 			logger.error(e);
