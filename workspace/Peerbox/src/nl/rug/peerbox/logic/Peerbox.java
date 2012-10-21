@@ -8,10 +8,10 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.rug.peerbox.logic.Message.Change;
-import nl.rug.peerbox.logic.Message.Command;
-import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.messaging.Message;
+import nl.rug.peerbox.logic.messaging.Message.Change;
+import nl.rug.peerbox.logic.messaging.Message.Command;
+import nl.rug.peerbox.logic.messaging.Message.Key;
 import nl.rug.peerbox.logic.messaging.MessageHandler;
 import nl.rug.peerbox.logic.messaging.UnsupportedCommandException;
 import nl.rug.peerbox.middleware.MessageListener;

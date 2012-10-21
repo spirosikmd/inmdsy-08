@@ -20,10 +20,10 @@ public class VirtualFileSystem {
 	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
 
 	private VirtualFileSystem(final Context ctx) {
-		
+
 		this.ctx = ctx;
 		FileSystem fs = FileSystems.getDefault();
-	
+
 		try {
 			Path path = fs.getPath(ctx.getPathToPeerbox());
 			final WatchService watcher = fs.newWatchService();
@@ -66,14 +66,12 @@ public class VirtualFileSystem {
 				}
 			});
 			peerboxObserver.setDaemon(true);
-			//peerboxObserver.start();
+			// peerboxObserver.start();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	};
-	
-
 
 	public static VirtualFileSystem initVirtualFileSystem(Peerbox ctx) {
 		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
@@ -112,24 +110,24 @@ public class VirtualFileSystem {
 		}
 		notifyListeners();
 	}
-	
+
 	public PeerboxFile removeFile(UFID ufid) {
 		notifyListeners();
 		return null;
 	}
-	
+
 	public void addVFSListener(VFSListener l) {
 		listeners.add(l);
 	}
-	
+
 	public void removeVFSListener(VFSListener l) {
 		listeners.remove(l);
 	}
-	
+
 	public Collection<PeerboxFile> getFileList() {
 		return new ArrayList<PeerboxFile>(filelist.values());
 	}
-	
+
 	private void notifyListeners() {
 		for (VFSListener l : listeners) {
 			l.updated();

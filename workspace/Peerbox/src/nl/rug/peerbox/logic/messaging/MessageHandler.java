@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
+import nl.rug.peerbox.logic.messaging.Message.Command;
 
 import org.apache.log4j.Logger;
 
