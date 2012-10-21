@@ -13,11 +13,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nl.rug.peerbox.logic.messaging.Message;
+import nl.rug.peerbox.logic.messaging.Message.Command;
+import nl.rug.peerbox.logic.messaging.Message.Key;
+
+import org.apache.log4j.Logger;
+
 public class VirtualFileSystem {
 
 	private Filelist filelist;
 	private final Context ctx;
 	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
+	private static final Logger logger = Logger.getLogger(VirtualFileSystem.class);
 
 	private VirtualFileSystem(final Context ctx) {
 		this.ctx = ctx;
@@ -43,8 +50,19 @@ public class VirtualFileSystem {
 							// update own vfs with the events
 							for (WatchEvent<?> event : events) {
 								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-									System.out.println("Created: "
-											+ event.context().toString());
+									logger.info("Detect file created event " + event.context().toString());
+									if (event.context() instanceof Path) {
+										Path path = (Path) event.context();
+										Context ctx = Peerbox.getInstance();
+										File file = path.toFile();
+										PeerboxFile pbf = new PeerboxFile(file.getName(), ctx.getLocalPeer(), file);
+										addFile(pbf);
+										Message update = new Message();
+										update.put(Key.Command, Command.Info.Created);
+										update.put(Key.Peer, ctx.getLocalPeer());
+										update.put(Key.File, pbf);
+										ctx.getMulticastGroup().announce(update.serialize());
+									}
 								}
 								if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 									System.out.println("Delete: "
@@ -65,7 +83,7 @@ public class VirtualFileSystem {
 				}
 			});
 			peerboxObserver.setDaemon(true);
-			// peerboxObserver.start();
+			peerboxObserver.start();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -96,10 +114,7 @@ public class VirtualFileSystem {
 			for (String filename : directory.list()) {
 				PeerboxFile file = new PeerboxFile(filename, ctx.getLocalPeer(), new File(filename));
 				if (!filename.equals(datafile) && !filename.startsWith(".")) {
-					if (!vfs.filelist.containsKey(file.getUFID())) {
-						vfs.filelist.put(file.getUFID(), file);
-						vfs.notifyAboutAddedFile(file);
-					}
+					vfs.addFile(file);
 				}
 			}
 		}
@@ -110,7 +125,6 @@ public class VirtualFileSystem {
 	public void addFile(PeerboxFile file) {
 		if (!filelist.containsKey(file.getUFID())) {
 			filelist.put(file.getUFID(), file);
-			filelist.serialize(ctx.getDatafileName(), ctx.getPathToPeerbox());
 			notifyAboutAddedFile(file);
 		}
 	}

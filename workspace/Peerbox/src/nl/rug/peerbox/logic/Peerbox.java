@@ -6,13 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import nl.rug.peerbox.logic.messaging.Message;
-import nl.rug.peerbox.logic.messaging.Message.Change;
 import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 import nl.rug.peerbox.logic.messaging.MessageHandler;
@@ -99,43 +97,10 @@ public class Peerbox implements MessageListener, Context {
 		group.announce(message.serialize());
 	}
 
-	public void listFiles() {
-		System.out.println("===FILE LIST BEGIN===");
-		for (PeerboxFile file : fs.getFileList()) {
-			Peer h = file.getOwner();
-			String f = file.getFilename();
-			System.out.println(f + "  @" + h.getName() + " \t\t(" + h + ")");
-		}
-		System.out.println("===FILE LIST END===");
-	}
-
 	@Override
 	public void requestFiles() {
 		Message message = new Message();
 		message.put(Key.Command, Command.Request.List);
-		group.announce(message.serialize());
-	}
-
-	public void getFile(PeerboxFile f) {
-		// Future<File> future =
-		// submit future to future observer to create a process list
-	}
-
-	private Peer findHostThatServesTheFileHelper(String filename) {
-		for (PeerboxFile file : fs.getFileList()) {
-			String f = file.getFilename();
-			if (filename.equals(f)) {
-				return file.getOwner();
-			}
-		}
-		return null;
-	}
-
-	public void sendChanges(List<String> filenames, List<Change> changes) {
-		Message message = new Message();
-		message.put(Key.Command, "EVENTS");
-		message.put(Key.Files, filenames);
-		message.put(Key.Changes, changes);
 		group.announce(message.serialize());
 	}
 

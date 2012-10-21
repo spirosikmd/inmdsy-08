@@ -9,10 +9,10 @@ import nl.rug.peerbox.logic.messaging.Message.Key;
 
 import org.apache.log4j.Logger;
 
-final class ReplyToListMessageHandler extends MessageHandler {
+final class ReplyListMessageHandler extends MessageHandler {
 
 	private static final Logger logger = Logger
-			.getLogger(ReplyToListMessageHandler.class);
+			.getLogger(ReplyListMessageHandler.class);
 
 	@Override
 	final void handle(Message message, Context ctx) {

@@ -7,7 +7,6 @@ import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
-import nl.rug.peerbox.logic.messaging.Message.Command;
 
 import org.apache.log4j.Logger;
 
@@ -17,9 +16,9 @@ public abstract class MessageHandler {
 	private static final Logger logger = Logger.getLogger(MessageHandler.class);
 
 	static {
-		registerHandler(new ReplyToListMessageHandler(), Command.Reply.List);
-		registerHandler(new ListMessageHandler(), Command.Request.List);
-		registerHandler(new ChangesMessageHandler(), Command.Info.Events);
+		registerHandler(new ReplyListMessageHandler(), Command.Reply.List);
+		registerHandler(new RequestListMessageHandler(), Command.Request.List);
+		registerHandler(new InfoCreatedMessageHandler(), Command.Info.Created);
 	}
 
 	static void registerHandler(final MessageHandler handler,
