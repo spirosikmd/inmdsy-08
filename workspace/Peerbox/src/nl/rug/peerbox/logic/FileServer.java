@@ -16,17 +16,14 @@ import org.apache.log4j.Logger;
 
 final class FileServer implements Runnable {
 
-	private final Context ctx;
+	
 
 	private static final Logger logger = Logger.getLogger(FileServer.class);
 	private final ExecutorService pool = Executors.newFixedThreadPool(5);
 
-	FileServer() {
-		this.ctx = Peerbox.getInstance();
-	}
-
 	@Override
 	public void run() {
+		Context ctx = Peerbox.getInstance();
 		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {
 			while (Thread.currentThread().isInterrupted()) {
 				logger.info("Waiting for incoming connection");

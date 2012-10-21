@@ -25,29 +25,26 @@ import org.apache.log4j.Logger;
 
 public class Peerbox implements MessageListener, Context {
 
-	private final Multicast group;
-	private final String path;
-	private final static Logger logger = Logger.getLogger(Peerbox.class);
-
-	private final ExecutorService pool;
-	private final Peer peer;
-	private final VirtualFileSystem fs;
-	private final String datafile;
-	
 	private static final String PEERBOX_PROPERTIES_FILE = "peerbox.properties";
 	private static final String DEFAULT_PROPERTIES_FILE = "default.properties";
+	private final static Logger logger = Logger.getLogger(Peerbox.class);
+
+	private Multicast group;
+	private String path;
+	private String datafile;
+	private ExecutorService pool = Executors.newFixedThreadPool(5);
+	private Peer peer;
+	private VirtualFileSystem fs;
 
 	private static class Holder {
-		private static final Context INSTANCE = new Peerbox();
+		private static final Context INSTANCE = Peerbox.createInstance();
 	}
 
-	public  static Context getInstance() {
+	public static Context getInstance() {
 		return Holder.INSTANCE;
 	}
 
 	private Peerbox() {
-		
-
 		Properties defaultProperties = new Properties();
 		createDefaults(defaultProperties);
 
@@ -59,39 +56,38 @@ public class Peerbox implements MessageListener, Context {
 			} catch (IOException e) {
 				logger.error(e);
 			}
-		}
-
+		}		
+		
+		path = properties.getProperty(Property.PATH);
+		datafile = properties.getProperty(Property.DATAFILE_NAME);
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
 				.getProperty(Property.MULTICAST_PORT));
+		group = ReliableMulticast.createPeer(address, port);
+		
+		byte[] ip = getLocalAddress();
 		int serverPort = Integer.parseInt(properties
 				.getProperty(Property.SERVER_PORT));
-		path = properties.getProperty(Property.PATH);
-		datafile = properties.getProperty(Property.DATAFILE_NAME);
-
 		String name = properties.getProperty(Property.NAME);
+		peer = Peer.createPeer(ip, serverPort, name);
+	}
 
-		group = ReliableMulticast.createPeer(address, port);
-		group.addMessageListener(this);
+	private static Peerbox createInstance() {
+		Peerbox peerbox = new Peerbox();
+		peerbox.group.addMessageListener(peerbox);
+		peerbox.fs = VirtualFileSystem.initVirtualFileSystem(peerbox);
+		peerbox.pool.execute(new FileServer());
+		return peerbox;
+	}
 
-		pool = Executors.newFixedThreadPool(5);
-
-		// check if folder exists
-		File folder = new File(path);
-		if (!folder.exists()) {
-			folder.mkdirs();
-		}
-
+	private static byte[] getLocalAddress() {
 		byte[] ip = new byte[] {};
 		try {
 			ip = InetAddress.getLocalHost().getAddress();
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
-		peer = Peer.createPeer(ip, serverPort, name);
-		fs = VirtualFileSystem.initVirtualFileSystem();
-		pool.execute(new FileServer());
-
+		return ip;
 	}
 
 	@Override

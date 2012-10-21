@@ -20,7 +20,6 @@ public class VirtualFileSystem {
 	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
 
 	private VirtualFileSystem(final Context ctx) {
-
 		this.ctx = ctx;
 		FileSystem fs = FileSystems.getDefault();
 
@@ -73,9 +72,13 @@ public class VirtualFileSystem {
 		}
 	};
 
-	public static VirtualFileSystem initVirtualFileSystem() {
-		Context ctx = Peerbox.getInstance();
-		VirtualFileSystem vfs = new VirtualFileSystem();
+	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
+		File folder = new File(ctx.getPathToPeerbox());
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+		
+		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
 
 		vfs.filelist = new Filelist();
 

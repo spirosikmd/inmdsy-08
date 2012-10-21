@@ -56,6 +56,11 @@ public class UFID implements Serializable {
 		return fileid.equals(otherUFID.getFileid())
 				&& owner.equals(otherUFID.getOwner());
 	}
+	
+	@Override
+	public int hashCode() {
+		return new String(fileid + "" + owner).hashCode();
+	}
 
 	@Override
 	public String toString() {
