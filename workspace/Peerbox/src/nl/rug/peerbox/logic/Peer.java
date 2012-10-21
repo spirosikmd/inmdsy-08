@@ -35,10 +35,13 @@ public class Peer implements Serializable {
 
 		Peer other = (Peer) obj;
 
-		return (address.equals(other.address) && port == other.port);
+		return (address.equals(other.address) && port == other.port && name.equals(other.name));
 	}
 	
-	
+	@Override
+	public int hashCode() {
+		return address.hashCode() + port + name.hashCode() + 23;
+	}
 
 	public InetAddress getAddress() {
 		return address;
@@ -53,10 +56,7 @@ public class Peer implements Serializable {
 	}
 
 
-	@Override
-	public int hashCode() {
-		return address.hashCode() + port + 23;
-	}
+	
 
 	@Override
 	public String toString() {

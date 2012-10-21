@@ -11,6 +11,7 @@ public class PeerboxFile implements Serializable {
 	private Peer owner;
 	private String filename;
 
+
 	public PeerboxFile(String filename, Peer owner) {
 		this.filename = filename;
 		this.ufid = new UFID(filename, owner);
@@ -37,6 +38,14 @@ public class PeerboxFile implements Serializable {
 		return owner;
 	}
 
+	public boolean isOwn() {
+		return getOwner().equals(Peerbox.getInstance().getLocalPeer());
+	}
+	
+	public boolean exists() {
+		return new File(filename).exists();
+	}
+	
 	public File getFile() {
 		return new File(filename);
 	}

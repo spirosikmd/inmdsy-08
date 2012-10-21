@@ -98,12 +98,12 @@ public class VirtualFileSystem {
 				if (!filename.equals(datafile) && !filename.startsWith(".")) {
 					if (!vfs.filelist.containsKey(file.getUFID())) {
 						vfs.filelist.put(file.getUFID(), file);
+						vfs.notifyAboutAddedFile(file);
 					}
 				}
 			}
 		}
-		vfs.filelist.serialize(datafile, path);
-		vfs.notifyListeners();
+		vfs.filelist.serialize(datafile, path);		
 		return vfs;
 	}
 
@@ -111,12 +111,12 @@ public class VirtualFileSystem {
 		if (!filelist.containsKey(file.getUFID())) {
 			filelist.put(file.getUFID(), file);
 			filelist.serialize(ctx.getDatafileName(), ctx.getPathToPeerbox());
+			notifyAboutAddedFile(file);
 		}
-		notifyListeners();
 	}
 
 	public PeerboxFile removeFile(UFID ufid) {
-		notifyListeners();
+		notifyAboutDeletedFile(null);
 		return null;
 	}
 
@@ -131,10 +131,22 @@ public class VirtualFileSystem {
 	public Collection<PeerboxFile> getFileList() {
 		return new ArrayList<PeerboxFile>(filelist.values());
 	}
-
-	private void notifyListeners() {
+	
+	private void notifyAboutAddedFile(PeerboxFile f) {
 		for (VFSListener l : listeners) {
-			l.updated();
+			l.added(f);
+		}
+	}
+	
+	private void notifyAboutDeletedFile(PeerboxFile f) {
+		for (VFSListener l : listeners) {
+			l.deleted(f);
+		}
+	}
+	
+	private void notifyAboutUpdatedFile(PeerboxFile f) {
+		for (VFSListener l : listeners) {
+			l.updated(f);
 		}
 	}
 }

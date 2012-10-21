@@ -1,0 +1,154 @@
+package nl.rug.peerbox.ui;
+
+import nl.rug.peerbox.logic.Context;
+import nl.rug.peerbox.logic.Peerbox;
+import nl.rug.peerbox.logic.PeerboxFile;
+import nl.rug.peerbox.logic.VFSListener;
+import nl.rug.peerbox.logic.VirtualFileSystem;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+
+public class SharedFilesView extends Composite implements DisposeListener,
+		VFSListener, SelectionListener {
+
+	private final Font title;
+	private final Color foreground;
+	private final Context peerbox;
+	private final Composite content;
+	private ScrolledComposite scrollable;
+
+	public SharedFilesView(Composite c) {
+
+		super(c, SWT.NONE);
+		this.peerbox = Peerbox.getInstance();
+		this.peerbox.getVirtualFilesystem().addVFSListener(this);
+
+		Display display = Display.getCurrent();
+		title = new Font(display, "Arial", 13, SWT.NORMAL);
+		foreground = new Color(display, 75, 75, 75);
+		setFont(title);
+		setForeground(foreground);
+
+		addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				e.gc.drawText("Shared Files", 20, 15);
+				e.gc.dispose();
+			}
+		});
+
+		GridLayout layout = new GridLayout();
+		layout.marginTop = 40;
+		layout.marginLeft = 20;
+		layout.numColumns = 1;
+		setLayout(layout);
+
+		Button request = new Button(this, SWT.PUSH);
+		request.setText("Request");
+		request.addSelectionListener(this);
+
+		scrollable = new ScrolledComposite(this, SWT.V_SCROLL | SWT.H_SCROLL);
+		scrollable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		scrollable.setLayout(new GridLayout(1, true));
+		content = new Composite(scrollable, SWT.NONE);
+		content.setSize(400, 400);
+		content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		content.setLayout(new GridLayout(1, true));
+
+		scrollable.setContent(content);
+		scrollable.pack();
+		Rectangle r = scrollable.getClientArea();
+		content.setSize(content.computeSize(r.width, SWT.DEFAULT));
+		scrollable.addControlListener(new ControlListener() {
+
+			@Override
+			public void controlResized(ControlEvent arg0) {
+				Rectangle r = scrollable.getClientArea();
+				content.setSize(content.computeSize(r.width - 10, SWT.DEFAULT));
+			}
+
+			@Override
+			public void controlMoved(ControlEvent arg0) {
+			}
+		});
+		System.out.println(scrollable.getSize());
+
+		VirtualFileSystem vfs = Peerbox.getInstance().getVirtualFilesystem();
+		for (PeerboxFile file : vfs.getFileList()) {
+			GridData textData = new GridData();
+			textData.grabExcessHorizontalSpace = true;
+			textData.horizontalAlignment = GridData.FILL;
+			FileView fv = new FileView(content);
+			fv.setModel(file);
+			fv.setLayoutData(textData);
+		}
+
+		content.layout();
+
+	}
+
+	@Override
+	public void widgetDisposed(DisposeEvent de) {
+		title.dispose();
+		foreground.dispose();
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent se) {
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent se) {
+		peerbox.requestFiles();
+	}
+
+	@Override
+	public void updated(final PeerboxFile f) {
+	}
+
+	@Override
+	public void added(final PeerboxFile f) {
+		final SharedFilesView parent = this;
+		this.getDisplay().asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				GridData textData = new GridData();
+				textData.grabExcessHorizontalSpace = true;
+				textData.horizontalAlignment = GridData.FILL;
+				FileView fv = new FileView(parent.content);
+				fv.setModel(f);
+				fv.setLayoutData(textData);
+
+				content.layout();
+				Rectangle r = scrollable.getClientArea();
+				content.setSize(content.computeSize(r.width, SWT.DEFAULT));
+			}
+		});
+
+	}
+
+	@Override
+	public void deleted(PeerboxFile f) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
