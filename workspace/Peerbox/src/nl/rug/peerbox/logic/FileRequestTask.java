@@ -30,7 +30,7 @@ public final class FileRequestTask implements Runnable {
 	@Override
 	public void run() {
 		File sharedFile = new File(ctx.getPathToPeerbox()
-				+ System.getProperty("file.separator") + filename);
+				+ System.getProperty("file.separator") + filename + ".tmp");
 
 		try (Socket s = new Socket(h.getAddress(), h.getPort())) {
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
@@ -50,11 +50,17 @@ public final class FileRequestTask implements Runnable {
 			logger.info("File " + filename + " has been received");
 			file.setFile(sharedFile);
 		} catch (IOException e) {
-			e.printStackTrace();
 			logger.error(e);
 			sharedFile.delete();
 			sharedFile = null;
+			file.setFile(null);
 		}
+		
+		
+		//verify file with peerboxfile properties
+		//filesize and content checksum
+		
+		
 		
 		
 	}

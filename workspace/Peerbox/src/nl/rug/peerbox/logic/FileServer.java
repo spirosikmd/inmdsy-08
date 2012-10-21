@@ -81,10 +81,15 @@ final class FileServer implements Runnable {
 				bis.close();
 				os.close();
 				st.close();
-				s.close();
 				logger.info("File " + fileid + " has been transmitted");
 			} catch (IOException e) {
 				logger.error(e);
+			} finally {
+				try {
+					s.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
 			}
 		}
 	}
