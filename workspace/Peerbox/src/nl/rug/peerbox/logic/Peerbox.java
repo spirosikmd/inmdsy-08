@@ -3,13 +3,13 @@ package nl.rug.peerbox.logic;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.WatchEvent;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.rug.peerbox.logic.Message.Change;
 import nl.rug.peerbox.logic.Message.Command;
 import nl.rug.peerbox.logic.Message.Key;
 import nl.rug.peerbox.logic.handler.MessageHandler;
@@ -42,7 +42,6 @@ public class Peerbox implements MessageListener, Context {
 		datafile = properties.getProperty(Property.DATAFILE_NAME);
 
 		String name = properties.getProperty(Property.NAME);
-		
 
 		group = ReliableMulticast.createPeer(address, port);
 		group.addMessageListener(this);
@@ -108,11 +107,12 @@ public class Peerbox implements MessageListener, Context {
 		}
 		return null;
 	}
-	
-	public void sendEvents(List<WatchEvent<?>> events) {
+
+	public void sendChanges(List<String> filenames, List<Change> changes) {
 		Message message = new Message();
 		message.put(Key.Command, "EVENTS");
-		message.put(Key.Events, events);
+		message.put(Key.Files, filenames);
+		message.put(Key.Changes, changes);
 		group.announce(message.serialize());
 	}
 
@@ -156,7 +156,7 @@ public class Peerbox implements MessageListener, Context {
 	public Peer getLocalPeer() {
 		return peer;
 	}
-	
+
 	@Override
 	public String getDatafileName() {
 		return datafile;

@@ -37,7 +37,7 @@ public class VirtualFileSystem {
 							System.out.println("got one");
 							List<WatchEvent<?>> events = watckKey.pollEvents();
 							// send list of events in one message
-							ctx.sendEvents(events);
+							// ctx.sendChanges(..., ...);
 							// update own vfs with the events
 							for (WatchEvent<?> event : events) {
 								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {

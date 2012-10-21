@@ -22,7 +22,7 @@ public class Message implements Serializable {
 	private final Map<Key, Object> dictionary = new HashMap<Key, Object>();
 
 	public static enum Key {
-		Command, Files, Peer, Events
+		Command, Files, Peer, Changes
 	}
 
 	public static interface Command {
@@ -33,8 +33,12 @@ public class Message implements Serializable {
 			List;
 		}
 		public enum Info {
-			Events;
+			Changes;
 		}
+	}
+	
+	public static enum Change {
+		Create, Delete, Modified
 	}
 
 	public void put(Key key, Object obj) {
