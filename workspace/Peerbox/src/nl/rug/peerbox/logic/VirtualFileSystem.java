@@ -94,7 +94,7 @@ public class VirtualFileSystem {
 
 		if (directory.isDirectory()) {
 			for (String filename : directory.list()) {
-				PeerboxFile file = new PeerboxFile(filename, ctx.getLocalPeer());
+				PeerboxFile file = new PeerboxFile(filename, ctx.getLocalPeer(), new File(filename));
 				if (!filename.equals(datafile) && !filename.startsWith(".")) {
 					if (!vfs.filelist.containsKey(file.getUFID())) {
 						vfs.filelist.put(file.getUFID(), file);

@@ -18,8 +18,10 @@ public final class FileRequestTask implements Runnable {
 	private final Peer h;
 	private final String filename;
 	private final Context ctx;
+	private final PeerboxFile file;
 
 	public FileRequestTask(PeerboxFile file) {
+		this.file = file;
 		this.h = file.getOwner();
 		this.filename = file.getFilename();
 		this.ctx = Peerbox.getInstance();
@@ -46,11 +48,14 @@ public final class FileRequestTask implements Runnable {
 			bos.close();
 			put.close();
 			logger.info("File " + filename + " has been received");
+			file.setFile(sharedFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
 			sharedFile.delete();
 			sharedFile = null;
 		}
+		
+		
 	}
 }
