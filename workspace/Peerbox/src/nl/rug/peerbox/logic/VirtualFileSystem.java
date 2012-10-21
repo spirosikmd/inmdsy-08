@@ -73,8 +73,9 @@ public class VirtualFileSystem {
 		}
 	};
 
-	public static VirtualFileSystem initVirtualFileSystem(Peerbox ctx) {
-		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
+	public static VirtualFileSystem initVirtualFileSystem() {
+		Context ctx = Peerbox.getInstance();
+		VirtualFileSystem vfs = new VirtualFileSystem();
 
 		vfs.filelist = new Filelist();
 

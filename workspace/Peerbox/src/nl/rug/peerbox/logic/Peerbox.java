@@ -89,8 +89,8 @@ public class Peerbox implements MessageListener, Context {
 			e.printStackTrace();
 		}
 		peer = Peer.createPeer(ip, serverPort, name);
-		fs = VirtualFileSystem.initVirtualFileSystem(this);
-		pool.execute(new FileServer(this));
+		fs = VirtualFileSystem.initVirtualFileSystem();
+		pool.execute(new FileServer());
 
 	}
 
@@ -121,7 +121,7 @@ public class Peerbox implements MessageListener, Context {
 	public void getFile(final String filename) {
 
 		final Peer h = findHostThatServesTheFileHelper(filename);
-		pool.submit(new FileRequestTask(h, filename, this));
+		pool.submit(new FileRequestTask(h, filename));
 		// Future<File> future =
 		// submit future to future observer to create a process list
 	}
@@ -158,7 +158,7 @@ public class Peerbox implements MessageListener, Context {
 
 		if (message != null) {
 			try {
-				MessageHandler.process(message, this);
+				MessageHandler.process(message);
 			} catch (UnsupportedCommandException e) {
 				logger.error("Unsupported command " + e.getUnsupportedCommand());
 				logger.error(e);

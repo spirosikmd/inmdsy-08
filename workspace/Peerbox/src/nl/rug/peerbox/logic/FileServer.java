@@ -21,8 +21,8 @@ final class FileServer implements Runnable {
 	private static final Logger logger = Logger.getLogger(FileServer.class);
 	private final ExecutorService pool = Executors.newFixedThreadPool(5);
 
-	FileServer(Context ctx) {
-		this.ctx = ctx;
+	FileServer() {
+		this.ctx = Peerbox.getInstance();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ final class FileServer implements Runnable {
 					final Socket s = server.accept();
 					logger.debug("Accepted incoming connection from "
 							+ s.getRemoteSocketAddress());
-					pool.execute(new SendFileTask(s, ctx));
+					pool.execute(new SendFileTask(s));
 				} catch (IOException e) {
 					logger.error(e);
 				}
@@ -51,9 +51,9 @@ final class FileServer implements Runnable {
 		private final Socket s;
 		private final Context ctx;
 
-		private SendFileTask(Socket s, Context ctx) {
+		private SendFileTask(Socket s) {
 			this.s = s;
-			this.ctx = ctx;
+			this.ctx = Peerbox.getInstance();
 		}
 
 		@Override

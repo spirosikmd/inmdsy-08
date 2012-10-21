@@ -20,10 +20,10 @@ final class FileRequestTask implements Callable<File> {
 	private final String filename;
 	private final Context ctx;
 
-	FileRequestTask(Peer h, String filename, Context ctx) {
+	FileRequestTask(Peer h, String filename) {
 		this.h = h;
 		this.filename = filename;
-		this.ctx = ctx;
+		this.ctx = Peerbox.getInstance();
 	}
 
 	@Override
