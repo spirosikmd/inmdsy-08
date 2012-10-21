@@ -92,7 +92,7 @@ public class VirtualFileSystem {
 			for (String filename : directory.list()) {
 				PeerboxFile file = new PeerboxFile(filename, ctx.getLocalPeer());
 				if (!filename.equals(datafile) && !filename.startsWith(".")) {
-					if (!vfs.filelist.containsKey(file)) {
+					if (!vfs.filelist.containsKey(file.getUFID())) {
 						vfs.filelist.put(file.getUFID(), file);
 					}
 				}
@@ -104,7 +104,7 @@ public class VirtualFileSystem {
 	}
 
 	public void addFile(PeerboxFile file) {
-		if (!filelist.containsKey(file)) {
+		if (!filelist.containsKey(file.getUFID())) {
 			filelist.put(file.getUFID(), file);
 			filelist.serialize(ctx.getDatafileName(), ctx.getPathToPeerbox());
 		}
