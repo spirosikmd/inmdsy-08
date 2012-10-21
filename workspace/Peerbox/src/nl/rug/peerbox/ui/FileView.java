@@ -125,6 +125,7 @@ public class FileView extends Composite implements DisposeListener, SelectionLis
 
 	@Override
 	public void widgetSelected(SelectionEvent arg0) {
+		action.setEnabled(false);
 		this.getDisplay().asyncExec(new FileRequestTask(getModel()));	
 	}
 
