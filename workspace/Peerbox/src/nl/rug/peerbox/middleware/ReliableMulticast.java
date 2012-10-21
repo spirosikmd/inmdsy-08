@@ -69,6 +69,7 @@ public class ReliableMulticast implements Multicast {
 	public void announce(byte[] payload) {
 
 		if (payload.length > Announcement.MAX_PAYLOAD_SIZE) {
+			logger.warn("Payload of message is too large");
 			throw new RuntimeException("Payload too large");
 		}
 		Announcement outgoing = Announcement.send(id,

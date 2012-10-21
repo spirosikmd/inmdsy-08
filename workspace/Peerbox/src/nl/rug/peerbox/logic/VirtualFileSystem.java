@@ -9,16 +9,21 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class VirtualFileSystem {
 
 	private Filelist filelist;
+	private final Context ctx;
+	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
 
-	private VirtualFileSystem(final Peerbox ctx) {
-
+	private VirtualFileSystem(final Context ctx) {
+		
+		this.ctx = ctx;
 		FileSystem fs = FileSystems.getDefault();
-
+	
 		try {
 			Path path = fs.getPath(ctx.getPathToPeerbox());
 			final WatchService watcher = fs.newWatchService();
@@ -32,9 +37,7 @@ public class VirtualFileSystem {
 				public void run() {
 					try {
 						while (true) {
-							System.out.println("Wait for watchkey");
 							WatchKey watckKey = watcher.take();
-							System.out.println("got one");
 							List<WatchEvent<?>> events = watckKey.pollEvents();
 							// send list of events in one message
 							// ctx.sendChanges(..., ...);
@@ -57,18 +60,20 @@ public class VirtualFileSystem {
 						}
 					} catch (InterruptedException e) {
 					} finally {
-						System.out.println("finished");
+						System.out.println("watcher finished");
 					}
 
 				}
 			});
 			peerboxObserver.setDaemon(true);
-			peerboxObserver.start();
+			//peerboxObserver.start();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	};
+	
+
 
 	public static VirtualFileSystem initVirtualFileSystem(Peerbox ctx) {
 		VirtualFileSystem vfs = new VirtualFileSystem(ctx);
@@ -87,21 +92,47 @@ public class VirtualFileSystem {
 
 		if (directory.isDirectory()) {
 			for (String filename : directory.list()) {
-				PeerboxFile pbxf = new PeerboxFile(filename, ctx.getLocalPeer());
-				String ufid = pbxf.getUFID().toString();
-				if (!vfs.filelist.containsKey(ufid)
-						&& !filename.equals(datafile)
-						&& !filename.startsWith(".")) {
-					vfs.filelist.put(ufid, pbxf);
+				PeerboxFile file = new PeerboxFile(filename, ctx.getLocalPeer());
+				if (!filename.equals(datafile) && !filename.startsWith(".")) {
+					if (!vfs.filelist.containsKey(file)) {
+						vfs.filelist.put(file.getUFID(), file);
+					}
 				}
 			}
 		}
 		vfs.filelist.serialize(datafile, path);
-
+		vfs.notifyListeners();
 		return vfs;
 	}
 
-	public Filelist getFileList() {
-		return filelist;
+	public void addFile(PeerboxFile file) {
+		if (!filelist.containsKey(file)) {
+			filelist.put(file.getUFID(), file);
+			filelist.serialize(ctx.getDatafileName(), ctx.getPathToPeerbox());
+		}
+		notifyListeners();
+	}
+	
+	public PeerboxFile removeFile(UFID ufid) {
+		notifyListeners();
+		return null;
+	}
+	
+	public void addVFSListener(VFSListener l) {
+		listeners.add(l);
+	}
+	
+	public void removeVFSListener(VFSListener l) {
+		listeners.remove(l);
+	}
+	
+	public Collection<PeerboxFile> getFileList() {
+		return new ArrayList<PeerboxFile>(filelist.values());
+	}
+	
+	private void notifyListeners() {
+		for (VFSListener l : listeners) {
+			l.updated();
+		}
 	}
 }

@@ -17,7 +17,7 @@ final class Announcement {
 	static final byte NACK = 4;
 
 	static final int HEADER_SIZE = 19;
-	static final int MAX_MESSAGE_SIZE = 4069;
+	static final int MAX_MESSAGE_SIZE = 40690;
 	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
 
 	private byte command;
@@ -132,11 +132,11 @@ final class Announcement {
 	@Override
 	public String toString() {
 		return cmdToText(command) + " " + peerID + "(" + messageID + ")  => "
-				+ first20(byteToText(payload));
+				+ firstX(byteToText(payload),40);
 	}
 
-	private String first20(String text) {
-		return text.substring(0, text.length() < 20 ? text.length() : 20);
+	private String firstX(String text, int x) {
+		return text.substring(0, text.length() < x ? text.length() : x);
 	}
 
 	private String byteToText(byte[] bytes) {

@@ -29,7 +29,7 @@ public class PeerboxUI implements DisposeListener, Listener {
 	private StackLayout contentLayout;
 	private PeerView peers;
 	private LogView log;
-	private FileView files;
+	private FilesView files;
 
 	private MenuButton logButton;
 	private MenuButton filesButton;
@@ -103,7 +103,7 @@ public class PeerboxUI implements DisposeListener, Listener {
 		content.setLayout(contentLayout);
 
 		log = new LogView(content);
-		files = new FileView(content, peerbox);
+		files = new FilesView(content, peerbox);
 		peers = new PeerView(content);
 		contentLayout.topControl = files;
 		content.layout();
