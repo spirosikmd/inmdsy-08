@@ -19,6 +19,7 @@ public abstract class MessageHandler {
 		registerHandler(new ReplyListMessageHandler(), Command.Reply.List);
 		registerHandler(new RequestListMessageHandler(), Command.Request.List);
 		registerHandler(new InfoCreatedMessageHandler(), Command.Info.Created);
+		registerHandler(new InfoDeletedMessageHandler(), Command.Info.Deleted);
 	}
 
 	static void registerHandler(final MessageHandler handler,
