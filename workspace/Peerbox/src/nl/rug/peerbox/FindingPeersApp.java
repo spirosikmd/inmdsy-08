@@ -1,19 +1,13 @@
 package nl.rug.peerbox;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Properties;
 
 import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peerbox;
-import nl.rug.peerbox.logic.Property;
 import nl.rug.peerbox.ui.PeerboxUI;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.swt.widgets.Display;
 
 public class FindingPeersApp {
@@ -32,8 +26,8 @@ public class FindingPeersApp {
 		Thread.currentThread().setName("Main");
 
 
-		BasicConfigurator.configure();
-		//PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
+		//BasicConfigurator.configure();
+		PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
 		
 		Context peerbox = Peerbox.getInstance();

@@ -64,9 +64,6 @@ public class SharedFilesView extends Composite implements DisposeListener,
 		layout.numColumns = 1;
 		setLayout(layout);
 
-		Button request = new Button(this, SWT.PUSH);
-		request.setText("Request");
-		request.addSelectionListener(this);
 
 		scrollable = new ScrolledComposite(this, SWT.V_SCROLL | SWT.H_SCROLL);
 		scrollable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -92,7 +89,6 @@ public class SharedFilesView extends Composite implements DisposeListener,
 			public void controlMoved(ControlEvent arg0) {
 			}
 		});
-		System.out.println(scrollable.getSize());
 
 		VirtualFileSystem vfs = Peerbox.getInstance().getVirtualFilesystem();
 		for (PeerboxFile file : vfs.getFileList()) {
@@ -105,6 +101,11 @@ public class SharedFilesView extends Composite implements DisposeListener,
 		}
 
 		content.layout();
+		
+		Button request = new Button(this, SWT.FLAT);
+		request.setText("Request");
+		request.addSelectionListener(this);
+		request.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 
 	}
 
