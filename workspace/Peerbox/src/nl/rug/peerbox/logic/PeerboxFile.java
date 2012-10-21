@@ -77,7 +77,6 @@ public class PeerboxFile implements Serializable {
 		for (PeerboxFileListener l : listeners) {
 			l.modelUpdated();
 		}
-
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import nl.rug.peerbox.logic.PeerboxFile;
 import nl.rug.peerbox.logic.VFSListener;
 import nl.rug.peerbox.logic.VirtualFileSystem;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlEvent;
@@ -23,6 +24,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 public class SharedFilesView extends Composite implements DisposeListener,
@@ -33,6 +35,8 @@ public class SharedFilesView extends Composite implements DisposeListener,
 	private final Context peerbox;
 	private final Composite content;
 	private ScrolledComposite scrollable;
+	private static final Logger logger = Logger
+			.getLogger(SharedFilesView.class);
 
 	public SharedFilesView(Composite c) {
 
@@ -146,9 +150,28 @@ public class SharedFilesView extends Composite implements DisposeListener,
 	}
 
 	@Override
-	public void deleted(PeerboxFile f) {
-		// TODO Auto-generated method stub
+	public void deleted(final PeerboxFile f) {
+		final SharedFilesView sfv = this;
+		this.getDisplay().asyncExec(new Runnable() {
 
+			@Override
+			public void run() {
+				logger.info("Iterate children");
+				for (Control c : sfv.content.getChildren()) {
+
+					if (c instanceof FileView) {
+						FileView fv = (FileView) c;
+						if (fv.getModel().equals(f)) {
+							fv.dispose();
+						}
+					}
+				}
+				content.layout();
+				Rectangle r = scrollable.getClientArea();
+				content.setSize(content.computeSize(r.width, SWT.DEFAULT));
+
+			}
+		});
 	}
 
 }
