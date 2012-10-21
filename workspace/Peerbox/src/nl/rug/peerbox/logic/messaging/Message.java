@@ -1,4 +1,4 @@
-package nl.rug.peerbox.logic.handler;
+package nl.rug.peerbox.logic.messaging;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

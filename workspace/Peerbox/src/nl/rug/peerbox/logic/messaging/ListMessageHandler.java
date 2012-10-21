@@ -1,10 +1,10 @@
-package nl.rug.peerbox.logic.handler;
+package nl.rug.peerbox.logic.messaging;
 
 import java.util.Collection;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.handler.Message.Command;
-import nl.rug.peerbox.logic.handler.Message.Key;
+import nl.rug.peerbox.logic.messaging.Message.Command;
+import nl.rug.peerbox.logic.messaging.Message.Key;
 import nl.rug.peerbox.logic.PeerboxFile;
 
 final class ListMessageHandler extends MessageHandler {

@@ -9,11 +9,11 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.rug.peerbox.logic.handler.Message;
-import nl.rug.peerbox.logic.handler.MessageHandler;
-import nl.rug.peerbox.logic.handler.UnsupportedCommandException;
-import nl.rug.peerbox.logic.handler.Message.Command;
-import nl.rug.peerbox.logic.handler.Message.Key;
+import nl.rug.peerbox.logic.messaging.Message;
+import nl.rug.peerbox.logic.messaging.MessageHandler;
+import nl.rug.peerbox.logic.messaging.UnsupportedCommandException;
+import nl.rug.peerbox.logic.messaging.Message.Command;
+import nl.rug.peerbox.logic.messaging.Message.Key;
 import nl.rug.peerbox.middleware.MessageListener;
 import nl.rug.peerbox.middleware.Multicast;
 import nl.rug.peerbox.middleware.ReliableMulticast;

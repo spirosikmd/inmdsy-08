@@ -1,11 +1,11 @@
-package nl.rug.peerbox.logic.handler;
+package nl.rug.peerbox.logic.messaging;
 
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.util.List;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.handler.Message.Key;
+import nl.rug.peerbox.logic.messaging.Message.Key;
 
 public class EventsMessageHandler extends MessageHandler {
 
