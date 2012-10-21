@@ -1,12 +1,13 @@
 package nl.rug.peerbox.ui;
 
-import java.awt.Desktop.Action;
-
+import nl.rug.peerbox.logic.FileRequestTask;
 import nl.rug.peerbox.logic.PeerboxFile;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -16,7 +17,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-public class FileView extends Composite implements DisposeListener {
+public class FileView extends Composite implements DisposeListener, SelectionListener {
 
 	private PeerboxFile model;
 	private final Text filename;
@@ -72,15 +73,19 @@ public class FileView extends Composite implements DisposeListener {
 	public void setModel(PeerboxFile model) {
 		this.model = model;
 		filename.setText(this.model.getFilename());
+		action.removeSelectionListener(this);
+		action.setVisible(false);
 		if (!model.isOwn()) {
 			owner.setText("@" + model.getOwner().getName());
 			if (!model.exists()) {
-				action.setText("Get");
 				action.setVisible(true);
+				action.setText("Get");
+				action.addSelectionListener(this);
 			}
 		} else {
 			owner.setText("");
 		}
+		layout();
 		
 	}
 
@@ -107,6 +112,15 @@ public class FileView extends Composite implements DisposeListener {
 	public void widgetDisposed(DisposeEvent arg0) {
 		background.dispose();
 		foreground.dispose();
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent arg0) {		
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent arg0) {
+		this.getDisplay().asyncExec(new FileRequestTask(getModel()));	
 	}
 
 }

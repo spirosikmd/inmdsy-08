@@ -20,12 +20,18 @@ final class FileServer implements Runnable {
 
 	private static final Logger logger = Logger.getLogger(FileServer.class);
 	private final ExecutorService pool = Executors.newFixedThreadPool(5);
-
+	private final Context ctx;
+	boolean alive = true;
+	
+	public FileServer(Context ctx) {
+		this.ctx = ctx;
+	}
+	
 	@Override
 	public void run() {
-		Context ctx = Peerbox.getInstance();
-		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {
-			while (Thread.currentThread().isInterrupted()) {
+		logger.info("Starting server" + ctx.getLocalPeer().getPort());
+		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {			
+			while (!Thread.currentThread().isInterrupted()) {
 				logger.info("Waiting for incoming connection");
 				try {
 					final Socket s = server.accept();

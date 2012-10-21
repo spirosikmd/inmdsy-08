@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
-final class FileRequestTask implements Callable<File> {
+public final class FileRequestTask implements Runnable {
 
 	private static final Logger logger = Logger
 			.getLogger(FileRequestTask.class);
@@ -20,14 +19,14 @@ final class FileRequestTask implements Callable<File> {
 	private final String filename;
 	private final Context ctx;
 
-	FileRequestTask(Peer h, String filename) {
-		this.h = h;
-		this.filename = filename;
+	public FileRequestTask(PeerboxFile file) {
+		this.h = file.getOwner();
+		this.filename = file.getFilename();
 		this.ctx = Peerbox.getInstance();
 	}
 
 	@Override
-	public File call() throws Exception {
+	public void run() {
 		File sharedFile = new File(ctx.getPathToPeerbox()
 				+ System.getProperty("file.separator") + filename);
 
@@ -53,6 +52,5 @@ final class FileRequestTask implements Callable<File> {
 			sharedFile.delete();
 			sharedFile = null;
 		}
-		return sharedFile;
 	}
 }

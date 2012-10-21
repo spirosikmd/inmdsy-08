@@ -76,7 +76,9 @@ public class Peerbox implements MessageListener, Context {
 		Peerbox peerbox = new Peerbox();
 		peerbox.group.addMessageListener(peerbox);
 		peerbox.fs = VirtualFileSystem.initVirtualFileSystem(peerbox);
-		peerbox.pool.execute(new FileServer());
+		Thread server = new Thread(new FileServer(peerbox));
+		server.setDaemon(true);
+		server.start();
 		return peerbox;
 	}
 
@@ -114,10 +116,7 @@ public class Peerbox implements MessageListener, Context {
 		group.announce(message.serialize());
 	}
 
-	public void getFile(final String filename) {
-
-		final Peer h = findHostThatServesTheFileHelper(filename);
-		pool.submit(new FileRequestTask(h, filename));
+	public void getFile(PeerboxFile f) {
 		// Future<File> future =
 		// submit future to future observer to create a process list
 	}
