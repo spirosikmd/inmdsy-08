@@ -5,8 +5,7 @@ import java.nio.file.WatchEvent;
 import java.util.List;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.Message;
-import nl.rug.peerbox.logic.Message.Key;
+import nl.rug.peerbox.logic.handler.Message.Key;
 
 public class EventsMessageHandler extends MessageHandler {
 

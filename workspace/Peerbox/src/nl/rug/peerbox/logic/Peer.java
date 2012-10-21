@@ -40,15 +40,15 @@ public class Peer implements Serializable {
 	
 	
 
-	InetAddress getAddress() {
+	public InetAddress getAddress() {
 		return address;
 	}
 
-	int getPort() {
+	public int getPort() {
 		return port;
 	}
 
-	String getName() {
+	public String getName() {
 		return name;
 	}
 

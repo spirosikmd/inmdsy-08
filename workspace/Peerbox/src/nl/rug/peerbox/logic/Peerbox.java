@@ -5,15 +5,15 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.WatchEvent;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.rug.peerbox.logic.Message.Command;
-import nl.rug.peerbox.logic.Message.Key;
+import nl.rug.peerbox.logic.handler.Message;
 import nl.rug.peerbox.logic.handler.MessageHandler;
 import nl.rug.peerbox.logic.handler.UnsupportedCommandException;
+import nl.rug.peerbox.logic.handler.Message.Command;
+import nl.rug.peerbox.logic.handler.Message.Key;
 import nl.rug.peerbox.middleware.MessageListener;
 import nl.rug.peerbox.middleware.Multicast;
 import nl.rug.peerbox.middleware.ReliableMulticast;
@@ -77,9 +77,9 @@ public class Peerbox implements MessageListener, Context {
 
 	public void listFiles() {
 		System.out.println("===FILE LIST BEGIN===");
-		for (Entry<String, PeerboxFile> entry : fs.getFileList().entrySet()) {
-			Peer h = entry.getValue().getOwner();
-			String f = entry.getValue().getFilename();
+		for (PeerboxFile file : fs.getFileList()) {
+			Peer h = file.getOwner();
+			String f = file.getFilename();
 			System.out.println(f + "  @" + h.getName() + " \t\t(" + h + ")");
 		}
 		System.out.println("===FILE LIST END===");
@@ -100,10 +100,10 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	private Peer findHostThatServesTheFileHelper(String filename) {
-		for (Entry<String, PeerboxFile> entry : fs.getFileList().entrySet()) {
-			String f = entry.getValue().getFilename();
+		for (PeerboxFile file : fs.getFileList()) {
+			String f = file.getFilename();
 			if (filename.equals(f)) {
-				return entry.getValue().getOwner();
+				return file.getOwner();
 			}
 		}
 		return null;

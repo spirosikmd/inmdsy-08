@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
+class Filelist extends ConcurrentHashMap<UFID, PeerboxFile> {
 
 	private final static int INITIAL_CAPACITY = 1;
 	private final static float LOAD_FACTOR = 0.9f;
@@ -23,24 +23,24 @@ public class Filelist extends ConcurrentHashMap<String, PeerboxFile> {
 	private final static long serialVersionUID = 1L;
 	private final static Logger logger = Logger.getLogger(Filelist.class);
 
-	public Filelist() {
+	Filelist() {
 		super(INITIAL_CAPACITY, LOAD_FACTOR, CONCURRENCY_LEVEL);
 	}
 
-	public void serialize(String datafile, String path) {
-		try {
-			OutputStream file = new FileOutputStream(path
-					+ System.getProperty("file.separator") + datafile);
-			OutputStream buffer = new BufferedOutputStream(file);
-			try (ObjectOutput output = new ObjectOutputStream(buffer)) {
-				output.writeObject(this);
-			}
-		} catch (IOException e) {
-			logger.error(e);
-		}
+	void serialize(String datafile, String path) {
+//		try {
+//			OutputStream file = new FileOutputStream(path
+//					+ System.getProperty("file.separator") + datafile);
+//			OutputStream buffer = new BufferedOutputStream(file);
+//			try (ObjectOutput output = new ObjectOutputStream(buffer)) {
+//				output.writeObject(this);
+//			}
+//		} catch (IOException e) {
+//			logger.error(e);
+//		}
 	}
 
-	public static Filelist deserialize(String datafile, String path) {
+	static Filelist deserialize(String datafile, String path) {
 		Filelist filelist = null;
 		try {
 			InputStream file = new FileInputStream(path

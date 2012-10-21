@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.Message;
-import nl.rug.peerbox.logic.Message.Command;
-import nl.rug.peerbox.logic.Message.Key;
+import nl.rug.peerbox.logic.handler.Message.Command;
+import nl.rug.peerbox.logic.handler.Message.Key;
 
 import org.apache.log4j.Logger;
 
@@ -23,7 +22,7 @@ public abstract class MessageHandler {
 	
 	static void registerHandler(final MessageHandler handler,
 			final Object forCommand) {
-		logger.info("Register message handler for the command " + forCommand );
+		logger.info("Register message handler for the command " + forCommand.getClass().getSimpleName()  + " " +forCommand );
 		handlers.put(forCommand, handler);
 	}
 
@@ -31,7 +30,7 @@ public abstract class MessageHandler {
 		Object command = message.get(Key.Command);
 		if (command != Message.NULLOBJ) {
 			if (handlers.containsKey(command)) {
-				logger.debug("Process command " + command);
+				logger.debug("Process command " + command.getClass().getSimpleName() + " " + command);
 				handlers.get(command).handle(message, ctx);
 			} else {
 				throw new UnsupportedCommandException(command);
