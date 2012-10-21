@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.Property;
 import nl.rug.peerbox.ui.PeerboxUI;
@@ -17,8 +18,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class FindingPeersApp {
 
-	private static final String PEERBOX_PROPERTIES_FILE = "peerbox.properties";
-	private static final String DEFAULT_PROPERTIES_FILE = "default.properties";
 	public static final String LOGGER_PROPERTIES_FILE = "logger.properties";
 
 	private static Logger logger = Logger.getLogger(FindingPeersApp.class);
@@ -32,24 +31,12 @@ public class FindingPeersApp {
 			InterruptedException {
 		Thread.currentThread().setName("Main");
 
-		Properties defaultProperties = new Properties();
-		createDefaults(defaultProperties);
-
-		Properties properties = new Properties(defaultProperties);
-		if (new File(PEERBOX_PROPERTIES_FILE).exists()) {
-			try (FileInputStream in = new FileInputStream(
-					PEERBOX_PROPERTIES_FILE)) {
-				properties.load(in);
-			} catch (FileNotFoundException fnfe) {
-				logger.error(fnfe);
-			}
-		}
 
 		BasicConfigurator.configure();
 		//PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
 
 		
-		Peerbox peerbox = new Peerbox(properties);
+		Context peerbox = Peerbox.getInstance();
 		peerbox.join();
 		
 
@@ -57,7 +44,7 @@ public class FindingPeersApp {
 		Display display = new Display();
 
 		
-		PeerboxUI view = new PeerboxUI(peerbox, display);
+		PeerboxUI view = new PeerboxUI(display);
 		view.getShell().setText("Peerbox");
 		
 		
@@ -73,23 +60,4 @@ public class FindingPeersApp {
 		System.exit(0);
 	}
 
-	private static void createDefaults(Properties properties) {
-		String homeDirectory = System.getProperty("user.home");
-		String computerName = System.getProperty("user.name");
-
-		properties.setProperty(Property.PATH,
-				homeDirectory + System.getProperty("file.separator")
-						+ "Peerbox");
-		properties.setProperty(Property.MULTICAST_ADDRESS, "239.1.2.4");
-		properties.setProperty(Property.MULTICAST_PORT, "1567");
-		properties.setProperty(Property.SERVER_PORT, "6666");
-		properties.setProperty(Property.NAME, computerName);
-		properties.setProperty(Property.DATAFILE_NAME, "data.pbx");
-		try (FileOutputStream out = new FileOutputStream(
-				DEFAULT_PROPERTIES_FILE)) {
-			properties.store(out, "");
-		} catch (IOException e) {
-			logger.error(e);
-		}
-	}
 }

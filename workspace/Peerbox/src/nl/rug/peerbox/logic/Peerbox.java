@@ -1,6 +1,9 @@
 package nl.rug.peerbox.logic;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -30,8 +33,33 @@ public class Peerbox implements MessageListener, Context {
 	private final Peer peer;
 	private final VirtualFileSystem fs;
 	private final String datafile;
+	
+	private static final String PEERBOX_PROPERTIES_FILE = "peerbox.properties";
+	private static final String DEFAULT_PROPERTIES_FILE = "default.properties";
 
-	public Peerbox(Properties properties) {
+	private static class Holder {
+		private static final Context INSTANCE = new Peerbox();
+	}
+
+	public  static Context getInstance() {
+		return Holder.INSTANCE;
+	}
+
+	private Peerbox() {
+		
+
+		Properties defaultProperties = new Properties();
+		createDefaults(defaultProperties);
+
+		Properties properties = new Properties(defaultProperties);
+		if (new File(PEERBOX_PROPERTIES_FILE).exists()) {
+			try (FileInputStream in = new FileInputStream(
+					PEERBOX_PROPERTIES_FILE)) {
+				properties.load(in);
+			} catch (IOException e) {
+				logger.error(e);
+			}
+		}
 
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
@@ -61,13 +89,12 @@ public class Peerbox implements MessageListener, Context {
 			e.printStackTrace();
 		}
 		peer = Peer.createPeer(ip, serverPort, name);
-
 		fs = VirtualFileSystem.initVirtualFileSystem(this);
-
 		pool.execute(new FileServer(this));
 
 	}
 
+	@Override
 	public void join() {
 		Message message = new Message();
 		message.put(Key.Command, "JOIN");
@@ -84,6 +111,7 @@ public class Peerbox implements MessageListener, Context {
 		System.out.println("===FILE LIST END===");
 	}
 
+	@Override
 	public void requestFiles() {
 		Message message = new Message();
 		message.put(Key.Command, Command.Request.List);
@@ -116,6 +144,7 @@ public class Peerbox implements MessageListener, Context {
 		group.announce(message.serialize());
 	}
 
+	@Override
 	public void leave() {
 		group.announce("I left".getBytes());
 		group.shutdown();
@@ -160,6 +189,26 @@ public class Peerbox implements MessageListener, Context {
 	@Override
 	public String getDatafileName() {
 		return datafile;
+	}
+
+	private static void createDefaults(Properties properties) {
+		String homeDirectory = System.getProperty("user.home");
+		String computerName = System.getProperty("user.name");
+
+		properties.setProperty(Property.PATH,
+				homeDirectory + System.getProperty("file.separator")
+						+ "Peerbox");
+		properties.setProperty(Property.MULTICAST_ADDRESS, "239.1.2.4");
+		properties.setProperty(Property.MULTICAST_PORT, "1567");
+		properties.setProperty(Property.SERVER_PORT, "6666");
+		properties.setProperty(Property.NAME, computerName);
+		properties.setProperty(Property.DATAFILE_NAME, "data.pbx");
+		try (FileOutputStream out = new FileOutputStream(
+				DEFAULT_PROPERTIES_FILE)) {
+			properties.store(out, "");
+		} catch (IOException e) {
+			logger.error(e);
+		}
 	}
 
 }

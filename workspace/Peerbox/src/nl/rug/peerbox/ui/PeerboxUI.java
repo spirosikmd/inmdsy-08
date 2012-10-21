@@ -1,7 +1,5 @@
 package nl.rug.peerbox.ui;
 
-import nl.rug.peerbox.logic.Peerbox;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.DisposeEvent;
@@ -19,7 +17,6 @@ import org.eclipse.swt.widgets.Shell;
 
 public class PeerboxUI implements DisposeListener, Listener {
 
-	private final Peerbox peerbox;
 	private final Shell shell;
 	private Composite content;
 
@@ -36,15 +33,13 @@ public class PeerboxUI implements DisposeListener, Listener {
 	private MenuButton peersButton;
 	private MenuButton changeButton;
 
-	public PeerboxUI(Peerbox peerbox, Display display, int style) {
+	public PeerboxUI(Display display, int style) {
 		shell = new Shell(display, style);
-		this.peerbox = peerbox;
 		init();
 	}
 
-	public PeerboxUI(Peerbox peerbox, Display display) {
+	public PeerboxUI(Display display) {
 		shell = new Shell(display);
-		this.peerbox = peerbox;
 		init();
 	}
 
@@ -103,7 +98,7 @@ public class PeerboxUI implements DisposeListener, Listener {
 		content.setLayout(contentLayout);
 
 		log = new LogView(content);
-		files = new FilesView(content, peerbox);
+		files = new FilesView(content);
 		peers = new PeerView(content);
 		contentLayout.topControl = files;
 		content.layout();

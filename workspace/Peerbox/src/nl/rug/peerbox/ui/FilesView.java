@@ -1,5 +1,6 @@
 package nl.rug.peerbox.ui;
 
+import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.PeerboxFile;
 import nl.rug.peerbox.logic.VFSListener;
@@ -25,12 +26,12 @@ public class FilesView extends Composite implements DisposeListener,
 
 	private final Font title;
 	private final Color foreground;
-	private final Peerbox peerbox;
+	private final Context peerbox;
 	private final Text text;
 
-	public FilesView(Composite c, Peerbox peerbox) {
+	public FilesView(Composite c) {
 		super(c, SWT.NONE);
-		this.peerbox = peerbox;
+		this.peerbox = Peerbox.getInstance();
 		this.peerbox.getVirtualFilesystem().addVFSListener(this);
 
 		Display display = Display.getCurrent();

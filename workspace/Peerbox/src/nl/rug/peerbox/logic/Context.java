@@ -4,14 +4,20 @@ import nl.rug.peerbox.middleware.Multicast;
 
 public interface Context {
 
-	public Multicast getMulticastGroup();
+	Multicast getMulticastGroup();
 
-	public String getPathToPeerbox();
+	String getPathToPeerbox();
 
-	public Peer getLocalPeer();
+	Peer getLocalPeer();
 
-	public VirtualFileSystem getVirtualFilesystem();
-	
-	public String getDatafileName();
+	VirtualFileSystem getVirtualFilesystem();
+
+	String getDatafileName();
+
+	void join();
+
+	void leave();
+
+	void requestFiles();
 
 }
