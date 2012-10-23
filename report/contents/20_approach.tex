@@ -13,7 +13,7 @@ reliable multicast
 
 additional checksum to verify payload
 
-\subsubsection{Message}
+\subsubsection{Messages}
 
 %figure message package
 
@@ -67,5 +67,39 @@ queue optimizations (discard duplicate)
 
 \subsection{Logic}
 
+    
+    \subsubsection{Messages}
+    serialized dictionary
+    dynamic structure realized by a serialized key-value store. 
+    this allows to easily extend the protocol
+
+
+    \subsubsection{Message handling}
+    Strategy pattern, depending on the Key.Command the appropriate handler will be chosen.
+    
+    \subsubsection{VirtualFileSystem}
+    
+    observe folder changes
+    
+    associate files with peers
+    
+    limitation: no real fs, hence it is possible to invalidate the state of the vfs by modifying the folder when the application is not running. 
+    
+    \subsubsection{Requesting a file}
+    
+    direct communication, multicasting files might be inappropriate
+    
+    \subsubsection{Fault-tolerance Hearbeat}
+    toughest challenge in async network, what happens when peer leaves without notice (e.g. crashed). On the one hand, it is not possible to distingush between a crash or a slow peer and  on the other hand there is no automatic mechanism that detects if a peer left a multicast group.
+    
+    Therefore we implement a (Heartbeat), we favored a heartbeat over a ping tactic because we do not need to elect a leader for that. 
+    every peer send a heartbeat every x second with its vector clock (showing its internal message state), if a peer 
+    
+    this might cause that a peer is temporarily not available also he is functioning properly.
+    
+
+    
+    
+    
 
 \subsection{Interface}
