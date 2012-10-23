@@ -17,6 +17,16 @@ additional checksum to verify payload
 
 %figure message package
 
+command can be either Message (1), ACK(2) or NACK(4). 
+Acks are not used in this implementation in order to reduce traffic on the channel 
+
+the size of the payload is dynamic though it is not allowed to be larger than the maximum message size, which is in our case preset to $2^15$. A fixed message size is important in order to determine the number of sizes from incoming messages. 
+
+
+However, if the logic needs to send a lot of data, it can be split onto multiple messages (due to the reliable multicast it is guaranteed that all messages will eventually arrive and are consumed in order).
+
+
+
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=.9\textwidth]{figures/message.pdf}
@@ -24,27 +34,8 @@ additional checksum to verify payload
     \label{fig:figures_announcement}
 \end{figure}
 
-
-\begin{lstlisting}
-final class Announcement {
-
-	static final byte MESSAGE = 1;
-	static final byte ACK = 2;
-	static final byte NACK = 4;
-
-	static final int HEADER_SIZE = 19;
-	static final int MAX_MESSAGE_SIZE = 32768; //2^15
-	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
-
-	private byte command;
-	private int peerID;
-	private int messageID;
-	private long checksum;
-	private short length;
-	private byte[] payload = new byte[0];
-}
-\end{lstlisting}
-
+use of resources  is indicated by a dashed line 
+processes are divided by swim-lanes (dotted vertical lines)
 
 \begin{figure}[htbp]
     \centering
@@ -60,7 +51,12 @@ final class Announcement {
     \label{fig:figures_processMessages}
 \end{figure}
 
-
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[height=4in]{figures/sendMessage.pdf}
+    \caption{caption}
+    \label{fig:figures_processMessages}
+\end{figure}
 
 \subsubsection{Optimizations}
 
