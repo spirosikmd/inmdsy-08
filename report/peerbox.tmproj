@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>Peerbox.tex</string>
+	<string>contents/20_approach.tex</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -28,14 +28,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>24</integer>
+				<integer>28</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
+			<integer>22</integer>
+		</dict>
+		<key>contents/20_approach.tex</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>1</integer>
+				<key>line</key>
+				<integer>44</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
 			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>10</integer>
 		</dict>
 		<key>system/config.tex</key>
 		<dict>
@@ -69,12 +83,13 @@
 	<key>openDocuments</key>
 	<array>
 		<string>Peerbox.tex</string>
+		<string>contents/20_approach.tex</string>
 		<string>system/config.tex</string>
 		<string>system/titlepage.tex</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{0, 4}, {720, 874}}</string>
+	<string>{{0, 256}, {720, 874}}</string>
 </dict>
 </plist>

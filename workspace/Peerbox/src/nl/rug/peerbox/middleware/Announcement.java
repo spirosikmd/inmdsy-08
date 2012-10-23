@@ -17,7 +17,7 @@ final class Announcement {
 	static final byte NACK = 4;
 
 	static final int HEADER_SIZE = 19;
-	static final int MAX_MESSAGE_SIZE = 40690;
+	static final int MAX_MESSAGE_SIZE = 32768; //2^15
 	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
 
 	private byte command;
