@@ -1,17 +1,18 @@
 %!TEX root = ../Peerbox.tex
 
-
-
-%  It also helps to avoid unwanted message transmission and prevents clogging of networks and conserves bandwidth.
-% % The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer.
-% Also, as messages are UDP, there is no need for connection set-up or teardown. The Peerbox system can be used across LAN.
+As illustrated in Figure~\ref{fig:figures_archOverview} the Peerbox client is structured according to the layered approach. The Middleware-layer is concerned about low level network communication. The Logic layer provides the functionality for the VirtualFileSystem and contains the application logic. The UI represents the user layer and provides the functionality for user interaction.
 
 \begin{figure}[htbp]
     \centering
-        \includegraphics[height=3in]{figures/archOverview.pdf}
+        \includegraphics[height=2in]{figures/archOverview.pdf}
     \caption{Architectural overview}
     \label{fig:figures_archOverview}
 \end{figure}
+
+We have decided to use two different channels for communication. The general peerbox related communication uses multicast message to a certain group, while File Transmission is implemented by using a 1-1 direct channel. 
+The reason for that is that files are arbitrary large and would produce a lot of messages that need to be multicasted. Furthermore, not all clients might be interested in every file. Last but not least, a direct channel is faster as we can rely on the build-in properties of the TCP/IP protocol. 
+
+
 
 
 arch overview. 
@@ -23,6 +24,7 @@ communication
 communication between peers via multicast 
 file transmission via direct peer-to-peer
 
+% % The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer.
 
 
 
@@ -120,7 +122,7 @@ eventually delivers it
 
 \begin{figure}[htbp]
     \centering
-        \includegraphics[height=4in]{figures/sendMessage.pdf}
+        \includegraphics[height=3in]{figures/sendMessage.pdf}
     \caption{Send a multicast message}
     \label{fig:figures_processMessages}
 \end{figure}
@@ -129,6 +131,8 @@ eventually delivers it
 
 limit bandwidth 
     - should be made dynamic
+    
+    %  It also helps to avoid unwanted message transmission and prevents clogging of networks and conserves bandwidth.
     
 queue optimizations (discard duplicate)
 
