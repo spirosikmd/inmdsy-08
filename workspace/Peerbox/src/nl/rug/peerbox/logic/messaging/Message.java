@@ -35,7 +35,7 @@ public class Message implements Serializable {
 		}
 
 		public enum Info {
-			Created, Deleted;
+			Created, Deleted, Modified, Heartbeat;
 		}
 	}
 
