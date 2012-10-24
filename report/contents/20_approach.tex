@@ -10,38 +10,27 @@ As illustrated in Figure~\ref{fig:figures_archOverview} the Peerbox client is st
 \end{figure}
 
 We have decided to use two different channels for communication. The general peerbox related communication uses multicast message to a certain group, while File Transmission is implemented by using a 1-1 direct channel. 
-The reason for that is that files are arbitrary large and would produce a lot of messages that need to be multicasted. Furthermore, not all clients might be interested in every file. Last but not least, a direct channel is faster as we can rely on the build-in properties of the TCP/IP protocol. 
+The reason for that is that files are arbitrary large and would produce a lot of messages that need to be multicasted. Furthermore, not all clients might be interested in every file. Last but not least, a direct channel is fast and reliable as we can rely on the build-in properties of the TCP/IP protocol. 
+
+\subsection{Middleware}
+
+The middleware of peerbox uses IP-Multicast to announce messages to a group. However, basic multicast is not reliable as it does not ensure the transmission of a message or correct ordering of messages. 
+Therefore, we need additional coordination and agreements on message receiving and delivery in form of a reliable multicast protocol.
+
+% open vs. closed group 
+%  only members can send to group, a member delivers to itself 
+%  they are useful for coordination of groups of cooperating servers
 
 
+The multicast protocol should ensure that all messages send to a group are eventually received and consumed by all process that are member of this group. Furthermore, messages need to be consumed in order, so that a file cannot be deleted before it has been created. 
+
+For peerbox it is enough to ensure FIFO-ordering. Since a file always has a specific owner, it is enough if the messages from one process are consumed in order and independent from another process (no causality required). 
 
 
-arch overview. 
-
-layers
-
-communication
-
-communication between peers via multicast 
-file transmission via direct peer-to-peer
 
 % % The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer.
 
 
-
-\subsection{Middleware}
-
-requires coordination and 
-agreement
-agree on the set of messages received or on delivery 
-ordering
-
-FIFO-ordering
-why we do not want Total ordering
-
-
-open vs. closed group 
- only members can send to group, a member delivers to itself 
- they are useful for coordination of groups of cooperating servers
 
 properties
 Integrity - duplicate messages detected and rejected.
