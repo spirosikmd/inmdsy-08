@@ -6,6 +6,14 @@
 % % The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer.
 % Also, as messages are UDP, there is no need for connection set-up or teardown. The Peerbox system can be used across LAN.
 
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[height=3in]{figures/archOverview.pdf}
+    \caption{Architectural overview}
+    \label{fig:figures_archOverview}
+\end{figure}
+
+
 arch overview. 
 
 layers
@@ -29,8 +37,24 @@ FIFO-ordering
 why we do not want Total ordering
 
 
-properties
+open vs. closed group 
+ only members can send to group, a member delivers to itself 
+ they are useful for coordination of groups of cooperating servers
 
+properties
+Integrity - duplicate messages detected and rejected.
+IP multicast uses checksums to reject corrupt messages
+Validity - due to IP multicast in which sender delivers to 
+itself
+Agreement - processes can detect missing messages. 
+They must keep copies of messages they have 
+delivered so that they can re-transmit them to others.
+discarding of copies of messages that are no longer 
+needed : 
+when piggybacked acknowledgements arrive, note which processes 
+have received messages. When all processes in g have the message, 
+discard it.
+problem of a process that stops sending - use ‘heartbeat’ messages.
 
 however ip multicast is per se unreliable, early test have shown a miss rate of 20\%
 
@@ -41,6 +65,11 @@ negative acknowledgements
 reliable multicast
 
 additional checksum to verify payload
+
+Operations 
+multicast(g, m) sends message m to all members of process group g
+deliver (m) is called to get a multicast message delivered. It is different 
+from receive as it may be delayed to allow for ordering or reliability.
 
 \subsubsection{Messages}
 
@@ -75,12 +104,17 @@ processes are divided by swim-lanes (dotted vertical lines)
     \label{fig:figures_processReceivePackage}
 \end{figure}
 
+decoupled listener and processing to decouple lengthy processing from receivings
+
 \begin{figure}[htbp]
     \centering
         \includegraphics[height=4.5in]{figures/processMessages.pdf}
     \caption{Process incoming multicast messages}
     \label{fig:figures_processMessages}
 \end{figure}
+
+eventually delivers it
+
 
 \subsubsection{Sending Messages to Group}
 
@@ -97,6 +131,8 @@ limit bandwidth
     - should be made dynamic
     
 queue optimizations (discard duplicate)
+
+easy to implement a vector clock in order to get partial ordering  (message may not be delivered until vector clock is as large)
 
 \subsection{Logic}
 
