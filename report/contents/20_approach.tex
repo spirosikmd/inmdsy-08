@@ -5,10 +5,36 @@
 %  It also helps to avoid unwanted message transmission and prevents clogging of networks and conserves bandwidth.
 % % The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer.
 % Also, as messages are UDP, there is no need for connection set-up or teardown. The Peerbox system can be used across LAN.
-\subsection{Middleware}
+
+arch overview. 
+
+layers
+
+communication
+
 communication between peers via multicast 
+file transmission via direct peer-to-peer
+
+
+
+
+\subsection{Middleware}
+
+requires coordination and 
+agreement
+agree on the set of messages received or on delivery 
+ordering
+
+FIFO-ordering
+why we do not want Total ordering
+
+
+properties
+
 
 however ip multicast is per se unreliable, early test have shown a miss rate of 20\%
+
+over udp datagram
 
 negative acknowledgements
 
@@ -29,11 +55,13 @@ the size of the payload is dynamic though it is not allowed to be larger than th
 However, if the logic needs to send a lot of data, it can be split onto multiple messages (due to the reliable multicast it is guaranteed that all messages will eventually arrive and are consumed in order).
 
 
+\subsubsection{Delivering Messages form Group}
+
 
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=.9\textwidth]{figures/message.pdf}
-    \caption{caption}
+    \caption{Structure of a message}
     \label{fig:figures_announcement}
 \end{figure}
 
@@ -53,6 +81,8 @@ processes are divided by swim-lanes (dotted vertical lines)
     \caption{Process incoming multicast messages}
     \label{fig:figures_processMessages}
 \end{figure}
+
+\subsubsection{Sending Messages to Group}
 
 \begin{figure}[htbp]
     \centering
