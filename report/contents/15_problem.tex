@@ -14,18 +14,14 @@ This scenario describes how the user can leave the peer-to-peer network. If the 
 \subsection{Properties of Peerbox}
 %spyros
 
-%things about distributed filesystem
-
-%how is peerbox imagined to work
-
-While designing Peerbox, several decisions had to be made regarding some important properties. For example, the size distribution of files and the relative and absolute frequencies of different file operations.
+While designing Peerbox, several decisions had to be made regarding some significant properties. For example, the size distribution of files, and the relative and absolute frequencies of different file operations.
 
 \subsubsection{File distribution size}
 
-The maximum file distribution size that Peerbox supports is 25 MB. This will even allow the sharing of image and pdf files, which normally have large sizes.
+The maximum size distribution of file that Peerbox can support is 25 MB. This will even allow the sharing of image and pdf files, which often have large sizes.
 
 \subsubsection{File operations}
 
-During Peerbox operation it is excepted that the number of file modifications will be higher than this of file reads. However, it is expected that there will also be a significant number of reads, as every peer of the group will need to read files from other peers. This means that sharing of files between peers is expected to be high. The number of file creations and deletions is expected to be relatively low.\\
+During Peerbox operation it is excepted that the number of file modifications will be higher than the number related  to file reads. However, it is expected that there will also be a significant number of reads, as every peer of the group will need to read files from other peers. This means that sharing of files between peers is expected to be high. The number of file creations and deletions is expected to be relatively low.\\
 
-Peerbox does not introduce any restriction on the type of files that can be shared. This influences the properties related to file operations. File modifications are expected to be slightly less than the previous expectation, mainly due to the existence of binary files that cannot very often modified. File creations are expected to increase, mainly due to the absence of restriction on the file type. This means that more files of various types can be created.
+Peerbox does not introduce any restriction on the type of files that can be shared. This influences the properties related to file operations. File modifications are expected to be slightly less than the previous expectation, mainly due to the existence of binary files that cannot very often modified. File creations are expected to increase, as the absence of restriction on the file type means that more files of various types can be created.
