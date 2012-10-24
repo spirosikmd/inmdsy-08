@@ -1,14 +1,15 @@
 %!TEX root = ../Peerbox.tex
 
-\subsection{Use cases}
+\subsection{Example Scenarios}
 
 
-	\subsubsection{Joining a peer to peer network}
-	 This scenario describes how a user joins a peer-to-peer network. The basic requirements includes a desktop PC or laptop and internet connection preferably Wi-fi. All the peers send messages via multicasting. For joining the network, one peer creates a new network connection and sends the password to all the remaining peers. All the peers accept the password and join the      network. 
-	\subsubsection{Modifying and updating files}
-	 This scenario describes how the user modifies and updates the files in a P2P network. The peer can view the list of files created by other peers but he himself cannot view his own created files. In order to modify any specific file, the peer sends a file request to all the other peers with the file name , IP address and Port number. The peer who has the requested file, sends the file immediately to the requested peer to his IP address. The requested user then makes the respective changes and then updates it with a new version number.  
-	\subsubsection{Disjoining the peer-to-peer network}
-          This scenario describes how the user can disjoin the peer-to-peer network. If the user wishes to disjoin the network, he sends the disjoin message to all the peers providing his IP address and port number. All the peers accept his request. In this way, a peer can disjoin from the peer-to-peer network. 
+% \subsubsection{Joining a peer to peer network}
+% This scenario describes how a user joins a peer-to-peer network. The basic requirements includes a desktop PC or laptop and internet connection preferably Wi-fi. All the peers send messages via multicasting. For joining the network, one peer creates a new network connection and sends the password to all the remaining peers. All the peers accept the password and join the      network. 
+\subsubsection{Modifying and updating files}
+This scenario describes how the user modifies and updates the files in a P2P network. The peer can view the list of files created by other peers. In order to modify any specific file, the peer sends a file request to the other owning peer. The peer who has the requested file, sends the file immediately to the requested peer. The requested user then makes the respective changes and then updates it with a new version number.  
+
+\subsubsection{Disjoining the peer-to-peer network}
+This scenario describes how the user can leave the peer-to-peer network. If the user wishes to leave the network, he sends the leave message to all the peers. All the peers accept his request. In this way, a peer can safely leave the peer-to-peer network. 
            
            
           

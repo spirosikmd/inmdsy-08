@@ -12,30 +12,34 @@ Implementing the proposed solution, would  enable them to work across network bo
 
 \subsection{Context}
 %manni
-The main goal of the Peerbox system is to enable file sharing among different peers by joing the network. Here, the process of multicasting is used where a set of data packets are transmitted to  multiple hosts who have joined the multicast group simultaneously. The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer. After joining the group, the peer can request for the list of files, create files, update the files as well as delete files. It also helps to avoid unwanted message transmission and prevents clogging of networks and conserves bandwidth. Also, as messages are UDP, there is no need for connection set-up or teardown. The Peerbox system can be used across LAN.  
+The main goal of the Peerbox system is to enable file sharing among different peers. Here, the process of multicasting is used where a set of data packets are transmitted to  multiple hosts who have joined the multicast group simultaneously. 
+
+After joining the group, the peer can request the list of files, create files, update the files as well as delete files. 
+
 
 
 \subsection{State of the Art}
 %spyros
 
-During the last decade, various peer-to-peer file systems were introduced. Most of them share common properties like availability, sharing, safety and decentralisation. However, some more advanced peer-to-peer file systems offer important propertiels like synchronisation and conflict detection. This section provides the state of the art in peer-to-peer file systems.
+During the last decade, various peer-to-peer file systems were introduced. Most of them share common properties like availability, sharing, safety and decentralization. However, some more advanced peer-to-peer file systems offer important properties like synchronization and conflict detection. This section provides the state of the art in peer-to-peer file systems.
 
 \begin{description}
 	\item[Pastis]\-\\
-	Pastis \cite{Busca:2005gt} is a decentralised multi-user read-write peer-to-peer file system. Every file is described by
+	Pastis \cite{Busca:2005gt} is a decentralized multi-user read-write peer-to-peer file system. Every file is described by
 a modifiable inode-like structure which contains the addresses of the immutable blocks in which the file contents are stored.
 
-All the data is stored using the Past \gls{acr:dht}, which has been modified in order to reduce the number of network messages it generates, thus optimising replica retrieval. Pastis is known for its simplicity, high scalability, fault tolerance and locality properties of its underlying storage layer.
+All the data is stored using the Past \gls{acr:dht}, which has been modified in order to reduce the number of network messages it generates, thus optimizing replica retrieval. Pastis is known for its simplicity, high scalability, fault tolerance and locality properties of its underlying storage layer.
+
 	\item[Ivy]\-\\
-	Ivy \cite{Muthitacharoen:2002iv} is a multi-user read and write peer-to-peer file system. It has no centralised or dedicated components. It provides useful integrity properties without requiring users to fully trust either the underlying peer-to-peer storage or other users of the file system.
+	Ivy \cite{Muthitacharoen:2002iv} is a multi-user read and write peer-to-peer file system. It has no centralized or dedicated components. It provides useful integrity properties without requiring users to fully trust either the underlying peer-to-peer storage or other users of the file system.
 	
 	One of its important properties is that with a special arrangement between logs and the modifications of participants, it maintains meta-data consistency without locking. Ivy provides semantics like \gls{acr:nfs} and is able of detecting conflicting modifications. Performance measurements show that Ivy is two to three time slower than \gls{acr:nfs}.
 	\item[ColonyFs]\-\\
-	ColonyFS \cite{Colony:2009fs} is a distributed file system which emphasises anonymity, security and dependability over a peer to peer network. This system implements a technique called \gls{acr:frs} and uses an optimization algorithm inspired by the movement of ants. The aim of the project is to produce an implementation of these techniques for the specific requirements of a dynamic peer-to-peer network where participants can join and leave at will.
+	ColonyFS \cite{Colony:2009fs} is a distributed file system which emphasizes anonymity, security and dependability over a peer to peer network. This system implements a technique called \gls{acr:frs} and uses an optimization algorithm inspired by the movement of ants. The aim of the project is to produce an implementation of these techniques for the specific requirements of a dynamic peer-to-peer network where participants can join and leave at will.
 	\item[Infinit]\-\\
-	Infinit\footnote{http://en.wikipedia.org/wiki/Infinit} is a peer-to-peer file system which allows users to store, access and share files in a safe and collaborative way. It also allows the virtualisation of decentralised storage space as one coherent drive. Infinit ensures reliability by dynamically replicating the data so that devices can crash without incurring data loss. It also ensures privacy by access control mechanisms.
+	Infinit\footnote{http://en.wikipedia.org/wiki/Infinit} is a peer-to-peer file system which allows users to store, access and share files in a safe and collaborative way. It also allows the virtualization of decentralized storage space as one coherent drive. Infinit ensures reliability by dynamically replicating the data so that devices can crash without incurring data loss. It also ensures privacy by access control mechanisms.
 	
-	Furthermore, it is known for ensuring synchronisation by distributing files and directories throughout the network's infrastructure and update them in real time. Some additional properties of Infinit are sharing, transparency, security, anonymity, and availability.
+	Furthermore, it is known for ensuring synchronization by distributing files and directories throughout the network's infrastructure and update them in real time. Some additional properties of Infinit are sharing, transparency, security, anonymity, and availability.
 	\item[Darknet]\-\\
-	Darknet \cite{Ledung:2010wq} is private peer-to-peer file system which aims to provide safe, fast, and scalable file sharing without constraining the users in this aspect. It utilises a decentralised peer-to-peer network overlay by creating a prototype with extreme programming as methodology. To maximise the freedom of users the network is accessed through a virtual file-system interface.
+	Darknet \cite{Ledung:2010wq} is private peer-to-peer file system which aims to provide safe, fast, and scalable file sharing without constraining the users in this aspect. It utilizes a decentralized peer-to-peer network overlay by creating a prototype with extreme programming as methodology. To maximize the freedom of users the network is accessed through a virtual file-system interface.
 \end{description}
