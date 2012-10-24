@@ -16,6 +16,16 @@ This scenario describes how the user can leave the peer-to-peer network. If the 
 
 things about distributed filesystem
  
-how is peerbox imagined to work           
-           
-          
+how is peerbox imagined to work
+
+
+
+\subsubsection{File distribution size}
+
+The maximum file distribution size that Peerbox supports is 25 MB. This will even allow the sharing of image and pdf files, which normally have large sizes.
+
+\subsubsection{File operations}
+
+Modifications more than reads. However, there will also be a significant number of reads, as very peer of the group will need to read files from other peers. This means that sharing of file between peers is expected to be high. Relatively low number of creations and deletions.
+
+There is no restriction on the type of files that can be shared. This influences the properties related to file operations. File modifications are slightly less, due to the existence of binary files that cannot very often modified. File creations are increased because more files of various types can be created.
