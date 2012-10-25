@@ -2,7 +2,9 @@
 
 Peerbox designed to be used for small groups as a simple and robust distributed file service. As such it needs to address some specific requirements.\\
 
-One of the most important requirements is the kind and level of transparency that it provides to the external environment. Peerbox offers good Access Transparency. On the one hand, the API is not operating system dependent, and it works transparently for both local and remote files. On the other hand, the fact that the peers are aware that some files of the Virtual File System are not stored locally, it does decreases the level of transparency. Access control is provided by the operating system and Peerbox does not introduce additional access control at the moment.
+One of the most important requirements is the kind and level of transparency that it provides to the external environment. Peerbox offers \textbf{excellent access transparency}. The file API is not OS dependent and it works transparently for both local and remote files. Access control is provided by the operating system and Peerbox does not introduce additional access control at the moment.
+
+Peerbox offers \textbf{weak location transparency}. The fact that the peers are aware that some files of the Virtual File System are not stored locally, and additionally to which member these files belong to, it does decrease the level of location transparency.
 
 
 
