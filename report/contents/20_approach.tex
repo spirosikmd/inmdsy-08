@@ -151,6 +151,26 @@ Causal ordering can be implemented by using vector clocks. The vector clock of a
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintain a consistent Virtual File System.
     
     \subsubsection{Messages}   
+The actual Peerbox messages are stacked on the Multicast Messages of the middleware, which means that they will be serialized into the payload of the multicast message. 
+Instead of using a predetermined structure, we decided to use an more open-approach that allows for easy modifiability. Hence, we are using a Key-Value store, which will be serialized and deserialized. 
+
+The actual type of a message is defined by the Key command, which might contain one of the following values illustrated in Listing~\ref{lst:keyvalues}.
+
+\begin{lstlisting}[caption=Possible values of command]
+public static interface Command {
+		public enum Request {
+			List, Join;
+		}
+
+		public enum Reply {
+			List, Welcome;
+		}
+
+		public enum Info {
+			Created, Deleted, Modified, Heartbeat, Leave;
+		}
+	}
+\end{lstlisting}
     serialized dictionary
     dynamic structure realized by a serialized key-value store. 
     this allows to easily extend the protocol
