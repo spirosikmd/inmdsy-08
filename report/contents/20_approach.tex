@@ -71,7 +71,8 @@ If the logic layer needs to send a lot of data, it has to be split into multiple
 Figure~\ref{fig:figures_processReceivePackage} shows the process view on the activity of listening for incoming messages and processing those messages. The actual consumption and reliability processes is shown in Figure~\ref{fig:figures_processMessages}.
 The use of resources  is indicated by a dashed line 
 processes are divided by swim-lanes (dotted vertical lines)
-\begin{figure}[htbp]
+
+\begin{figure}[H]
     \centering
         \includegraphics[height=4.5in]{figures/receivePackets.pdf}
     \caption{Listen for incoming multicast messages}
@@ -133,7 +134,7 @@ We consider two tactics to increase fault-tolerance. The first one is a ping-ech
 The alternative is a heartbeat tactic, in which every peer multicasts a life signal in a certain time interval. The dead peer detection is done by every peer on its own. Although the multicasted heartbeat might be less reliable as a fault-detection algorithm because it might happen that peers are in a different state (e.g. if one peer misses heartbeat messages), the complexity and total amount of messages is lower compared to the described ping/echo tactic.
 
 Therefore, we implement a heartbeat mechanism into the middleware to be able to detect unresponsive peers.
-
+\clearpage
 \subsubsection{Optimizations}
 The following optimizations have been implemented or were considered for implementation.
 
