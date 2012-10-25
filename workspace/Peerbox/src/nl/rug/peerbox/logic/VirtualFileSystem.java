@@ -52,7 +52,6 @@ public class VirtualFileSystem {
 											+ event.context().toString());
 									if (event.context() instanceof Path) {
 										Path path = (Path) event.context();
-										Context ctx = Peerbox.getInstance();
 										File file = path.toFile();
 										PeerboxFile pbf = new PeerboxFile(file
 												.getName(), ctx.getLocalPeer(),
@@ -72,7 +71,6 @@ public class VirtualFileSystem {
 											+ event.context().toString());
 									if (event.context() instanceof Path) {
 										Path path = (Path) event.context();
-										Context ctx = Peerbox.getInstance();
 										File file = path.toFile();
 
 										PeerboxFile pbf = new PeerboxFile(file

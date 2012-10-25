@@ -31,8 +31,7 @@ public abstract class MessageHandler {
 	}
 
 
-	public static void process(final Message message) throws UnsupportedCommandException {
-		Context ctx = Peerbox.getInstance();
+	public static void process(final Message message, final Context ctx) throws UnsupportedCommandException {
 		Object command = message.get(Key.Command);
 		if (command != Message.NULLOBJ) {
 			if (handlers.containsKey(command)) {

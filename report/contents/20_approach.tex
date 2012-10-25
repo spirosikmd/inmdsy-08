@@ -145,6 +145,7 @@ By associating a negative acknowledgement with a timer, the peer will automatica
 Another optimization would be to dynamically limiting the bandwidth based on heuristics. For example, if the number of messages and peers increase a certain threshold, the bandwidth can be reduced by increasing the timeframe of the semaphore. 
 
 Causal ordering can be implemented by using vector clocks. The vector clock of a peer p is piggybacked to message m. A peer q, which receive m is only allowed to rdeliver m, if he has seen all messages that p has seen. Otherwise, can send out negative acknowledgements based on the vector clock of p. 
+
 \subsection{Logic}
 
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintain a consistent Virtual File System.
@@ -173,12 +174,18 @@ The application logic is mainly responsible for processing dispatched messages f
     limitation: no real fs, hence it is possible to invalidate the state of the vfs by modifying the folder when the application is not running. 
     
     \subsubsection{Requesting a file}
-    
     direct communication, multicasting files might be inappropriate
-    
-
-    
-    
+        
     
 
 \subsection{Interface}
+The focus of this report lies on the implementation of the distributed aspects of Peerbox. Nevertheless, in order to use the system a simple user interface has been implemented using the Simple Widget Toolkit (SWT) and a Model-View-Controller approach. 
+
+The user interface is shown in Figure~\ref{fig:figures_gui}.
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[height=3in]{figures/gui.png}
+    \caption{User interface}
+    \label{fig:figures_gui}
+\end{figure}
