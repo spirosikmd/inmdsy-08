@@ -198,11 +198,8 @@ The VFS has some limitations. The most important of them is the fact that there 
 direct communication, multicasting files might be inappropriate
 
 \subsubsection{Dynamicity}
-IP addresses of the peers are transmitted and thus dynamically discovered.
-All options are configurable via configuration files
-No hardcoded properties
-Works on any IP network that supports multicast
-
+Since Peerbox will be used on different operating systems and changing environments, it is important that it allows for a certain configuration dynamicity. Therefore, it tries to dynamically configure itself whenever possible, e.g. it dynamically receives the IP-Address and port from remote peers or it obtains the folder and username from the system properties. If a dynamic approach is not possible, the configuration options are at least configurable via a property file. 
+For example, it is possible to specify the Multicast-address and port.
 
 \subsection{Interface}
 The focus of this report lies on the implementation of the distributed aspects of Peerbox. Nevertheless, in order to use the system a simple user interface has been implemented using the Simple Widget Toolkit (SWT) and a Model-View-Controller approach. 
