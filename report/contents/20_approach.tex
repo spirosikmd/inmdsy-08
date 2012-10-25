@@ -149,38 +149,37 @@ Causal ordering can be implemented by using vector clocks. The vector clock of a
 \subsection{Logic}
 
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintain a consistent Virtual File System.
-    
-    \subsubsection{Messages}   
-    serialized dictionary
-    dynamic structure realized by a serialized key-value store. 
-    this allows to easily extend the protocol
 
-    \subsubsection{Dynamicity}
-    ip of peers is transmitted and thus dynamically discovered
-    all options are configurable via configuration files
-    no hardcoded properties
-    works on any ip network that support multicast
-    
-    
-    \subsubsection{Message handling}
-    Strategy pattern, depending on the Key.Command the appropriate handler will be chosen.
-    
-    \subsubsection{Virtual File System}
-    
-    The \gls{acr:vfs} contains a File List which is a dictionary of \glspl{acr:ufid} and Peerbox Files. The VFS is responsible for maintaining the consistency of the File List among all peers. This is mainly accomplished with two techniques. The first one by observing the file system for changes, e.g. file creations, deletions, or modifications, and updating the File List.
-    
-    observe folder changes
-    
 
+\subsubsection{Messages}   
+serialized dictionary
+dynamic structure realized by a serialized key-value store. 
+this allows to easily extend the protocol
+
+\subsubsection{Dynamicity}
+ip of peers is transmitted and thus dynamically discovered
+all options are configurable via configuration files
+no hardcoded properties
+works on any ip network that support multicast
+
+
+\subsubsection{Message handling}
+Strategy pattern, depending on the Key.Command the appropriate handler will be chosen.
+
+
+\subsubsection{Virtual File System}
     
-    associate files with peers
+The \gls{acr:vfs} contains a File List which is a dictionary of \glspl{acr:ufid} and Peerbox Files. We decided to create our own entity in order to represent a file, instead of using the Java File entity. We did this in order to create a virtual file which contains only the important information and not the data. Furthermore, the Java File entity would contains operating systems specific information that should not be shared with the rest of the peers. The Peerbox Files are associated with peers. This means that File List could contain two files with the same file name belonging to different peers.
     
-    limitation: no real fs, hence it is possible to invalidate the state of the vfs by modifying the folder when the application is not running. 
-    
-    \subsubsection{Requesting a file}
-    direct communication, multicasting files might be inappropriate
-        
-    
+The VFS is responsible for maintaining the consistency of the File List among all peers. This is mainly accomplished with two techniques. The first one by observing the file system for changes, e.g. file creations, deletions, or modifications, and updating the local File List. The second one is to multicast these changes to the rest of the peers so they can also update their own local File Lists.
+
+
+
+limitation: no real fs, hence it is possible to invalidate the state of the vfs by modifying the folder when the application is not running. 
+
+\subsubsection{Requesting a file}
+direct communication, multicasting files might be inappropriate
+
 
 \subsection{Interface}
 The focus of this report lies on the implementation of the distributed aspects of Peerbox. Nevertheless, in order to use the system a simple user interface has been implemented using the Simple Widget Toolkit (SWT) and a Model-View-Controller approach. 
