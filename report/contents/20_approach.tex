@@ -37,7 +37,7 @@ For peerbox it is enough to ensure FIFO-ordering. Since a file always has a spec
 
 We implemented the reliable multicast based on the lecture slides, using  piggybacked messages number, negative acknowledgement and a holdback queue. Furthermore, we optimized the implementation using  multi-threading, bandwidth limiting, checksum and send optimizations. 
     
-
+In the following sections, we will use the following terminology. Multicast a message means to send a message to a multicast group. Receiving a message means that a message has been received from a multicast group but has not yet been forwarded to the application logic. For example because it has not arrived in the correct order. Delivering a message from group g means that the message has been received in correct order and can be consumed by the application logic.
 
 
 % % The IP address 224.0.0.0 through 239.255.255.255 are reserved for multicasts. The user needs to set some properties such as Path, Multicast address, Multicast port, Server Port and the name of the computer.
@@ -56,9 +56,7 @@ We implemented the reliable multicast based on the lecture slides, using  piggyb
 % from receive as it may be delayed to allow for ordering or reliability.
 
 \subsubsection{Messages}
-The basic entity of our reliable multicast implementation is a Message, which structure is shown in Figure~\ref{fig:messages}. The first byte represent the command, hence the message supports $2^8$ different commands. In our case, a command can be either Message (1), ACK(2) or NACK(4). However, ACK messages are not used in this implementation in order to reduce traffic on the channel. Furthermore, the peer and message number are represented each by four byte. Afterwards, the length of the payload is specified by two bytes. Eight bytes are reserved for the checksum, which is calculated on the payload. The actual payload has no fixed size and is only limited by the maximum message size, which is in our case is set to $2^{15}$.
-
-\todo{CRC32 checksum} 
+The basic entity of our reliable multicast implementation is a Message, which structure is shown in Figure~\ref{fig:messages}. The first byte represent the command, hence the message supports $2^8$ different commands. In our case, a command can be either Message (1), ACK(2), NACK(4), or HEARTBEAT(8). However, ACK messages are not used in this implementation in order to reduce traffic on the channel. Furthermore, the peer and message number are represented each by four byte. Afterwards, the length of the payload is specified by two bytes. Eight bytes are reserved for the checksum, which is calculated on the payload using a cyclic redundancy check (CRC32). The actual payload has no fixed size and is only limited by the maximum message size, which is in our case is set to $2^{15}$.
 
 If the logic needs to send a lot of data, it has to be split into multiple messages. Due to the reliable multicast it is guaranteed that all messages will eventually arrive and are consumed in order.
 
@@ -70,12 +68,7 @@ If the logic needs to send a lot of data, it has to be split into multiple messa
 \end{figure}
 
 \subsubsection{Delivering Messages form Group}
-
-\todo{difference between receiving a message and delivering it}
-
-every process holds for every other process the id of the last consumed message and the id of the last seen message, ideally both are the same 
-
-Figure~\ref{fig:figures_processReceivePackage} shows the process view on the activity of listeneing for incoming messages and processing those messages. the actual consumption and reliability process is shown in Figure~\ref{fig:figures_processMessages}.
+Figure~\ref{fig:figures_processReceivePackage} shows the process view on the activity of listening for incoming messages and processing those messages. the actual consumption and reliability process is shown in Figure~\ref{fig:figures_processMessages}.
 The use of resources  is indicated by a dashed line 
 processes are divided by swim-lanes (dotted vertical lines)
 \begin{figure}[htbp]
@@ -84,20 +77,23 @@ processes are divided by swim-lanes (dotted vertical lines)
     \caption{Listen for incoming multicast messages}
     \label{fig:figures_processReceivePackage}
 \end{figure}
-When the middleware is initialized it starts a separate listener threads and a received thread. The listener waits incoming messages on the channel of the multicast group. as soon as it receives a message, it pushes it on a blockingqueue for received packages and immediately continues to listen for the next message. 
+When the middleware is initialized it starts a separate listener threads and a received thread. The listener waits incoming messages on the channel of the multicast group. as soon as it receives a message, it pushes it on a blocking queue for received packages and immediately continues to listen for the next message. 
 
 Listening and processing of incoming messages has been decoupled by a blocking queue to decouple lengthy processing from receiving new messages, if the blocking queue is full, the listener thread has to wait until all packets have been processed. 
 
-On the other side, the receiver thread takes packets from the blocking queue and processes them. if the queue is empty, it just waits until the listener thread has received and pushed the next package. 
+On the other side, the receiver thread takes packets from the blocking queue and processes them. if the queue is empty it  waits until the listener thread has received and pushed the next package. 
 At first the receiver thread parses the incoming packet into the aforementioned message structure and then decides wether the message is directly consumed, discarded or pushed on the holdback queue for later consumption.
 
-this process is described in Figure~\ref{fig:figures_processMessages}.
-Depending on the command of the message, the message either contains data or is a request for a missed message (Nack). If it is a NACK  then the process resends the message by taking it from the sent messages queue.
+This process is described in Figure~\ref{fig:figures_processMessages}.
+Depending on the command of the message, the message either contains data or is a request for a missed message (Nack). If it is a NACK  then the process resends the requested message by taking it from the sent messages list.
 
-If the command is actually a message, it first checks wether it has ever received a message from that particularly process before. if not it initializes the piggyback counter and the seen message id to the id of the current message minus one. 
-Afterwards, it compares the local piggybackcounter with the piggybacked messages number. One of three things might happen. 
 
-1) The message has been seen before and is discarded
+
+If the command is actually a message it first checks, whether it has ever received a message from that particularly process before. If not it initializes the piggyback counter and the seen message id to the id of the current message minus one. 
+Every peer holds the id of every other peer that is member of the group, a piggyback counter that contains the id of the last consumed message from that peer and, the id of the last seen message, ideally both are the same.
+Afterwards, it compares the local piggyback counter with the piggybacked messages number. One of three things might happen. 
+
+1) The message has been seen before and is discarded.
 2) The message id is larger than the expected message, which means that a message has been missed. A negative acknowledge is send for the missed message. 
 3) The message is expected and can be reliably consumed, which involves another multicast of the message to the group.
  
