@@ -20,8 +20,12 @@ While designing Peerbox, several decisions had to be made regarding some signifi
 
 The maximum size distribution of file that Peerbox can support is 25 MB. This will even allow the sharing of image and pdf files, which often have large sizes.
 
+\todo{can or is optimized for? Why will it be limited to 25mb?}
+
 \subsubsection{File operations}
 
 During Peerbox operation it is excepted that the number of file modifications will be higher than the number related  to file reads. However, it is expected that there will also be a significant number of reads, as every peer of the group will need to read files from other peers. This means that sharing of files between peers is expected to be high. The number of file creations and deletions is expected to be relatively low.\\
+
+\todo{you need some argumentation here, why are more modifications are expected than reads?}
 
 Peerbox does not introduce any restriction on the type of files that can be shared. This influences the properties related to file operations. File modifications are expected to be slightly less than the previous expectation, mainly due to the existence of binary files that cannot very often modified. File creations are expected to increase, as the absence of restriction on the file type means that more files of various types can be created.
