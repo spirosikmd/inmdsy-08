@@ -150,7 +150,7 @@ Causal ordering can be implemented by using vector clocks. The vector clock of a
 
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintain a consistent Virtual File System.
     
-    \subsubsection{Messages}
+    \subsubsection{Messages}   
     serialized dictionary
     dynamic structure realized by a serialized key-value store. 
     this allows to easily extend the protocol
@@ -165,9 +165,13 @@ The application logic is mainly responsible for processing dispatched messages f
     \subsubsection{Message handling}
     Strategy pattern, depending on the Key.Command the appropriate handler will be chosen.
     
-    \subsubsection{VirtualFileSystem}
+    \subsubsection{Virtual File System}
+    
+    The \gls{acr:vfs} contains a File List which is a dictionary of \glspl{acr:ufid} and Peerbox Files. The VFS is responsible for maintaining the consistency of the File List among all peers. This is mainly accomplished with two techniques. The first one by observing the file system for changes, e.g. file creations, deletions, or modifications, and updating the File List.
     
     observe folder changes
+    
+
     
     associate files with peers
     
