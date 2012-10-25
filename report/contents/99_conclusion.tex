@@ -3,11 +3,11 @@
  Scalability: excellent
 
  Access transparency: good - access control per directory, not per
-ﬁle
+file
 
- Replication: limited à only on read-only ﬁles
+ Replication: limited, only on read-only files
 
- Security: limited à Kerberos authentication protocol used
+ Security: limited, Kerberos authentication protocol used
 
  Mobility transparency: good
 
@@ -19,40 +19,40 @@ server load of 40\% with 18 client nodes versus a load of 100\% for
 NFS
 
 Access transparency: excellent - the API is the UNIX system call
-interface for both local and remote ﬁles.
+interface for both local and remote files.
 
 Location transparency: not guaranteed but normally achieved -
-naming of ﬁlesystems is controlled by client mount operations, but
+naming of filesystems is controlled by client mount operations, but
 good location transparency can be ensured by an appropriate
-system conﬁguration.
+system configuration.
 
- Mobility transparency: hardly achieved - relocation of ﬁles is not
-possible, relocation of ﬁlesystem is possible, but requires updates
-to client conﬁgurations.
+ Mobility transparency: hardly achieved - relocation of files is not
+possible, relocation of filesystem is possible, but requires updates
+to client configurations.
 
  Scaling: good - a group of NFS servers can handle very large loads.
 For a single server, the performance limit is determined by its load.
-Additional servers may be added, so that ﬁlesystems are
+Additional servers may be added, so that filesystems are
 subdivided and allocated between them.
 
- Replication: limited to read-only ﬁle systems. File replication for
+ Replication: limited to read-only file systems. File replication for
 updates is achieved with a support of the Sun Network
 Information Service (NIS).
 
  Heterogeneity: good - NFS is implemented for almost every OS
 and hardware platform.
 
- Failure: limited but eﬀective - ﬁle service is suspended if a server
+ Failure: limited but effective - file service is suspended if a server
 fails. Failure recovery is aided by the simple stateless design.
 
  Concurrency: limited but adequate for most purposes - when
-read-write ﬁles are shared concurrently betweeen clients,
+read-write files are shared concurrently between clients,
 consistency is not perfect.
 
  Security: hardly achieved - no data is encrypted and UNIX-style
-authentication is used. Additionally, it supports Diﬃe-Hellman
+authentication is used. Additionally, it supports Diffie-Hellman
 and Kerberos authentication mechanisms.
 
  Performance: good - multiprocessor servers achieve very high
-performance, but for a single ﬁlesystem it is not possible to go
+performance, but for a single filesystem it is not possible to go
 beyond the throughput of a multiprocessor server.
