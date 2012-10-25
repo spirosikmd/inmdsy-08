@@ -58,6 +58,8 @@ We implemented the reliable multicast based on the lecture slides, using  piggyb
 \subsubsection{Messages}
 The basic entity of our reliable multicast implementation is a Message, which structure is shown in Figure~\ref{fig:messages}. The first byte represent the command, hence the message supports $2^8$ different commands. In our case, a command can be either Message (1), ACK(2) or NACK(4). However, ACK messages are not used in this implementation in order to reduce traffic on the channel. Furthermore, the peer and message number are represented each by four byte. Afterwards, the length of the payload is specified by two bytes. Eight bytes are reserved for the checksum, which is calculated on the payload. The actual payload has no fixed size and is only limited by the maximum message size, which is in our case is set to $2^{15}$.
 
+\todo{CRC32 checksum} 
+
 If the logic needs to send a lot of data, it has to be split into multiple messages. Due to the reliable multicast it is guaranteed that all messages will eventually arrive and are consumed in order.
 
 \begin{figure}[htbp]
@@ -92,16 +94,13 @@ At first the receiver thread parses the incoming packet into the aforementioned 
 this process is described in Figure~\ref{fig:figures_processMessages}.
 Depending on the command of the message, the message either contains data or is a request for a missed message (Nack). If it is a NACK  then the process resends the message by taking it from the sent messages queue.
 
-
-If the command is actually message, it first checks wether it hs ever received a message from that particularly process before. if not it initializes the piggybackounter and the seen message id to the id of the current message minus one. 
+If the command is actually a message, it first checks wether it has ever received a message from that particularly process before. if not it initializes the piggyback counter and the seen message id to the id of the current message minus one. 
 Afterwards, it compares the local piggybackcounter with the piggybacked messages number. One of three things might happen. 
 
 1) The message has been seen before and is discarded
 2) The message id is larger than the expected message
     A missed message is detected
 3) The message is expected and can be safely consumed.
-
-
  
 \begin{figure}[htbp]
     \centering
@@ -112,28 +111,48 @@ Afterwards, it compares the local piggybackcounter with the piggybacked messages
 
 eventually delivers it
 
-
 \subsubsection{Sending Messages to Group}
+
+The process of multicasting a message to the group is described in Figure~\ref{fig:sendMessage}. Sending a message to a group is straightforward in Java. At first the message will be serialized into an array of bytes, which will be multicasted by using the Socket class. 
+
+However, we have implemented various optimizations in order to improve reliability and avoid a clogging of the network. For instance, we figured out that if we limit the frequency of messages, less messages are lost. This is similar to limiting the bandwidth because less bits per seconds can be transferred.  
+We implemented the limit by using a timed semaphore, which ensures that a critical path can only be entered every given time frame. Since Peerbox is not time critical it is no problem to limit the bandwidth. 
+However, the timed semaphore is not enough because this will cause the application to halt until it can enter the critical section. Therefore, we decoupled  sending from the main application by using a blocking queue, which acts as a send buffer. 
+
+In summary, the sender thread tries to acquire the semaphores, takes the next message from the queue, multicasts it to the group and then waits again for the semaphore and the next message. 
+
+Furthermore, the send buffer allows to reduce the amount of sent messages by discarding messages that are already in the send buffer but were not yet multicasted to the group. Therefore, before pushing a message to the send buffer, it is checked if the message is already contained in the buffer.
+An analysis of the network traffic showed that a lot of negative acknowledgements were sent multiple times because the process encountered a missed message multiple times but had not yet the chance to multicast the first negative acknowledgement. 
 
 \begin{figure}[htbp]
     \centering
         \includegraphics[height=3in]{figures/sendMessage.pdf}
     \caption{Send a multicast message}
-    \label{fig:figures_processMessages}
+    \label{fig:sendMessage}
 \end{figure}
+  
+\subsubsection{Hearbeat}
+A tough challenge is to handle peers that left without notice. Firstly, it is difficult to distinguish between a crashed peer or a slow peer and  secondly there is no automatic mechanism implemented in the basic multicast that informs other peers if a peer left the group.
+
+We considered two tactics to increase fault-tolerance. The first one is a ping-echo tactic, in which a peer sends a ping message to another peer. If the peer answers with an echo message, everything is fine if not the peer is down for the count. We considered to implement the ping-echo mechanism using a reliable 1-1 channel, i.e. TCP/IP. In order to reduce the number of ping/echo messages, it would be good to have one peer that is responsible for sending out pings and detecting dead peers. This would require a leader-election algorithm.
+
+The alternative is a heartbeat tactic, in which every peer multicasts a multicasts a life signal in a certain time interval. The dead peer detection is done by every peer on its own. Although the multicasted heartbeat might be less reliable as a fault-detection algorithm as it might happen that peers are in a different state (e.g. if one peer misses heartbeat messages), the complexity and total amount of messages is lower compared to the described ping/echo tactic.
+
+Therefore we implemented a heartbeat mechanism into the middleware, to be able to detect unresponsive peers.
 
 \subsubsection{Optimizations}
+e
+Miss Timer
+
+easy to implement a vector clock in order to get partial ordering  (message may not be delivered until vector clock is as large)
 
 limit bandwidth 
     - should be made dynamic
     
-    %  It also helps to avoid unwanted message transmission and prevents clogging of networks and conserves bandwidth.
-    
-queue optimizations (discard duplicate)
+    , we favored a heartbeat over a ping tactic because we do not need to elect a leader for that. 
+       every peer send a heartbeat every x second with its vector clock (showing its internal message state), if a peer 
 
-easy to implement a vector clock in order to get partial ordering  (message may not be delivered until vector clock is as large)
-
-
+       this might cause that a peer is temporarily not available also he is functioning properly.
 
 \subsection{Logic}
 
@@ -165,14 +184,6 @@ The application logic is mainly responsible for processing dispatched messages f
     \subsubsection{Requesting a file}
     
     direct communication, multicasting files might be inappropriate
-    
-    \subsubsection{Fault-tolerance Hearbeat}
-    toughest challenge in async network, what happens when peer leaves without notice (e.g. crashed). On the one hand, it is not possible to distingush between a crash or a slow peer and  on the other hand there is no automatic mechanism that detects if a peer left a multicast group.
-    
-    Therefore we implement a (Heartbeat), we favored a heartbeat over a ping tactic because we do not need to elect a leader for that. 
-    every peer send a heartbeat every x second with its vector clock (showing its internal message state), if a peer 
-    
-    this might cause that a peer is temporarily not available also he is functioning properly.
     
 
     
