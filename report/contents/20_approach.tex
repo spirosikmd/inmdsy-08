@@ -176,14 +176,23 @@ public static interface Command {
     dynamic structure realized by a serialized key-value store. 
     this allows to easily extend the protocol
 
-    \subsubsection{Dynamicity}
-    IP addresses of the peers are transmitted and thus dynamically discovered.
-    All options are configurable via configuration files
-    No hardcoded properties
-    Works on any IP network that supports multicast
+
 
 \subsubsection{Message handling}
 Strategy pattern, depending on the Key.Command the appropriate handler will be chosen.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[height=2in]{figures/mhStrategy.pdf}
+\caption{Strategy Pattern for handling messages}
+\label{fig:figures_mhStrategy}
+\end{figure}
+
+\subsubsection{Dynamicity}
+IP addresses of the peers are transmitted and thus dynamically discovered.
+All options are configurable via configuration files
+No hardcoded properties
+Works on any IP network that supports multicast
 
 
 \subsubsection{Virtual File System}
