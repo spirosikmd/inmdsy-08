@@ -161,15 +161,15 @@ The actual type of a message is defined by the Key command, which might contain 
 \begin{lstlisting}[caption=Possible values of command]
 public static interface Command {
 		public enum Request {
-			List, Join;
+			List, Join, Token;
 		}
 
 		public enum Reply {
-			List, Welcome;
+			List, Welcome, Token;
 		}
 
 		public enum Info {
-			Created, Deleted, Modified, Heartbeat, Leave;
+			Created, Deleted, Modified, Leave;
 		}
 	}
 \end{lstlisting}
