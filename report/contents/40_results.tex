@@ -1,6 +1,6 @@
 %!TEX root = ../Peerbox.tex
 
-Peerbox is designed to be used for small groups as a simple distributed file service based on an ad-hoc network. The current implementation of Peerbox satisfies some of the requirements that file services should in general address.
+Peerbox is designed to be used for small groups as a simple distributed file sharing service based on an ad-hoc network. The current implementation of Peerbox satisfies some of the requirements that file services should in general addressed.
 
 
 One of the most important requirements is the kind and level of transparency that Peerbox provides to the external environment. Peerbox offers \textbf{weak access transparency}. The users can use the OS specific file service in order to interact with the local files. However, in order to interact with remote files they would need to use the Peerbox interface. In order to achieve this goal, we would need to integrate Peerbox with the OS file service.  Access control is provided by the operating system and Peerbox does not introduce additional access control at the moment.
@@ -17,13 +17,13 @@ Peerbox exhibits \textbf{good scalability}. It can scale linearly and for every 
 
 
 
-Peerbox provides \textbf{excellent heterogeneity} as it can be accessed by clients running on MacOS, Windows, Linux and any hardware platform as long as the Java dependency is met. Furthermore, the design of Peerbox is compatible with the file systems of different OSes.
+Peerbox provides \textbf{excellent heterogeneity} as it can be accessed by clients running on MacOS, Windows, Linux and any hardware platform as long as the Java dependency is met. Furthermore, the design of Peerbox is compatible with the file systems of different OS.
 
 
-Peerbox offers limited fault-tolerance but at the same time is sufficient for the current purposes of the application. The files are not replicated on all peers. This means that if one peer fails and he is the only holder of a file, then the rest of the peers cannot get this file. However if one peers fails the rest of the peers can still operate efficiently. Failure recovery is aided by the simple stateless design.
+Peerbox offers limited fault-tolerance but at the same time is sufficient for the current purposes of the application. The files are not replicated on all peers. This means that if one peer fails and it is the only holder of a file, then the rest of the peers cannot get this file. However if one peers fails the rest of the peers can still operate efficiently. Failure recovery is aided by the simple stateless design.
 
 
 The level of provided \textbf{concurrency is limited} but adequate for most cases. All the peers share the same state of the file system due to the use of the Virtual File System in the application logic. Peerbox offers file-level locking which is a sufficient locking mechanism for the purposes that it is meant to be used. It is likely that when read-writes are shared concurrently consistency would not be perfect. 
 
 
-Peerbox \textbf{hardly achieves security}. We did not try to address security as we did not consider it of high importance, due to the limited amount of time. Therefore, security level is left to the levels that the operating systems provide. 
+Peerbox \textbf{hardly achieves security}. We did not try to address security as we did not consider it as high priority, due to the limited amount of time. Therefore, security level is left to the levels that the operating systems provide. 
