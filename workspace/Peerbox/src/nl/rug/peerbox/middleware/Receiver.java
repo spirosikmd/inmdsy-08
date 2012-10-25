@@ -103,6 +103,7 @@ final class Receiver {
 
 				p.setReceivedMessageID(++r);
 				//sendAck(m);
+				//TODO broadcast message
 				group.rdeliver(m);
 
 				Announcement stored = findMessageInHoldbackQueue(p.getHostID(),
