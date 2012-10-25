@@ -1,6 +1,7 @@
 package nl.rug.peerbox.ui;
 
 import nl.rug.peerbox.logic.FileRequestTask;
+import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.PeerboxFile;
 import nl.rug.peerbox.logic.PeerboxFileListener;
 
@@ -126,7 +127,7 @@ public class FileView extends Composite implements DisposeListener, SelectionLis
 	@Override
 	public void widgetSelected(SelectionEvent arg0) {
 		action.setEnabled(false);
-		this.getDisplay().asyncExec(new FileRequestTask(getModel()));	
+		this.getDisplay().asyncExec(new FileRequestTask(getModel(),Peerbox.getInstance()));	
 	}
 
 	@Override

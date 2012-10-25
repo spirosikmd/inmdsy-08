@@ -20,11 +20,11 @@ public final class FileRequestTask implements Runnable {
 	private final Context ctx;
 	private final PeerboxFile file;
 
-	public FileRequestTask(PeerboxFile file) {
+	public FileRequestTask(PeerboxFile file, Context ctx) {
 		this.file = file;
 		this.h = file.getOwner();
 		this.filename = file.getFilename();
-		this.ctx = Peerbox.getInstance();
+		this.ctx = ctx;
 	}
 
 	@Override

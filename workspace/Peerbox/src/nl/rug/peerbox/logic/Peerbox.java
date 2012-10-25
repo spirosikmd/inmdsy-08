@@ -38,7 +38,7 @@ public class Peerbox implements MessageListener, Context {
 		private static final Context INSTANCE = Peerbox.createInstance();
 	}
 
-	public static Context getInstance() {
+	public static synchronized Context getInstance() {
 		return Holder.INSTANCE;
 	}
 
@@ -55,7 +55,7 @@ public class Peerbox implements MessageListener, Context {
 				logger.error(e);
 			}
 		}		
-		
+		System.err.println("Constructur Start");
 		path = properties.getProperty(Property.PATH);
 		datafile = properties.getProperty(Property.DATAFILE_NAME);
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
@@ -68,6 +68,7 @@ public class Peerbox implements MessageListener, Context {
 				.getProperty(Property.SERVER_PORT));
 		String name = properties.getProperty(Property.NAME);
 		peer = Peer.createPeer(ip, serverPort, name);
+		System.err.println("Constructur complete");
 	}
 
 	private static Peerbox createInstance() {
@@ -118,7 +119,7 @@ public class Peerbox implements MessageListener, Context {
 
 		if (message != null) {
 			try {
-				MessageHandler.process(message);
+				MessageHandler.process(message, this);
 			} catch (UnsupportedCommandException e) {
 				logger.error("Unsupported command " + e.getUnsupportedCommand());
 				logger.error(e);
