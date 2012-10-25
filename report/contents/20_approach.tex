@@ -98,8 +98,7 @@ If the command is actually a message, it first checks wether it has ever receive
 Afterwards, it compares the local piggybackcounter with the piggybacked messages number. One of three things might happen. 
 
 1) The message has been seen before and is discarded
-2) The message id is larger than the expected message
-    A missed message is detected
+2) The message id is larger than the expected message, which means that a message has been missed. A negative acknowledge is send for the missed message. 
 3) The message is expected and can be safely consumed.
  
 \begin{figure}[htbp]
