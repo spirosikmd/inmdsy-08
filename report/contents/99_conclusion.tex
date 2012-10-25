@@ -2,9 +2,10 @@
 
 Peerbox designed to be used for small groups as a simple and robust distributed file service. As such it needs to address some specific requirements.\\
 
-One of the most important requirements is the kind and level of transparency that it provides to the external environment. Peerbox offers \textbf{excellent access transparency}. The file API is not OS dependent and it works transparently for both local and remote files. Access control is provided by the operating system and Peerbox does not introduce additional access control at the moment.
+One of the most important requirements is the kind and level of transparency that Peerbox provides to the external environment. Peerbox offers \textbf{weak access transparency}. The users can use the OS specific file service in order to interact with the local files. However, in order to interact with remote files they would need to use the Peerbox interface. In order to achieve this goal, we would need to integrate Peerbox with the OS file service.  Access control is provided by the operating system and Peerbox does not introduce additional access control at the moment.
 
-Peerbox offers \textbf{weak location transparency}. The fact that the peers are aware that some files of the Virtual File System are not stored locally, and additionally to which member these files belong to, it does decrease the level of location transparency.
+Peerbox offers \textbf{weak location transparency}. The fact that the peers are aware that some files of the Virtual File System are not stored locally, and that to which members these files belong to, it does decrease the level of location transparency. The peers are aware of file distribution.
+
 
 
 
@@ -73,12 +74,16 @@ Peerbox offers \textbf{weak location transparency}. The fact that the peers are 
 % Heterogeneity: good - NFS is implemented for almost every OS
 %and hardware platform.
 
+Peerbox provides \textbf{excellent heterogeneity}. 
+
 % Failure: limited but effective - file service is suspended if a server
 %fails. Failure recovery is aided by the simple stateless design.
 
 % Concurrency: limited but adequate for most purposes - when
 %read-write files are shared concurrently between clients,
 %consistency is not perfect.
+
+concurrency yes
 
 
 
