@@ -129,10 +129,10 @@ Causal ordering can be implemented by using vector clocks. The vector clock of a
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintains a consistent Virtual File System.
     
 \subsubsection{Messages}   
-The actual Peerbox messages are stacked on the Multicast Messages of the middleware which means that they will be serialized into the payload of a multicast message. 
-Instead of using a predetermined structure, we decided to use a more open-approach that allows for easy modifiability and an simple extension of the protocol. Hence, we are using a Key-Value store, which will be serialized and deserialized. 
+The actual Peerbox messages are stacked on the multicast messages of the middleware, which means that they will be serialized into the payload of a multicast message. 
+Instead of using a predetermined structure, we decided to use a more flexible approach that allows for easy modifiability and a simple extension of the protocol. Hence, we are using a Key-Value store, which will be serialized and deserialized. 
 
-The actual type of a message is defined by the Key command, which might contain one of the following values illustrated in Listing~\ref{lst:keyvalues}. In concrete, we use the HashMap class, which can be easily serialized using Java serialization API.  The HashMap takes objects of the enum-type Key as keys and any type of Object as value. The application logic is responsible to cast the value to the appropriate type, e.g. \verb|Command c = (Command)message.get(Key.Command);|.
+The actual type of a message is defined by the Key command, which might contain one of the following values illustrated in Listing~\ref{lst:keyvalues}. In concrete, we use the HashMap class, which can be easily serialized using the Java serialization API.  The HashMap takes objects of the enum-type Key as keys and any type of Object as value. The application logic is responsible to cast the value to the appropriate type, e.g. \verb|Command c = (Command)message.get(Key.Command);|.
 
 \begin{lstlisting}[caption=Possible values of command, label=lst:keyvalues]
 public static interface Command {
@@ -151,9 +151,8 @@ public static interface Command {
 \end{lstlisting}
 
 \subsubsection{Message handling}
-Due to the diversity of messages that are sent in the logic layer, the Strategy Pattern has been implemented to execute the appropriate algorithm depending on the received Key.Command. The Strategy is implemented by an abstract MessageHandler class, which provides a static method to process a message. The process method that forwards the message to the appropriate concrete MessageHandler, e.g. ReplyListMessageHandler which multicast a list of local files. The concrete messages and the actual creation of the VirtualFileSystem will be described in the following section. 
-
-Using the StrategyPattern increases the cohesion and thus improves maintainability, because MessageHandler have a concrete task and new MessageHandler can be easily added.
+Due to the diversity of messages that are sent in the logic layer, the Strategy Pattern has been implemented to execute the appropriate algorithm depending on the received command. The strategy is implemented by an abstract MessageHandler class, which provides a static method to process a message. The process method then forwards the message to the appropriate concrete MessageHandler, e.g. ReplyListMessageHandler which multicast a list of local files. 
+Using the Strategy pattern increases the cohesion and thus improves maintainability because a MessageHandler has a concrete responsibility and new MessageHandler can be easily added.
 
 \begin{figure}[htbp]
 \centering
@@ -165,20 +164,20 @@ Using the StrategyPattern increases the cohesion and thus improves maintainabili
 
 \subsubsection{Virtual File System}
     
-The \gls{acr:vfs} contains a File List which is a dictionary of \glspl{acr:ufid} and Peerbox Files. We decided to create our own entity in order to represent a file, instead of using the Java File entity. We did this in order to create a virtual file which contains only the important information and not the data. Furthermore, the Java File entity contains operating system specific information that should not be shared with the rest of the peers. The Peerbox Files are associated with peers. This means that File List could contain two files with the same file name belonging to different peers.
+The \gls{acr:vfs} contains a list of files, which is a dictionary of \glspl{acr:ufid} and Peerbox Files. We decided to create our own entity in order to represent a file, instead of using the Java File entity. We did this in order to create a virtual file, which contains only the important information and not the data. Furthermore, the Java File entity contains operating system specific information that should not be shared with the rest of the peers. The Peerbox Files are associated with peers. This means that the VFS could contain files with the same name belonging to different peers.
     
-The VFS is responsible for maintaining the consistency of the File List among all peers. This is mainly accomplished with two techniques. The first one by observing the local file system for changes, e.g. file creations, deletions, or modifications, and updating the local File List. The second one is to multicast these changes to the rest of the peers so they can also update their own local File Lists.
+The VFS is responsible for maintaining the consistency of the file list among all peers. This is mainly accomplished with two techniques. At first, the local file system is observed for changes, e.g. file creations, deletions, or modifications in the local file system. These change events update the VFS. Secondly, changes are multicasted to the other peers so they can  update their own VFS, respectively their local file system.
 
-The current implementation of Peerbox does not allow the creation, deletion, and updating of remote files. This can be accomplished by introducing a token-based approach. Each token is paired with a file and denotes the owner of the file. Ownership can change when a peer agrees to give the token of a particular file to another peer. In this way peers would be able to apply changes to a remote File System.
+The current implementation of Peerbox does not allow the to create, to delete, or to modify  remote files. This could be accomplished by introducing a token-based approach. Each token is paired with a file and denotes the owner of the file. Ownership can change when a peer agrees to give the token of a particular file to another peer. In this way peers would be able to apply changes to a remote File System.
 
-The VFS has some limitations. The most important of them is the fact that there is no real file system shared between peers. Hence, it is possible to invalidate the state of the VFS by modifying the Peerbox folder when the application is not running.
+The VFS has some limitations. The most important of them is the fact that Peerbox does not tightly intergrate with the operating system's own file Hence, it is possible to invalidate the state of the VFS by modifying the local folder, in case  Peerbox is not running.
 
 \subsubsection{Dynamicity}
-Since Peerbox will be used on different operating systems and changing environments, it is important that it allows for a certain configuration dynamicity. Therefore, it tries to dynamically configure itself whenever possible, e.g. it dynamically receives the IP-Address and port from remote peers or it obtains the folder and username from the system properties. If a dynamic approach is not possible, the configuration options are at least configurable via a property file. 
+Since Peerbox will be used on different operating systems and in changing environments, it is important that it allows for a certain configuration dynamicity. Therefore, it tries to dynamically configure itself whenever possible, e.g. it dynamically receives the IP-Address and port from remote peers or it obtains the folder and username from the system properties. If a dynamic approach is not possible, the configuration options are at least configurable via a property file. 
 For example, it is possible to specify the Multicast-address and port.
 
 \subsection{Interface}
-The focus of this report lies on the implementation of the distributed aspects of Peerbox. Nevertheless, in order to use the system a simple user interface has been implemented using the Simple Widget Toolkit (SWT) and a Model-View-Controller approach. The user interface is shown in Figure~\ref{fig:figures_gui}.
+The focus of this report lies on the implementation of the distributed aspects of Peerbox. Nevertheless, in order to use the system a user interface has been implemented using the Simple Widget Toolkit (SWT) and a Model-View-Controller approach. The user interface is shown in Figure~\ref{fig:figures_gui}.
 \begin{figure}[htbp]
     \centering
         \includegraphics[height=4.15in]{figures/gui.png}
