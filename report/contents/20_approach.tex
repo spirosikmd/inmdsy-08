@@ -56,7 +56,7 @@ We implemented the reliable multicast based on the lecture slides, using  piggyb
 % from receive as it may be delayed to allow for ordering or reliability.
 
 \subsubsection{Messages}
-The basic entity of our reliable multicast implementation is a Message, which structure is shown in Figure~\ref{fig:messages}. The first byte represent the command, hence the message supports $2^8$ different commands. In our case, a command can be either Message (1), ACK(2) or NACK(4). However, ACK messages are not used in this implementation in order to reduce traffic on the channel. Furthermore, the peer and message number are represented each by four byte. Afterwards, the length of the payload is specified by two bytes. Eight bytes are reserved for the checksum, which is calculated on the payload. The actual payload has no fixed size and is only limited by the maximum message size, which is in our case is set to $2^15$.
+The basic entity of our reliable multicast implementation is a Message, which structure is shown in Figure~\ref{fig:messages}. The first byte represent the command, hence the message supports $2^8$ different commands. In our case, a command can be either Message (1), ACK(2) or NACK(4). However, ACK messages are not used in this implementation in order to reduce traffic on the channel. Furthermore, the peer and message number are represented each by four byte. Afterwards, the length of the payload is specified by two bytes. Eight bytes are reserved for the checksum, which is calculated on the payload. The actual payload has no fixed size and is only limited by the maximum message size, which is in our case is set to $2^{15}$.
 
 If the logic needs to send a lot of data, it has to be split into multiple messages. Due to the reliable multicast it is guaranteed that all messages will eventually arrive and are consumed in order.
 
@@ -117,6 +117,7 @@ easy to implement a vector clock in order to get partial ordering  (message may 
 
 \subsection{Logic}
 
+The application logic is mainly responsible for processing dispatched messages from the middleware and maintain a consistent Virtual File System.
     
     \subsubsection{Messages}
     serialized dictionary
