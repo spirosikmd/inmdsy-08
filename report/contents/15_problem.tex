@@ -18,7 +18,7 @@ While designing Peerbox, we needed to identify significant properties regarding 
 
 \subsubsection{File distribution size}
 
-There is no restriction on the size distribution of files. This literally means that even huge files could be shared, for instance large image, pdf or small video files. However, Peerbox is optimized for file sizes up to 100 MB \todo{not shore about this}. This can cover almost every kind of file type sharing. However, we do not expect that Peerbox will be used for sharing large image and video files.
+There is no restriction on the size distribution of files. This literally means that even huge files could be shared, for instance large image, pdf or small video files. However, Peerbox is optimized for file sizes up to 100 MB \todo{not shore about this}. This can cover almost every kind of file type sharing. However, we expect that Peerbox will rarely be used for sharing large image and video files.
 
 \subsubsection{File operations}
 
@@ -28,4 +28,4 @@ The number of file creations is expected to be significantly higher than deletio
 
 \subsubsection{File type}
 
-Peerbox does not introduce any restriction on the type of files that can be shared. This influences the property of the size distribution of files. Usually, the size of image and video files is large. This considerably increases the size distribution of files. However, It does not influence the property of file operations. The number of file read is not affected by the various file types.
+Peerbox does not introduce any restriction on the type of files that can be shared. This influences the property of the size distribution of files. Usually, the size of image and video files is large. This considerably increases the size distribution of files, as someone might decide to use Peerbox for the purposes of video and image sharing. However, It does not influence the property of file operations. The number of file reads is not affected by the various file types.
