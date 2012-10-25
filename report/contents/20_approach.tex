@@ -176,6 +176,8 @@ public static interface Command {
 \subsubsection{Message handling}
 Due to the diversity of messages that are sent in the logic layer, the Strategy Pattern has been implemented to execute the appropriate algorithm depending on the received Key.Command. The Strategy is implemented by an abstract MessageHandler class, which provides a static method to process a message. The process method that forwards the message to the appropriate concrete MessageHandler, e.g. ReplyListMessageHandler which multicast a list of local files. The concrete messages and the actual creation of the VirtualFileSystem will be described in the following section. 
 
+Using the StrategyPattern increases the cohesion and thus improves maintainability, because MessageHandler have a concrete task and new MessageHandler can be easily added.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[height=2in]{figures/mhStrategy.pdf}
