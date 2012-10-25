@@ -14,7 +14,7 @@ This scenario describes how the user can leave the peer-to-peer network. If the 
 \subsection{Properties of Peerbox}
 %spyros
 
-While designing Peerbox, we needed to identify significant properties regarding a file system. For example, the size distribution of files, and the relative and absolute frequencies of different file operations. In order to identify these properties, we needed to imagine the context that Peerbox would be placed in and how Peerbox would be used.
+While designing Peerbox, we need to identify certain significant properties regarding a file system. For example, the distribution of files based on their sizes and the relative and absolute frequencies of different file operations. In order to identify these properties, we need to imagine the context that Peerbox would be placed in and how Peerbox would be used.
 
 \subsubsection{File distribution size}
 
@@ -28,4 +28,4 @@ The number of file creations is expected to be significantly higher than deletio
 
 \subsubsection{File type}
 
-Peerbox does not introduce any restriction on the type of files that can be shared. This influences the property of the size distribution of files. Usually, the size of image and video files is large. This considerably increases the size distribution of files, as someone might decide to use Peerbox for the purposes of video and image sharing. However, It does not influence the property of file operations. The number of file reads is not affected by the various file types.
+Peerbox does not introduce any restriction on the type of files that can be shared. This influences the property of the size distribution of files. Usually, the size of image and video files is large. This considerably increases the size distribution of files, as someone might decide to use Peerbox for the purposes of video and image sharing. However, it wil not influence the property of file operations. The number of file reads is not affected by the various file types.
