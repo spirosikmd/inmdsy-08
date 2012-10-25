@@ -103,6 +103,7 @@ final class Receiver {
 
 				p.setReceivedMessageID(++r);
 				//sendAck(m);
+				//TODO broadcast message
 				group.rdeliver(m);
 
 				Announcement stored = findMessageInHoldbackQueue(p.getHostID(),
@@ -119,7 +120,7 @@ final class Receiver {
 				holdbackQueue.add(m);
 				for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
 					if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
-						//todo associate miss message with timer, if timer is over and h.messageid < missedID retry else message has been received
+						//TODO associate miss message with timer, if timer is over and h.messageid < missedID retry else message has been received
 						sendMiss(m.getPeerID(), missedID);
 					}
 				}
