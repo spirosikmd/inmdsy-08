@@ -99,7 +99,7 @@ Afterwards, it compares the local piggybackcounter with the piggybacked messages
 
 1) The message has been seen before and is discarded
 2) The message id is larger than the expected message, which means that a message has been missed. A negative acknowledge is send for the missed message. 
-3) The message is expected and can be safely consumed.
+3) The message is expected and can be reliably consumed, which involves another multicast of the message to the group.
  
 \begin{figure}[htbp]
     \centering
@@ -140,19 +140,15 @@ The alternative is a heartbeat tactic, in which every peer multicasts a multicas
 Therefore we implemented a heartbeat mechanism into the middleware, to be able to detect unresponsive peers.
 
 \subsubsection{Optimizations}
-e
-Miss Timer
+The following optimizations have been implemented or were considered. 
 
-easy to implement a vector clock in order to get partial ordering  (message may not be delivered until vector clock is as large)
+When a peer p detects that it has missed a message m from peer q, it will send a negative acknowledgment. However, if the negative acknowledgment or the resend message is lost, the p will not ask again for that message until he receives another message from peer q. 
+In the Peerbox system, the time frame between two messages could be arbitrary large, which means that a peer might wait for a lengthy period until he finally receives and consumes a message. 
+By associating a negative acknowledgement with a timer, the peer will automatically send the negative acknowledgement again if he has not yet received the message.
 
-limit bandwidth 
-    - should be made dynamic
-    
-    , we favored a heartbeat over a ping tactic because we do not need to elect a leader for that. 
-       every peer send a heartbeat every x second with its vector clock (showing its internal message state), if a peer 
+Another optimization would be to dynamically limiting the bandwidth based on heuristics. For example, if the number of messages and peers increase a certain threshold, the bandwidth can be reduced by increasing the timeframe of the semaphore. 
 
-       this might cause that a peer is temporarily not available also he is functioning properly.
-
+Causal ordering can be implemented by using vector clocks. The vector clock of a peer p is piggybacked to message m. A peer q, which receive m is only allowed to rdeliver m, if he has seen all messages that p has seen. Otherwise, can send out negative acknowledgements based on the vector clock of p. 
 \subsection{Logic}
 
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintain a consistent Virtual File System.
