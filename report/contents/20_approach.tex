@@ -152,12 +152,12 @@ Causal ordering can be implemented by using vector clocks. The vector clock of a
 The application logic is mainly responsible for processing dispatched messages from the middleware and maintains a consistent Virtual File System.
     
     \subsubsection{Messages}   
-The actual Peerbox messages are stacked on the Multicast Messages of the middleware which means that they will be serialized into the payload of the multicast message. 
-Instead of using a predetermined structure, we decided to use a more open-approach that allows for easy modifiability. Hence, we are using a Key-Value store, which will be serialized and deserialized. 
+The actual Peerbox messages are stacked on the Multicast Messages of the middleware which means that they will be serialized into the payload of a multicast message. 
+Instead of using a predetermined structure, we decided to use a more open-approach that allows for easy modifiability and an simple extension of the protocol. Hence, we are using a Key-Value store, which will be serialized and deserialized. 
 
-The actual type of a message is defined by the Key command, which might contain one of the following values illustrated in Listing~\ref{lst:keyvalues}.
+The actual type of a message is defined by the Key command, which might contain one of the following values illustrated in Listing~\ref{lst:keyvalues}. In concrete, we use the HashMap class, which can be easily serialized using Java serialization API.  The HashMap takes objects of the enum-type Key as keys and any type of Object as value. The application logic is responsible to cast the value to the appropriate type, e.g. \verb|Command c = (Command)message.get(Key.Command);|.
 
-\begin{lstlisting}[caption=Possible values of command]
+\begin{lstlisting}[caption=Possible values of command, label=lst:keyvalues]
 public static interface Command {
 		public enum Request {
 			List, Join, Token;
@@ -172,18 +172,22 @@ public static interface Command {
 		}
 	}
 \end{lstlisting}
-    serialized dictionary
-    dynamic structure realized by a serialized key-value store. 
-    this allows to easily extend the protocol
-
-    \subsubsection{Dynamicity}
-    IP addresses of the peers are transmitted and thus dynamically discovered.
-    All options are configurable via configuration files
-    No hardcoded properties
-    Works on any IP network that supports multicast
 
 \subsubsection{Message handling}
-Strategy pattern, depending on the Key.Command the appropriate handler will be chosen.
+Due to the diversity of messages that are sent in the logic layer, the Strategy Pattern has been implemented to execute the appropriate algorithm depending on the received Key.Command. The Strategy is implemented by an abstract MessageHandler class, which provides a static method to process a message. The process method that forwards the message to the appropriate concrete MessageHandler, e.g. ReplyListMessageHandler which multicast a list of local files. The concrete messages and the actual creation of the VirtualFileSystem will be described in the following section. 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[height=2in]{figures/mhStrategy.pdf}
+\caption{Strategy Pattern for handling messages}
+\label{fig:figures_mhStrategy}
+\end{figure}
+
+\subsubsection{Dynamicity}
+IP addresses of the peers are transmitted and thus dynamically discovered.
+All options are configurable via configuration files
+No hardcoded properties
+Works on any IP network that supports multicast
 
 
 \subsubsection{Virtual File System}
