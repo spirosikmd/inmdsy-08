@@ -89,8 +89,7 @@ Depending on the command of the message, the message either contains data or is 
 
 
 
-If the command is actually a message it first checks, whether it has ever received a message from that particular process before. \textbf{If not, it initializes the piggyback counter and the seen message id to the id of the current message minus one. } 
-\todo{Pls make it a bit clear}
+If the command is actually a message it first checks, whether it has ever received a message from that particular process before. If not, it initializes the piggyback counter and set the seen message id to the id of the current received message minus one.
 
 Every peer holds the id of every other peer, that is member of the group, a piggyback counter that contains the id of the last consumed message from that peer and the id of the last seen message, ideally both are the same.
 Afterwards, it compares the local piggyback counter with the piggybacked messages number. One of three things might happen. 
@@ -106,8 +105,6 @@ Afterwards, it compares the local piggyback counter with the piggybacked message
     \label{fig:figures_processMessages}
 \end{figure}
 
-\textbf{eventually delivers it}\todo{seems incomplete}
-
 \subsubsection{Sending Messages to the group}
 
 The process of multicasting a message to the group is described in Figure~\ref{fig:sendMessage}. Sending a message to a group is quite simple and easy in Java. At first the message will be serialized into an array of bytes, which will be multicasted by using the Socket class. 
@@ -119,7 +116,7 @@ However, the timed semaphore is not enough because this will cause the applicati
 To summarize, the sender thread tries to acquire the semaphores, takes the next message from the queue, multicasts it to the group and then waits again for the semaphore and the next message. 
 
 Furthermore, the send buffer allows to reduce the amount of sent messages by discarding messages that are already in the send buffer but are not yet  multicasted to the group. Therefore, before pushing a message to the send buffer, it is checked if the message is already present in the buffer.
-An analysis of the network traffic showed that a lot of negative acknowledgements were sent multiple times because the process encountered a missed message multiple times but \textbf{had not yet} \todo{meaning is not clear} the chance to multicast the first negative acknowledgement. 
+An analysis of the network traffic showed that a lot of negative acknowledgements were sent multiple times because the process encountered a missed message multiple times. However, this process did not have the chance to multicast the first negative acknowledgement.
 
 \begin{figure}[htbp]
     \centering
@@ -138,7 +135,7 @@ The alternative is a heartbeat tactic, in which every peer multicasts a life sig
 Therefore, we implement a heartbeat mechanism into the middleware to be able to detect unresponsive peers.
 
 \subsubsection{Optimizations}
-The following optimizations have been \textbf{implemented or were considered}\todo{its not clear whether we have implemented or we have just considerd them}. 
+The following optimizations have been implemented or were considered for implementation.
 
 When a peer p detects that it has missed a message m from peer q, it will send a negative acknowledgment. However, if the negative acknowledgment or the resend message is lost, the peer p will not ask again for that message until it receives another message from peer q. 
 In the Peerbox system, the time frame between two messages could be arbitrarily large, which means that a peer might wait for a long period until he finally receives and consumes a message. 
