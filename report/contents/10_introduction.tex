@@ -1,11 +1,16 @@
 %!TEX root = ../Peerbox.tex
+Peer-to-peer systems have become most popular recently in social, academic and commercial domains. These systems use networks in which each computer can act as a client or server for other computers without the need of a central server. One of the early driving forces behind peer-to-peer concept is that there are many PC's at home and offices that lie idle for large chunks of time. These resources can be leveraged for content sharing. In this report, we present the design and implementation of a peer-to-peer file sharing system known as \textbf{"Peerbox"}. This project is a part of  \textbf{Distributed Systems} course. This project is mainly targeted for university students who can share their work amoung their group. This system proves helpful in sharing and saving files. It is intended for small groups with an average size of 3-5 members. We identified some major advantages like scalability, performance, heterogeneity while using this system. However there are still some issues like security, mobile transparency, location transparency and replication which will be dealt in future.  
 
+
+The report is organized in different sections. Section 1 gives a general idea about the working of the Peerbox system.It describes about how file-sharing is done using the technique known as multicasting and introduces some of the most popular peer-to-peer file sharing systems that were developed recently. Section 2 discusses about some scenarios where we get acquainted with the various operations done in a peer-to-peer system.  It also discusses about some important properties of the Peerbox system. Section 3 discusses about the overall design and architecture of the system. It describes each architectural layer in detail. Section 4 discusses about different results achieved by the actual implementation of the Peerbox system.       
 \subsection{Idea}
 %manni
 
 Christian, Divya and Spyros are three students who work on a project based on Cloud Computing Project. The ideal for them, would be to work together to achieve their goals. This involves sharing their work with each other. However, there may be some situations where internet cannot be accessed, which may in turn delay their project. Nevertheless, the students need to work effectively by sharing their work - this means that they should be able to access files that are stored on another computer. This can be accomplished by combining the computers in a Virtual File System (VFS) that automatically adds files in a peer-to-peer scheme. Hence, the VFS would automatically detect new peers and show their file, so that they can accessed by the group members.
 
 Implementing the proposed solution, would  enable them to work across network boundaries without setting up complex shared folders, creating a flexible file structure and thus the peers do not have to be connected via internet. In this way, every student will not need to transmit ownership of a file because the file is stored locally on his computer File sharing will be possible with minimal configuration. 
+
+ 
 
 \todo{Figures showing three computers that build a vfs.}
 
@@ -14,7 +19,7 @@ Implementing the proposed solution, would  enable them to work across network bo
 %manni
 The main goal of the Peerbox system is to enable file sharing among different peers. Here, the process of multicasting is used where a set of data packets are transmitted to  multiple hosts who have joined the multicast group simultaneously. 
 
-After joining the group, the peer can request the list of files, create files, update the files as well as delete files. 
+After joining the group, the peer can request the list of files, create files, update the files as well as delete files.
 
 
 
