@@ -9,8 +9,7 @@ Section 1 describes the general idea and requirements  of Peerbox. Section 2 com
 
 Christian, Divya and Spyros are students who work on a project for their Cloud Computing course. Typically they meet every second day to synchronize their work and discuss the further progress of the project. These meetings often require to share files with each other. However, there may be some situations where internet is not available. Nevertheless, the students need to work effectively by sharing their work - this means that they should be able to access files that are stored on another computer in an easy and straight-forward manner. This can be accomplished by combining the computers in a \gls{acr:vfs} that automatically adds files in a peer-to-peer scheme. Hence, the VFS would  detect new peers and show their files, so that they can be accessed by the group members.
 
-Implementing the proposed solution, would  enable them to work across network boundaries without setting up complex shared folders, by creating a flexible file system structure. In this way, the students would not need to transmit ownership of a file because  files are stored locally on their computers. Thus, File sharing will be possible with minimal configuration. Figure~\ref{fig:idea} illustrates the general idea of Peerbox.
-
+Implementing the proposed solution, would  enable them to work across network boundaries without setting up complex shared folders, by creating a flexible file system structure. In this way, the students would not need to transmit ownership of a file because  files are stored locally on their computers. Thus, file sharing will be possible with minimal configuration. Figure~\ref{fig:idea} illustrates the general idea of Peerbox.
  
 \begin{figure}[H]
 \begin{center}
@@ -24,10 +23,8 @@ Implementing the proposed solution, would  enable them to work across network bo
 
 \subsection{Context}
 %manni
-The main goal of the Peerbox system is to enable file sharing among different peers. Here, the process of multicasting is used where a set of data packets are transmitted to  multiple hosts who have joined the multicast group simultaneously. 
-
-After joining the group, the peer can request the list of files, create files, update the files as well as delete files.
-
+The main goal of the Peerbox system is to enable file sharing among different peers. Therefore, the multicasting is used, in which data packets are transmitted simultaneously to multiple hosts who have joined a group. 
+After joining the group, the peer can request a list of files, create files, update  files as well as delete files.
 
 \clearpage
 \section{State of the Art}
