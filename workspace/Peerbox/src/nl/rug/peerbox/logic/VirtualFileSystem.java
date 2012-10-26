@@ -53,17 +53,21 @@ public class VirtualFileSystem {
 									if (event.context() instanceof Path) {
 										Path path = (Path) event.context();
 										File file = path.toFile();
-										PeerboxFile pbf = new PeerboxFile(file
-												.getName(), ctx.getLocalPeer(),
-												file);
-										addFile(pbf);
-										Message update = new Message();
-										update.put(Key.Command,
-												Command.Info.Created);
-										update.put(Key.Peer, ctx.getLocalPeer());
-										update.put(Key.File, pbf);
-										ctx.getMulticastGroup().announce(
-												update.serialize());
+										if (file.isFile()) {
+											PeerboxFile pbf = new PeerboxFile(
+													file.getName(), ctx
+															.getLocalPeer(),
+													file);
+											addFile(pbf);
+											Message update = new Message();
+											update.put(Key.Command,
+													Command.Info.Created);
+											update.put(Key.Peer,
+													ctx.getLocalPeer());
+											update.put(Key.File, pbf);
+											ctx.getMulticastGroup().announce(
+													update.serialize());
+										}
 									}
 								}
 								if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
@@ -72,20 +76,23 @@ public class VirtualFileSystem {
 									if (event.context() instanceof Path) {
 										Path path = (Path) event.context();
 										File file = path.toFile();
+										if (file.isFile()) {
+											PeerboxFile pbf = new PeerboxFile(
+													file.getName(), ctx
+															.getLocalPeer());
+											if (removeFile(pbf.getUFID()) != null) {
 
-										PeerboxFile pbf = new PeerboxFile(file
-												.getName(), ctx.getLocalPeer());
-										if (removeFile(pbf.getUFID()) != null) {
-
-											Message update = new Message();
-											update.put(Key.Command,
-													Command.Info.Deleted);
-											update.put(Key.Peer,
-													ctx.getLocalPeer());
-											update.put(Key.FileId,
-													pbf.getUFID());
-											ctx.getMulticastGroup().announce(
-													update.serialize());
+												Message update = new Message();
+												update.put(Key.Command,
+														Command.Info.Deleted);
+												update.put(Key.Peer,
+														ctx.getLocalPeer());
+												update.put(Key.FileId,
+														pbf.getUFID());
+												ctx.getMulticastGroup()
+														.announce(
+																update.serialize());
+											}
 										}
 									}
 								}
@@ -132,11 +139,14 @@ public class VirtualFileSystem {
 		}
 
 		if (directory.isDirectory()) {
-			for (String filename : directory.list()) {
-				PeerboxFile file = new PeerboxFile(filename,
-						ctx.getLocalPeer(), new File(filename));
-				if (!filename.equals(datafile) && !filename.startsWith(".")) {
-					vfs.addFile(file);
+			for (File file : directory.listFiles()) {
+				if (file.isFile()) {
+					String filename = file.getName();
+					PeerboxFile pbxf = new PeerboxFile(filename,
+							ctx.getLocalPeer(), file);
+					if (!filename.equals(datafile) && !filename.startsWith(".")) {
+						vfs.addFile(pbxf);
+					}
 				}
 			}
 		}
