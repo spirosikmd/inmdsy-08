@@ -75,11 +75,14 @@ final class Sender {
 		thread.interrupt();
 	}
 
-	void resendMessage(int messageID) {
+	void resendMessage(int messageID, int peerID) {
+
 		for (Announcement stored : sentMessagesList) {
 			if (stored.getMessageID() == messageID) {
-				pushMessage(stored);
-				return;
+				if (stored.getPeerID() == peerID) {
+					pushMessage(stored);
+					return;
+				}
 			}
 		}
 	}

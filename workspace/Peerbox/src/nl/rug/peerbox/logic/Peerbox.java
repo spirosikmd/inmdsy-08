@@ -55,7 +55,7 @@ public class Peerbox implements MessageListener, Context {
 				logger.error(e);
 			}
 		}		
-		System.err.println("Constructur Start");
+	
 		path = properties.getProperty(Property.PATH);
 		datafile = properties.getProperty(Property.DATAFILE_NAME);
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
@@ -68,7 +68,6 @@ public class Peerbox implements MessageListener, Context {
 				.getProperty(Property.SERVER_PORT));
 		String name = properties.getProperty(Property.NAME);
 		peer = Peer.createPeer(ip, serverPort, name);
-		System.err.println("Constructur complete");
 	}
 
 	private static Peerbox createInstance() {

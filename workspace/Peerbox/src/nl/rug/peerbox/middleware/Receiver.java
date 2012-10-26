@@ -102,8 +102,6 @@ final class Receiver {
 				logger.debug("Received: " + m.toString());
 
 				p.setReceivedMessageID(++r);
-				//sendAck(m);
-				//TODO broadcast message
 				group.rdeliver(m);
 
 				Announcement stored = findMessageInHoldbackQueue(p.getHostID(),
@@ -130,10 +128,8 @@ final class Receiver {
 			break;
 
 		case Announcement.NACK:
-			if (m.getPeerID() != group.getPeerId())
-				return;
 			logger.debug(m.toString());
-			group.getSender().resendMessage(m.getMessageID());
+			group.getSender().resendMessage(m.getMessageID(),m.getPeerID());
 
 		case Announcement.ACK:
 			if (m.getPeerID() != group.getPeerId()) {
