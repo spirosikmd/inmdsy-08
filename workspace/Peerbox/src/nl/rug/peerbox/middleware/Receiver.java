@@ -85,9 +85,10 @@ final class Receiver {
 			break;
 		case Announcement.HEARTBEAT:
 			RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
-			if (p != null) {
-				p.heartbeated();
+			if (p == null) {
+				p = detectedRemoteHost(m);
 			}
+			p.heartbeated();
 			break;
 		case Announcement.ACK:
 			if (m.getPeerID() != group.getPeerId()) {
@@ -103,13 +104,7 @@ final class Receiver {
 
 		RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
 		if (p == null) {
-			logger.debug("Detected group " + m.getPeerID() + " with piggyback "
-					+ (m.getMessageID() - 1));
-			p = new RemoteHost();
-			p.setHostID(m.getPeerID());
-			p.setSeenMessageID(m.getMessageID() - 1);
-			p.setReceivedMessageID(m.getMessageID() - 1);
-			group.getPeers().addRemoteHost(m.getPeerID(), p);
+			p = detectedRemoteHost(m);
 		}
 
 		int r = p.getReceivedMessageID();
@@ -147,6 +142,19 @@ final class Receiver {
 		} else if (s <= r) {
 			logger.debug("Discarded duplicate: " + m.toString());
 		}
+	}
+
+	private RemoteHost detectedRemoteHost(Announcement m) {
+		RemoteHost p;
+		logger.debug("Detected group " + m.getPeerID() + " with piggyback "
+				+ (m.getMessageID() - 1));
+		p = new RemoteHost();
+		p.setHostID(m.getPeerID());
+		p.setSeenMessageID(m.getMessageID() - 1);
+		p.setReceivedMessageID(m.getMessageID() - 1);
+		p.heartbeated();
+		group.getPeers().addRemoteHost(m.getPeerID(), p);
+		return p;
 	}
 
 	void sendMiss(int peer, int message_id) {
