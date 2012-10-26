@@ -15,10 +15,12 @@ final class Announcement {
 	static final byte MESSAGE = 1;
 	static final byte ACK = 2;
 	static final byte NACK = 4;
+	static final byte HEARTBEAT = 8;
 
 	static final int HEADER_SIZE = 19;
 	static final int MAX_MESSAGE_SIZE = 32768; //2^15
 	static final int MAX_PAYLOAD_SIZE = MAX_MESSAGE_SIZE - HEADER_SIZE;
+	
 
 	private byte command;
 	private int peerID;
@@ -52,6 +54,12 @@ final class Announcement {
 		m.checksum = m.calculateChecksum(m.payload);
 		return m;
 
+	}
+	
+	static Announcement heartbeat(int source, int s_piggyback, byte[] payload) {
+		Announcement m = send(source, s_piggyback, payload);
+		m.command = HEARTBEAT;
+		return m;
 	}
 
 	static Announcement nack(int destination, int messageID) {
@@ -155,6 +163,8 @@ final class Announcement {
 			return "MISS";
 		case MESSAGE:
 			return "MESSAGE";
+		case HEARTBEAT:
+			return "HEARTBEAT";
 		default:
 			return "STRANGE";
 		}

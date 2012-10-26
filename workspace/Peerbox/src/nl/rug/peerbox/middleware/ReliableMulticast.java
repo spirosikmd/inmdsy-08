@@ -6,6 +6,8 @@ import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,14 +16,14 @@ import org.apache.log4j.Logger;
 
 public class ReliableMulticast implements Multicast {
 
+	private static final int HEARTBEAT_FREQUENCY = 1000 * 10; //ms (10 seconds)
+
 	static Logger logger = Logger.getLogger(ReliableMulticast.class);
 
 	private final int id = new Random().nextInt(Integer.MAX_VALUE);
 
 	private final int port;
 	private final InetAddress address;
-
-	private final HashMap<Integer, RemoteHost> peers = new HashMap<Integer, RemoteHost>();
 
 	private Sender sender;
 	private MulticastSocket socket;
@@ -31,6 +33,8 @@ public class ReliableMulticast implements Multicast {
 	private ArrayList<MessageListener> observer = new ArrayList<MessageListener>();
 
 	private final AtomicInteger messageCounter = new AtomicInteger(0);
+
+	private RemoteHostManager hostManager;
 
 	private ReliableMulticast(InetAddress address, int port,
 			MulticastSocket socket) {
@@ -50,13 +54,25 @@ public class ReliableMulticast implements Multicast {
 
 			final ReliableMulticast group = new ReliableMulticast(address,
 					port, socket);
+			group.hostManager = new RemoteHostManager();
 			group.sender = new Sender(group);
 			group.receiver = new Receiver(group);
 			group.listener = new Listener(group);
-
+			
 			group.sender.start();
 			group.receiver.start();
 			group.listener.start();
+			
+			
+			Timer timer = new Timer("Heartbeat", true);
+			timer.scheduleAtFixedRate(new TimerTask() {
+				
+				@Override
+				public void run() {
+					Announcement heartbeat = Announcement.heartbeat(group.getPeerId(), group.messageCounter.get(), new byte[0]);
+					group.sendMessage(heartbeat);
+				}
+			}, 0, HEARTBEAT_FREQUENCY);
 
 			return group;
 
@@ -111,8 +127,8 @@ public class ReliableMulticast implements Multicast {
 		return receiver;
 	}
 
-	public HashMap<Integer, RemoteHost> getPeers() {
-		return peers;
+	public RemoteHostManager getPeers() {
+		return hostManager;
 	}
 
 	@Override

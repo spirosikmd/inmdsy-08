@@ -1,15 +1,36 @@
 package nl.rug.peerbox.middleware;
 
+import java.util.Date;
+
 class RemoteHost {
 
 	private int hostID;
 	private int processedMessageID;
 	private int actualMessageID;
-
+	private long lastLifeSign = 0;
+	private int count = 0;
+	
 	static RemoteHost find(int hostID) {
 		RemoteHost p  = new RemoteHost();
 		p.setHostID(hostID);
 		return p;
+	}
+	
+	synchronized void heartbeated() {
+		lastLifeSign = new Date().getTime();
+		count = 0;
+	}
+	
+	synchronized int incrementCount() {
+		return ++count;
+	}
+	
+	synchronized int getCount() {
+		return count;
+	}
+	
+	synchronized long getLastLifeSign() {
+		return lastLifeSign;
 	}
 	
 	int getHostID() {

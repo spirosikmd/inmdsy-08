@@ -76,66 +76,76 @@ final class Receiver {
 		switch (m.getCommand()) {
 		case Announcement.MESSAGE:
 
-			if (m.getPeerID() == group.getPeerId())
-				return;
-
-			RemoteHost p = null;
-			if (!group.getPeers().containsKey(m.getPeerID())) {
-				logger.debug("Detected group " + m.getPeerID()
-						+ " with piggyback " + (m.getMessageID() - 1));
-				p = new RemoteHost();
-				p.setHostID(m.getPeerID());
-				p.setSeenMessageID(m.getMessageID() - 1);
-				p.setReceivedMessageID(m.getMessageID() - 1);
-				group.getPeers().put(m.getPeerID(), p);
-			} else {
-				p = group.getPeers().get(m.getPeerID());
-			}
-
-			int r = p.getReceivedMessageID();
-			int s = m.getMessageID();
-			if (s > p.getSeenMessageID()) {
-				p.setSeenMessageID(s);
-			}
-
-			if (s == r + 1) {
-				logger.debug("Received: " + m.toString());
-
-				p.setReceivedMessageID(++r);
-				group.rdeliver(m);
-
-				Announcement stored = findMessageInHoldbackQueue(p.getHostID(),
-						s + 1);
-				if (stored != null) {
-					holdbackQueue.remove(stored);
-					receiveMessage(stored);
-				}
-
-			} else if (s > r + 1) {
-				logger.debug("Received: " + m.toString());
-				logger.debug("Missed message " + (r + 1)
-						+ " detected from group " + m.getPeerID());
-				holdbackQueue.add(m);
-				for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
-					if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
-						//TODO associate miss message with timer, if timer is over and h.messageid < missedID retry else message has been received
-						sendMiss(m.getPeerID(), missedID);
-					}
-				}
-			} else if (s <= r) {
-				logger.debug("Discarded duplicate: " + m.toString());
-			}
+			handleMessage(m);
 			break;
 
 		case Announcement.NACK:
 			logger.debug(m.toString());
-			group.getSender().resendMessage(m.getMessageID(),m.getPeerID());
+			group.getSender().resendMessage(m.getMessageID(), m.getPeerID());
+			break;
+		case Announcement.HEARTBEAT:
+			RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
+			if (p != null) {
+				p.heartbeated();
+			}
 			break;
 		case Announcement.ACK:
 			if (m.getPeerID() != group.getPeerId()) {
 				logger.debug("Acked: " + m.toString());
 			}
-			
+
+		}
+	}
+
+	private void handleMessage(Announcement m) {
+		if (m.getPeerID() == group.getPeerId())
+			return;
+
+		RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
+		if (p == null) {
+			logger.debug("Detected group " + m.getPeerID() + " with piggyback "
+					+ (m.getMessageID() - 1));
+			p = new RemoteHost();
+			p.setHostID(m.getPeerID());
+			p.setSeenMessageID(m.getMessageID() - 1);
+			p.setReceivedMessageID(m.getMessageID() - 1);
+			group.getPeers().addRemoteHost(m.getPeerID(), p);
+		}
+
+		int r = p.getReceivedMessageID();
+		int s = m.getMessageID();
+		if (s > p.getSeenMessageID()) {
+			p.setSeenMessageID(s);
+		}
+
+		if (s == r + 1) {
+			logger.debug("Received: " + m.toString());
+
+			p.setReceivedMessageID(++r);
+			group.rdeliver(m);
+
+			Announcement stored = findMessageInHoldbackQueue(p.getHostID(),
+					s + 1);
+			if (stored != null) {
+				holdbackQueue.remove(stored);
+				receiveMessage(stored);
+			}
+
+		} else if (s > r + 1) {
+			logger.debug("Received: " + m.toString());
+			logger.debug("Missed message " + (r + 1) + " detected from group "
+					+ m.getPeerID());
+			holdbackQueue.add(m);
+			for (int missedID = r + 1; missedID < p.getSeenMessageID(); missedID++) {
+				if (findMessageInHoldbackQueue(p.getHostID(), missedID) == null) {
+					// TODO associate miss message with timer, if timer is over
+					// and h.messageid < missedID retry else message has been
+					// received
+					sendMiss(m.getPeerID(), missedID);
+				}
+			}
+		} else if (s <= r) {
+			logger.debug("Discarded duplicate: " + m.toString());
 		}
 	}
 
