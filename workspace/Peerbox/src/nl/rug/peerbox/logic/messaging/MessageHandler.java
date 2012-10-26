@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 

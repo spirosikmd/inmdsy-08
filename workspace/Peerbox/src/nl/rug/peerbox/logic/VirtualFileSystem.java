@@ -22,13 +22,11 @@ import org.apache.log4j.Logger;
 public class VirtualFileSystem {
 
 	private Filelist filelist;
-	private final Context ctx;
 	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
 	private static final Logger logger = Logger
 			.getLogger(VirtualFileSystem.class);
 
 	private VirtualFileSystem(final Context ctx) {
-		this.ctx = ctx;
 		FileSystem fs = FileSystems.getDefault();
 
 		try {
@@ -51,13 +49,17 @@ public class VirtualFileSystem {
 									logger.info("Detect file created event "
 											+ event.context().toString());
 									if (event.context() instanceof Path) {
-										Path path = (Path) event.context();
-										File file = path.toFile();
-										if (file.isFile()) {
+										String path = ctx.getPathToPeerbox();
+										File directory = new File(path);
+										String filename = event.context()
+												.toString();
+										File file = new File(
+												directory.getAbsolutePath()
+														+ System.getProperty("file.separator")
+														+ filename);
+										if (file.isFile() && !file.isHidden()) {
 											PeerboxFile pbf = new PeerboxFile(
-													file.getName(), ctx
-															.getLocalPeer(),
-													file);
+													file.getName(), ctx.getLocalPeer(), file);
 											addFile(pbf);
 											Message update = new Message();
 											update.put(Key.Command,
@@ -74,25 +76,18 @@ public class VirtualFileSystem {
 									logger.info("Detect file deleted event "
 											+ event.context().toString());
 									if (event.context() instanceof Path) {
-										Path path = (Path) event.context();
-										File file = path.toFile();
-										if (file.isFile()) {
-											PeerboxFile pbf = new PeerboxFile(
-													file.getName(), ctx
-															.getLocalPeer());
-											if (removeFile(pbf.getUFID()) != null) {
-
-												Message update = new Message();
-												update.put(Key.Command,
-														Command.Info.Deleted);
-												update.put(Key.Peer,
-														ctx.getLocalPeer());
-												update.put(Key.FileId,
-														pbf.getUFID());
-												ctx.getMulticastGroup()
-														.announce(
-																update.serialize());
-											}
+										String filename = event.context().toString();
+										PeerboxFile pbf = new PeerboxFile(filename, ctx.getLocalPeer());
+										if (removeFile(pbf.getUFID()) != null) {
+											Message update = new Message();
+											update.put(Key.Command,
+													Command.Info.Deleted);
+											update.put(Key.Peer,
+													ctx.getLocalPeer());
+											update.put(Key.FileId,
+													pbf.getUFID());
+											ctx.getMulticastGroup().announce(
+													update.serialize());
 										}
 									}
 								}
@@ -140,12 +135,12 @@ public class VirtualFileSystem {
 
 		if (directory.isDirectory()) {
 			for (File file : directory.listFiles()) {
-				if (file.isFile()) {
+				if (file.isFile() && !file.isHidden()) {
 					String filename = file.getName();
-					PeerboxFile pbxf = new PeerboxFile(filename,
+					PeerboxFile pbf = new PeerboxFile(filename,
 							ctx.getLocalPeer(), file);
-					if (!filename.equals(datafile) && !filename.startsWith(".")) {
-						vfs.addFile(pbxf);
+					if (!filename.equals(datafile)) {
+						vfs.addFile(pbf);
 					}
 				}
 			}
