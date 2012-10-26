@@ -130,7 +130,7 @@ final class Receiver {
 		case Announcement.NACK:
 			logger.debug(m.toString());
 			group.getSender().resendMessage(m.getMessageID(),m.getPeerID());
-
+			break;
 		case Announcement.ACK:
 			if (m.getPeerID() != group.getPeerId()) {
 				logger.debug("Acked: " + m.toString());
