@@ -1,9 +1,9 @@
 package nl.rug.peerbox.middleware;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -13,7 +13,7 @@ public class RemoteHostManager {
 	private static final int FREQUENCY = 1000 * 15; //should be smaller then timeout
 	private static final Logger logger = Logger.getLogger(RemoteHostManager.class);
 	
-	private final HashMap<Integer, RemoteHost> hosts = new HashMap<Integer, RemoteHost>();
+	private final ConcurrentHashMap<Integer,RemoteHost> hosts = new ConcurrentHashMap<Integer, RemoteHost>();
 	
 		public RemoteHostManager() {
 		

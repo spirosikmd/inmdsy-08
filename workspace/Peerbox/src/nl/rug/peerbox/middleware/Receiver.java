@@ -150,8 +150,13 @@ final class Receiver {
 				+ (m.getMessageID() - 1));
 		p = new RemoteHost();
 		p.setHostID(m.getPeerID());
-		p.setSeenMessageID(m.getMessageID() - 1);
-		p.setReceivedMessageID(m.getMessageID() - 1);
+		if (m.getCommand()!=Announcement.MESSAGE) {
+			p.setSeenMessageID(m.getMessageID());
+			p.setReceivedMessageID(m.getMessageID());
+		} else {
+			p.setSeenMessageID(m.getMessageID() - 1);
+			p.setReceivedMessageID(m.getMessageID() - 1);	
+		}
 		p.heartbeated();
 		group.getPeers().addRemoteHost(m.getPeerID(), p);
 		return p;
