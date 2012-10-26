@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 public class RemoteHostManager {
 	
 	private static final int TIMEOUT = 1000 * 30; //should be smaller then timeout
-	private static final int FREQUENCY = 1000 * 15; //should be smaller then timeout
+	private static final int FREQUENCY = 1000 * 5; //should be smaller then timeout
 	private static final Logger logger = Logger.getLogger(RemoteHostManager.class);
 	
 	private final ConcurrentHashMap<Integer,RemoteHost> hosts = new ConcurrentHashMap<Integer, RemoteHost>();
@@ -23,7 +23,6 @@ public class RemoteHostManager {
 				@Override
 				public void run() {
 					long current = new Date().getTime();
-					logger.debug("Check hosts");
 					for (RemoteHost h : hosts.values()) {
 						if (h.getLastLifeSign()+TIMEOUT < current) {
 							logger.info(h.getHostID() + "is dead");
