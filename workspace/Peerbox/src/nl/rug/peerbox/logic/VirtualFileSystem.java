@@ -51,8 +51,7 @@ public class VirtualFileSystem {
 									if (event.context() instanceof Path) {
 										String path = ctx.getPathToPeerbox();
 										File directory = new File(path);
-										String filename = event.context()
-												.toString();
+										String filename = event.context().toString();
 										File file = new File(
 												directory.getAbsolutePath()
 														+ System.getProperty("file.separator")
@@ -99,7 +98,8 @@ public class VirtualFileSystem {
 							watckKey.reset();
 						}
 					} catch (InterruptedException e) {
-					} finally {
+					} 
+				finally {
 						System.out.println("watcher finished");
 					}
 

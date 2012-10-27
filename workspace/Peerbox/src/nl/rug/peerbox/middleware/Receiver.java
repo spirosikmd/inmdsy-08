@@ -84,6 +84,8 @@ final class Receiver {
 			group.getSender().resendMessage(m.getMessageID(), m.getPeerID());
 			break;
 		case Announcement.HEARTBEAT:
+			if (m.getPeerID() == group.getPeerId())
+				return;
 			RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
 			if (p == null) {
 				p = detectedRemoteHost(m);
