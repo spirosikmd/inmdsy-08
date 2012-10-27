@@ -98,9 +98,12 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	@Override
-	public void requestFiles() {
+	public void requestFiles(boolean initFilelist) {
 		Message message = new Message();
 		message.put(Key.Command, Command.Request.List);
+		if (initFilelist) {
+			message.put(Key.Files, fs.getFileList());
+		}
 		group.announce(message.serialize());
 	}
 

@@ -18,6 +18,6 @@ public interface Context {
 
 	void leave();
 
-	void requestFiles();
+	void requestFiles(boolean initFilelist);
 
 }

@@ -19,8 +19,6 @@ final class ReplyListMessageHandler extends MessageHandler {
 				.get(Key.Files);
 		for (PeerboxFile file : messageFilelist) {
 			vfs.addFile(file);
-
 		}
-
 	}
 }

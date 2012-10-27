@@ -121,7 +121,7 @@ public class SharedFilesView extends Composite implements DisposeListener,
 
 	@Override
 	public void widgetSelected(SelectionEvent se) {
-		peerbox.requestFiles();
+		peerbox.requestFiles(false);
 	}
 
 	@Override
