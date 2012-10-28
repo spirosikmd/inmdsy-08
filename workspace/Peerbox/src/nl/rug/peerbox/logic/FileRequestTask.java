@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.security.MessageDigest;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
@@ -34,8 +35,9 @@ public final class FileRequestTask implements Runnable {
 
 	@Override
 	public void run() {
+		String tempFilename = "." + filename;
 		File sharedFile = new File(ctx.getPathToPeerbox()
-				+ System.getProperty("file.separator") + filename);
+				+ System.getProperty("file.separator") + tempFilename);
 		
 		try (Socket s = new Socket()) {
 			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()), SOCKET_TIMEOUT);
@@ -54,18 +56,26 @@ public final class FileRequestTask implements Runnable {
 			}
 			bos.close();
 			put.close();
-			logger.info("File " + filename + " has been received");
 			file.setFile(sharedFile);
-		} catch (SocketTimeoutException e) {
-			logger.error(e);
+			logger.info("File " + filename + " has been received");
 		} catch (IOException e) {
 			logger.error(e);
-//			sharedFile.delete();
-//			sharedFile = null;
-//			file.setFile(null);
+			sharedFile.delete();
+			sharedFile = null;
+			file.setFile(null);
+		} finally {
+			if (sharedFile.length() == file.getSize()) {
+				String checksum = MD5Util.md5(sharedFile);
+				System.out.println(checksum + "  "+ file.getChecksum());
+				if (file.getChecksum().equals(checksum)) {
+					//rename
+				}
+			} 
+			
 		}
 		
-		
+		// if successful 
+			//rename tempFilename to filename
 		//verify file with peerboxfile properties
 		//filesize and content checksum		
 	}

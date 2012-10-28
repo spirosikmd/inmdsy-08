@@ -13,6 +13,8 @@ public class PeerboxFile implements Serializable {
 	private int version;
 	private Peer owner;
 	private String filename;
+	private String checksum;
+	private long size;
 	private transient File file = null;
 	private transient List<PeerboxFileListener> listeners;
 
@@ -23,6 +25,8 @@ public class PeerboxFile implements Serializable {
 	public PeerboxFile(String filename, Peer owner, File file) {
 		this.filename = filename;
 		this.file = file;
+		this.size = file.length();
+		this.checksum = MD5Util.md5(file);
 		this.ufid = new UFID(filename, owner);
 		this.owner = owner;
 		listeners = new ArrayList<PeerboxFileListener>();
@@ -48,6 +52,10 @@ public class PeerboxFile implements Serializable {
 		return owner;
 	}
 
+	public String getChecksum() {
+		return checksum;
+	}
+	
 	public boolean isOwn() {
 		return getOwner().equals(Peerbox.getInstance().getLocalPeer());
 	}
@@ -94,6 +102,10 @@ public class PeerboxFile implements Serializable {
 			ClassNotFoundException {
 		in.defaultReadObject();
 		listeners = new ArrayList<PeerboxFileListener>();
+	}
+
+	public long getSize() {
+		return size;
 	}
 
 }
