@@ -192,10 +192,12 @@ public class VirtualFileSystem implements PeerListener {
 										file.getName(), ctx.getLocalPeer(),
 										file);
 								boolean remoteFile = false;
-								for (PeerboxFile f : vfs.filelist.values()) {
-									if (file.equals(f.getFile())) {
-										remoteFile = true;
-										break;
+								synchronized (VirtualFileSystem.class) {
+									for (PeerboxFile f : vfs.filelist.values()) {
+										if (file.equals(f.getFile())) {
+											remoteFile = true;
+											break;
+										}
 									}
 								}
 								if (!remoteFile) {
@@ -223,8 +225,9 @@ public class VirtualFileSystem implements PeerListener {
 									break;
 								}
 							}
-							if (!remoteFile && vfs.removeFile(pbf.getUFID()) != null) {
-								
+							if (!remoteFile
+									&& vfs.removeFile(pbf.getUFID()) != null) {
+
 								Message update = new Message();
 								update.put(Key.Command, Command.Deleted);
 								update.put(Key.Peer, ctx.getLocalPeer());

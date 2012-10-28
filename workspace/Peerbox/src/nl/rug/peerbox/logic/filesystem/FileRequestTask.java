@@ -58,10 +58,8 @@ public final class FileRequestTask implements Runnable {
 			tempFile = File.createTempFile("peerbox_", filename);
 		} catch (IOException e1) {
 			tempFile = new File(ctx.getPathToPeerbox(), tempFilename);
-		} 
-				
-				
-		
+		}
+
 		try (Socket s = new Socket()) {
 			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()),
 					SOCKET_TIMEOUT);
@@ -96,9 +94,11 @@ public final class FileRequestTask implements Runnable {
 				valid = false;
 			}
 			if (valid) {
-				File sharedFile = new File(ctx.getPathToPeerbox(), filename);
-				tempFile.renameTo(sharedFile);
-				file.setFile(sharedFile);
+				synchronized (VirtualFileSystem.class) {
+					File sharedFile = new File(ctx.getPathToPeerbox(), filename);
+					tempFile.renameTo(sharedFile);
+					file.setFile(sharedFile);
+				}
 			} else {
 				file.setFile(null);
 			}
