@@ -19,7 +19,7 @@ import nl.rug.peerbox.logic.messaging.Message.Key;
 
 import org.apache.log4j.Logger;
 
-public class VirtualFileSystem {
+public class VirtualFileSystem implements PeerListener {
 
 	private Filelist filelist;
 	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
@@ -27,8 +27,8 @@ public class VirtualFileSystem {
 			.getLogger(VirtualFileSystem.class);
 
 	private VirtualFileSystem(final Context ctx) {
+		
 		FileSystem fs = FileSystems.getDefault();
-
 		try {
 			Path path = fs.getPath(ctx.getPathToPeerbox());
 			final WatchService watcher = fs.newWatchService();
@@ -111,7 +111,10 @@ public class VirtualFileSystem {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	};
+		
+		ctx.addPeerListener(this);
+		
+	}
 
 	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
 		File folder = new File(ctx.getPathToPeerbox());
@@ -193,6 +196,20 @@ public class VirtualFileSystem {
 	private void notifyAboutUpdatedFile(PeerboxFile f) {
 		for (VFSListener l : listeners) {
 			l.updated(f);
+		}
+	}
+
+	@Override
+	public void updated(int hostID, Peer peer) {
+		
+	}
+
+	@Override
+	public void deleted(int hostID, Peer peer) {
+		for (PeerboxFile f : filelist.values()) {
+			if (f.getOwner().equals(peer)) {
+				removeFile(f.getUFID());
+			}
 		}
 	}
 }

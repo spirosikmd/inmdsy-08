@@ -33,11 +33,6 @@ public abstract class MessageHandler {
 
 	public static void process(final Message message, final Context ctx) throws UnsupportedCommandException {
 		Object command = message.get(Key.Command);
-		Object obj = message.get(Key.Peer);
-		if (obj != Message.NULLOBJ && obj instanceof Peer) {
-			Peer peer = (Peer)obj;
-			//TODO stuff
-		}
 		if (command != Message.NULLOBJ) {
 			if (handlers.containsKey(command)) {
 				logger.debug("Process command "

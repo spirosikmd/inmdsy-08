@@ -31,8 +31,8 @@ public class FindingPeersApp {
 
 		
 		Context peerbox = Peerbox.getInstance();
-		peerbox.join();
-		peerbox.requestFiles(true);
+		//peerbox.join();
+		//peerbox.requestFiles(true);
 
 		Display.setAppName("Peerbox");
 		Display display = new Display();

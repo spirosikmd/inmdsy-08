@@ -1,5 +1,7 @@
 package nl.rug.peerbox.ui;
 
+import nl.rug.peerbox.logic.Peer;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -15,11 +17,12 @@ import org.eclipse.swt.widgets.Text;
 public class PeerView extends Composite implements DisposeListener {
 
 	private int hostID;
+	private Peer model;
 	private final Text peerID;
 	private final Text owner;
+	private final Text address;
 	private final Color background;
 	private final Color foreground;
-	private final Button action;
 
 	public PeerView(Composite parent) {
 		super(parent, SWT.BORDER);
@@ -32,45 +35,45 @@ public class PeerView extends Composite implements DisposeListener {
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 12;
 		layout.makeColumnsEqualWidth = true;
-		layout.marginHeight=0;
-		layout.marginWidth=0;
-		layout.marginTop=0;
-		layout.marginBottom=0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.marginTop = 0;
+		layout.marginBottom = 0;
 		setLayout(layout);
-
-		GridData filenameData = new GridData();
-		filenameData.grabExcessHorizontalSpace = true;
-		filenameData.horizontalAlignment = SWT.FILL;
-		filenameData.horizontalSpan = 6;
-		peerID = new Text(this, SWT.NONE);
-		peerID.setBackground(background);
-		peerID.setForeground(foreground);
-		peerID.setLayoutData(filenameData);
-		peerID.setEditable(false);
 
 		GridData ownerData = new GridData();
 		ownerData.grabExcessHorizontalSpace = true;
 		ownerData.horizontalAlignment = SWT.FILL;
-		ownerData.horizontalSpan = 3;
+		ownerData.horizontalSpan = 4;
 		owner = new Text(this, SWT.NONE);
 		owner.setBackground(background);
 		owner.setForeground(foreground);
 		owner.setLayoutData(ownerData);
-		
-		action = new Button(this, SWT.PUSH);
-		action.setVisible(false);
-		GridData actionData = new GridData();
-		actionData.grabExcessHorizontalSpace = true;
-		actionData.horizontalAlignment = SWT.FILL;
-		actionData.horizontalSpan = 3;
-		action.setLayoutData(actionData);
+
+		GridData addressData = new GridData();
+		addressData.grabExcessHorizontalSpace = true;
+		addressData.horizontalAlignment = SWT.FILL;
+		addressData.horizontalSpan = 4;
+		address = new Text(this, SWT.NONE);
+		address.setBackground(background);
+		address.setForeground(foreground);
+		address.setLayoutData(ownerData);
+
+		GridData peerIDData = new GridData();
+		peerIDData.grabExcessHorizontalSpace = true;
+		peerIDData.horizontalAlignment = SWT.FILL;
+		peerIDData.horizontalSpan = 4;
+		peerID = new Text(this, SWT.NONE);
+		peerID.setBackground(background);
+		peerID.setForeground(foreground);
+		peerID.setLayoutData(peerIDData);
+		peerID.setEditable(false);
+
 	}
 
 	public void setHostID(int hostID) {
 		this.hostID = hostID;
-		//this.model.addListener(this);
-		peerID.setText(hostID+"");
-		layout();
+		peerID.setText(hostID + "");
 	}
 
 	public int getHostID() {
@@ -96,19 +99,31 @@ public class PeerView extends Composite implements DisposeListener {
 		foreground.dispose();
 	}
 
+	public Peer getModel() {
+		return model;
+	}
 
-//	@Override
-//	public void modelUpdated() {
-//		this.getDisplay().asyncExec(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				if (getModel().exists()) {
-//					action.setVisible(false);
-//				}
-//				layout();
-//			}
-//		});
-//	}
+	public void setModel(Peer model) {
+		this.model = model;
+		if (model != null) {
+			owner.setText(model.getName());
+			address.setText(model.getAddress().toString() + ":"
+					+ model.getPort());
+		}
+	}
+
+	// @Override
+	// public void modelUpdated() {
+	// this.getDisplay().asyncExec(new Runnable() {
+	//
+	// @Override
+	// public void run() {
+	// if (getModel().exists()) {
+	// action.setVisible(false);
+	// }
+	// layout();
+	// }
+	// });
+	// }
 
 }

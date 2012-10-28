@@ -33,6 +33,7 @@ public class Peerbox implements MessageListener, Context {
 	private ExecutorService pool = Executors.newFixedThreadPool(5);
 	private Peer peer;
 	private VirtualFileSystem fs;
+	private PeerManager peerManager;
 
 	private static class Holder {
 		private static final Context INSTANCE = Peerbox.createInstance();
@@ -54,15 +55,15 @@ public class Peerbox implements MessageListener, Context {
 			} catch (IOException e) {
 				logger.error(e);
 			}
-		}		
-	
+		}
+
 		path = properties.getProperty(Property.PATH);
 		datafile = properties.getProperty(Property.DATAFILE_NAME);
 		String address = properties.getProperty(Property.MULTICAST_ADDRESS);
 		int port = Integer.parseInt(properties
 				.getProperty(Property.MULTICAST_PORT));
 		group = ReliableMulticast.createPeer(address, port);
-		
+		peerManager = new PeerManager(group);
 		byte[] ip = getLocalAddress();
 		int serverPort = Integer.parseInt(properties
 				.getProperty(Property.SERVER_PORT));
@@ -123,7 +124,12 @@ public class Peerbox implements MessageListener, Context {
 
 		if (message != null) {
 			try {
-				MessageHandler.process(message, this);
+				Object obj = message.get(Key.Peer);
+				if (obj != Message.NULLOBJ && obj instanceof Peer) {
+					Peer peer = (Peer) obj;
+					peerManager.update(hostID, peer);
+					MessageHandler.process(message, this);
+				}
 			} catch (UnsupportedCommandException e) {
 				logger.error("Unsupported command " + e.getUnsupportedCommand());
 				logger.error(e);
@@ -174,6 +180,18 @@ public class Peerbox implements MessageListener, Context {
 		} catch (IOException e) {
 			logger.error(e);
 		}
+	}
+
+	@Override
+	public void addPeerListener(PeerListener l) {
+		peerManager.addPeerListener(l);
+		
+	}
+
+	@Override
+	public void removePeerListener(PeerListener l) {
+		peerManager.removePeerListener(l);
+		
 	}
 
 }
