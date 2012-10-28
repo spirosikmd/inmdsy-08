@@ -4,6 +4,7 @@ import nl.rug.peerbox.logic.FileRequestTask;
 import nl.rug.peerbox.logic.Peerbox;
 import nl.rug.peerbox.logic.PeerboxFile;
 import nl.rug.peerbox.logic.PeerboxFileListener;
+import nl.rug.peerbox.middleware.RemoteHost;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -19,10 +20,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-public class PeerView extends Composite implements DisposeListener, SelectionListener, PeerboxFileListener {
+public class PeerView extends Composite implements DisposeListener {
 
-	private PeerboxFile model;
-	private final Text filename;
+	private RemoteHost model;
+	private final Text peerID;
 	private final Text owner;
 	private final Color background;
 	private final Color foreground;
@@ -49,10 +50,11 @@ public class PeerView extends Composite implements DisposeListener, SelectionLis
 		filenameData.grabExcessHorizontalSpace = true;
 		filenameData.horizontalAlignment = SWT.FILL;
 		filenameData.horizontalSpan = 6;
-		filename = new Text(this, SWT.NONE);
-		filename.setBackground(background);
-		filename.setForeground(foreground);
-		filename.setLayoutData(filenameData);
+		peerID = new Text(this, SWT.NONE);
+		peerID.setBackground(background);
+		peerID.setForeground(foreground);
+		peerID.setLayoutData(filenameData);
+		peerID.setEditable(false);
 
 		GridData ownerData = new GridData();
 		ownerData.grabExcessHorizontalSpace = true;
@@ -72,30 +74,18 @@ public class PeerView extends Composite implements DisposeListener, SelectionLis
 		action.setLayoutData(actionData);
 	}
 
-	public void setModel(PeerboxFile model) {
+	public void setModel(RemoteHost model) {
 		if (this.model != null) {
-			this.model.removeListener(this);
+			//this.model.removeListener(this);
 		}
 		this.model = model;
-		this.model.addListener(this);
-		filename.setText(this.model.getFilename());
-		action.removeSelectionListener(this);
-		action.setVisible(false);
-		if (!model.isOwn()) {
-			owner.setText("@" + model.getOwner().getName());
-			if (!model.exists()) {
-				action.setVisible(true);
-				action.setText("Get");
-				action.addSelectionListener(this);
-			}
-		} else {
-			owner.setText("");
-		}
+		//this.model.addListener(this);
+		peerID.setText(this.model.getHostID()+"");
 		layout();
 		
 	}
 
-	public PeerboxFile getModel() {
+	public RemoteHost getModel() {
 		return model;
 	}
 
@@ -108,9 +98,7 @@ public class PeerView extends Composite implements DisposeListener, SelectionLis
 		} else {
 			size.x = (whint < 50) ? 50 : whint;
 		}
-
 		size.y = 30;
-
 		return size;
 	}
 
@@ -120,28 +108,19 @@ public class PeerView extends Composite implements DisposeListener, SelectionLis
 		foreground.dispose();
 	}
 
-	@Override
-	public void widgetDefaultSelected(SelectionEvent arg0) {		
-	}
 
-	@Override
-	public void widgetSelected(SelectionEvent arg0) {
-		action.setEnabled(false);
-		this.getDisplay().asyncExec(new FileRequestTask(getModel(),Peerbox.getInstance()));	
-	}
-
-	@Override
-	public void modelUpdated() {
-		this.getDisplay().asyncExec(new Runnable() {
-			
-			@Override
-			public void run() {
-				if (getModel().exists()) {
-					action.setVisible(false);
-				}
-				layout();
-			}
-		});
-	}
+//	@Override
+//	public void modelUpdated() {
+//		this.getDisplay().asyncExec(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				if (getModel().exists()) {
+//					action.setVisible(false);
+//				}
+//				layout();
+//			}
+//		});
+//	}
 
 }

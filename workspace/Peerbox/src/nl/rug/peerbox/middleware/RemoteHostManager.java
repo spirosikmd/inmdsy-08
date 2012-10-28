@@ -1,6 +1,7 @@
 package nl.rug.peerbox.middleware;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -11,9 +12,9 @@ import org.apache.log4j.Logger;
 
 public class RemoteHostManager {
 
-	private static final int TIMEOUT = 1000 * 30; // should be smaller then
+	private static final int TIMEOUT = (int)(1000 * 7.5); // should be smaller then
 													// timeout
-	private static final int FREQUENCY = 1000 * 5; // should be smaller then
+	private static final int FREQUENCY = 1000 * 1; // should be smaller then
 													// timeout
 	private static final Logger logger = Logger
 			.getLogger(RemoteHostManager.class);
@@ -55,6 +56,10 @@ public class RemoteHostManager {
 		for (HostListener l : listeners) {
 			l.detected(h);
 		}
+	}
+	
+	public Collection<RemoteHost> getHosts() {
+		return hosts.values();
 	}
 	
 	public void addListener(HostListener l) {

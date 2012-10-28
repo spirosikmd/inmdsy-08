@@ -64,7 +64,9 @@ public class LogView extends Composite implements DisposeListener,
 				if (logText.getText().isEmpty()) {
 					logText.setText(line.replaceAll("^\\s+", ""));
 				} else {
-					logText.setText(logText.getText() + System.getProperty("line.separator") + line.replaceAll("^\\s+", ""));
+					logText.setText(logText.getText()
+							+ System.getProperty("line.separator")
+							+ line.replaceAll("^\\s+", ""));
 				}
 			}
 			reader.close();
@@ -112,11 +114,14 @@ public class LogView extends Composite implements DisposeListener,
 
 			@Override
 			public void run() {
-				if (logText.getText().isEmpty()) {
-					logText.setText(text.replaceAll("^\\s+", ""));
-				} else {
-					logText.setText(logText.getText() + System.getProperty("line.separator")
-							+ text.replaceAll("^\\s+", ""));
+				if (!logText.isDisposed()) {
+					if (logText.getText().isEmpty()) {
+						logText.setText(text.replaceAll("^\\s+", ""));
+					} else {
+						logText.setText(logText.getText()
+								+ System.getProperty("line.separator")
+								+ text.replaceAll("^\\s+", ""));
+					}
 				}
 			}
 		});

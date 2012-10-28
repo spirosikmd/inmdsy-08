@@ -157,7 +157,6 @@ public class FileListView extends Composite implements DisposeListener,
 
 			@Override
 			public void run() {
-				logger.info("Iterate children");
 				for (Control c : sfv.content.getChildren()) {
 
 					if (c instanceof FileView) {

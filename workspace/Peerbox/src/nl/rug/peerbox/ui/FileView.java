@@ -50,6 +50,7 @@ public class FileView extends Composite implements DisposeListener, SelectionLis
 		filenameData.horizontalAlignment = SWT.FILL;
 		filenameData.horizontalSpan = 6;
 		filename = new Text(this, SWT.NONE);
+		filename.setEditable(false);
 		filename.setBackground(background);
 		filename.setForeground(foreground);
 		filename.setLayoutData(filenameData);
@@ -62,6 +63,7 @@ public class FileView extends Composite implements DisposeListener, SelectionLis
 		owner.setBackground(background);
 		owner.setForeground(foreground);
 		owner.setLayoutData(ownerData);
+		owner.setEditable(false);
 		
 		action = new Button(this, SWT.PUSH);
 		action.setVisible(false);
