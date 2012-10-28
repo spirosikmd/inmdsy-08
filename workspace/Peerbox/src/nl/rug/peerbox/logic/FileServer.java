@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -30,7 +31,8 @@ final class FileServer implements Runnable {
 	@Override
 	public void run() {
 		logger.info("Starting server " + ctx.getLocalPeer().getPort());
-		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {			
+		try (ServerSocket server = new ServerSocket()) {
+			server.bind(new InetSocketAddress(ctx.getLocalPeer().getAddress(), ctx.getLocalPeer().getPort()));
 			while (!Thread.currentThread().isInterrupted()) {
 				logger.info("Waiting for incoming connection");
 				try {
