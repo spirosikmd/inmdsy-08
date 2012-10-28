@@ -18,6 +18,7 @@ import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.pattern.FullLocationPatternConverter;
 
 public class VirtualFileSystem implements PeerListener {
 
@@ -46,53 +47,35 @@ public class VirtualFileSystem implements PeerListener {
 							WatchKey watckKey = watcher.take();
 							List<WatchEvent<?>> events = watckKey.pollEvents();
 							for (WatchEvent<?> event : events) {
+								if (!(event.context() instanceof Path)) {
+									continue;
+								}
+
+								Path path = (Path) event.context();
+
+								String filename = path.toString();
+								File file = new File(ctx.getPathToPeerbox(),
+										filename);
+								if (file.isDirectory() || file.isHidden()) {
+									continue;
+								}
+
 								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-									logger.info("Detect file created event "
-											+ event.context().toString());
-									if (event.context() instanceof Path) {
-										String path = ctx.getPathToPeerbox();
-										File directory = new File(path);
-										String filename = event.context()
-												.toString();
-										File file = new File(
-												directory.getAbsolutePath()
-														+ System.getProperty("file.separator")
-														+ filename);
-										if (file.isFile() && !file.isHidden()) {
-											PeerboxFile pbf = new PeerboxFile(
-													file.getName(), ctx
-															.getLocalPeer(),
-													file);
-											addFile(pbf);
-											Message update = new Message();
-											update.put(Key.Command,
-													Command.Created);
-											update.put(Key.Peer,
-													ctx.getLocalPeer());
-											update.put(Key.File, pbf);
-											ctx.getMulticastGroup().announce(
-													update.serialize());
-										}
+									if (file.isFile()) {
+										logger.info("Detected file created event "
+												+ event.context().toString());
+										addFile(file);
 									}
+
 								}
 								if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-									logger.info("Detect file deleted event "
+									logger.info("Detect file deleted event " 
 											+ event.context().toString());
 									if (event.context() instanceof Path) {
-										String filename = event.context()
-												.toString();
 										PeerboxFile pbf = new PeerboxFile(
 												filename, ctx.getLocalPeer());
 										if (removeFile(pbf.getUFID()) != null) {
-											Message update = new Message();
-											update.put(Key.Command,
-													Command.Deleted);
-											update.put(Key.Peer,
-													ctx.getLocalPeer());
-											update.put(Key.FileId,
-													pbf.getUFID());
-											ctx.getMulticastGroup().announce(
-													update.serialize());
+
 										}
 									}
 								}
@@ -109,6 +92,7 @@ public class VirtualFileSystem implements PeerListener {
 					}
 
 				}
+
 			});
 			peerboxObserver.setDaemon(true);
 			peerboxObserver.start();
@@ -157,10 +141,26 @@ public class VirtualFileSystem implements PeerListener {
 		return vfs;
 	}
 
+	private void addFile(File file) {
+		PeerboxFile pbf = new PeerboxFile(file.getName(), ctx.getLocalPeer(),
+				file);
+		for (PeerboxFile f : filelist.values()) {
+			if (file.equals(f.getFile())) {
+				return;
+			}
+		}
+		addFile(pbf);
+	}
+
 	public void addFile(PeerboxFile file) {
 		if (!filelist.containsKey(file.getUFID())) {
 			filelist.put(file.getUFID(), file);
 			notifyAboutAddedFile(file);
+			Message update = new Message();
+			update.put(Key.Command, Command.Created);
+			update.put(Key.Peer, ctx.getLocalPeer());
+			update.put(Key.File, file);
+			ctx.getMulticastGroup().announce(update.serialize());
 		}
 	}
 
@@ -170,6 +170,11 @@ public class VirtualFileSystem implements PeerListener {
 		if (f != null) {
 			logger.info("Actually removed");
 			notifyAboutDeletedFile(f);
+			Message update = new Message();
+			update.put(Key.Command, Command.Deleted);
+			update.put(Key.Peer, ctx.getLocalPeer());
+			update.put(Key.FileId, f.getUFID());
+			ctx.getMulticastGroup().announce(update.serialize());
 		}
 		return f;
 	}
