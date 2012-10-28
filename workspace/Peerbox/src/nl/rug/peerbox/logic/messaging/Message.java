@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.rug.peerbox.middleware.PrettyPrinter;
+
 import org.apache.log4j.Logger;
 
 public class Message implements Serializable {
@@ -67,6 +69,29 @@ public class Message implements Serializable {
 			logger.error(e);
 		}
 		return message;
+	}
+	
+	public static class MessagePrinter extends PrettyPrinter {
+
+		@Override
+		public String printPayload(byte[] payload) {
+			Message message = null;
+			try {
+				ByteArrayInputStream bais = new ByteArrayInputStream(payload);
+				ObjectInputStream is = new ObjectInputStream(bais);
+				Object o = is.readObject();
+				if (o instanceof Message) {
+					message = (Message) o;
+				}
+			} catch (Exception e) {
+			}
+			
+			if (message != null) {
+				return "" + message.get(Key.Command);
+			}
+			return null;
+		}
+		
 	}
 
 }

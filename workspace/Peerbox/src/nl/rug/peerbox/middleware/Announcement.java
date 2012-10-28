@@ -140,20 +140,9 @@ final class Announcement {
 	@Override
 	public String toString() {
 		return cmdToText(command) + " " + peerID + "(" + messageID + ")  => "
-				+ firstX(byteToText(payload),40);
+				+ PrettyPrinter.print(this);
 	}
 
-	private String firstX(String text, int x) {
-		return text.substring(0, text.length() < x ? text.length() : x);
-	}
-
-	private String byteToText(byte[] bytes) {
-		StringBuffer bf = new StringBuffer();
-		for (byte b : bytes) {
-			bf.append((char) b);
-		}
-		return bf.toString();
-	}
 
 	private String cmdToText(byte command) {
 		switch (command) {

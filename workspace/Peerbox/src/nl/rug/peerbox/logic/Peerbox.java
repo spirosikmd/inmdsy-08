@@ -18,6 +18,7 @@ import nl.rug.peerbox.logic.messaging.MessageHandler;
 import nl.rug.peerbox.logic.messaging.UnsupportedCommandException;
 import nl.rug.peerbox.middleware.MessageListener;
 import nl.rug.peerbox.middleware.Multicast;
+import nl.rug.peerbox.middleware.PrettyPrinter;
 import nl.rug.peerbox.middleware.ReliableMulticast;
 
 import org.apache.log4j.Logger;
@@ -79,6 +80,9 @@ public class Peerbox implements MessageListener, Context {
 		Thread server = new Thread(new FileServer(peerbox));
 		server.setDaemon(true);
 		server.start();
+		
+		PrettyPrinter.registerPrinter(new Message.MessagePrinter());
+		
 		return peerbox;
 	}
 
