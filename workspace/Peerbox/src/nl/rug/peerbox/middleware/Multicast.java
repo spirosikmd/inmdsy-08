@@ -8,5 +8,7 @@ public interface Multicast {
 	
 	public void addMessageListener(MessageListener ml);
 	
-	public void shutdown();	
+	public void shutdown();
+
+	RemoteHostManager getHostManager();	
 }

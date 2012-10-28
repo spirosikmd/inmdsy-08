@@ -86,7 +86,7 @@ final class Receiver {
 		case Announcement.HEARTBEAT:
 			if (m.getPeerID() == group.getPeerId())
 				return;
-			RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
+			RemoteHost p = group.getHostManager().getRemoteHost(m.getPeerID());
 			if (p == null) {
 				p = detectedRemoteHost(m);
 			}
@@ -104,7 +104,7 @@ final class Receiver {
 		if (m.getPeerID() == group.getPeerId())
 			return;
 
-		RemoteHost p = group.getPeers().getRemoteHost(m.getPeerID());
+		RemoteHost p = group.getHostManager().getRemoteHost(m.getPeerID());
 		if (p == null) {
 			p = detectedRemoteHost(m);
 		}
@@ -148,8 +148,6 @@ final class Receiver {
 
 	private RemoteHost detectedRemoteHost(Announcement m) {
 		RemoteHost p;
-		logger.debug("Detected group " + m.getPeerID() + " with piggyback "
-				+ (m.getMessageID() - 1));
 		p = new RemoteHost();
 		p.setHostID(m.getPeerID());
 		if (m.getCommand()!=Announcement.MESSAGE) {
@@ -160,7 +158,7 @@ final class Receiver {
 			p.setReceivedMessageID(m.getMessageID() - 1);	
 		}
 		p.heartbeated();
-		group.getPeers().addRemoteHost(m.getPeerID(), p);
+		group.getHostManager().addRemoteHost(m.getPeerID(), p);
 		return p;
 	}
 

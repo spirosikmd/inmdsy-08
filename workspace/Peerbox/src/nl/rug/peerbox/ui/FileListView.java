@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public class SharedFilesView extends Composite implements DisposeListener,
+public class FileListView extends Composite implements DisposeListener,
 		VFSListener, SelectionListener {
 
 	private final Font title;
@@ -36,9 +36,9 @@ public class SharedFilesView extends Composite implements DisposeListener,
 	private final Composite content;
 	private ScrolledComposite scrollable;
 	private static final Logger logger = Logger
-			.getLogger(SharedFilesView.class);
+			.getLogger(FileListView.class);
 
-	public SharedFilesView(Composite c) {
+	public FileListView(Composite c) {
 
 		super(c, SWT.NONE);
 		this.peerbox = Peerbox.getInstance();
@@ -130,7 +130,7 @@ public class SharedFilesView extends Composite implements DisposeListener,
 
 	@Override
 	public void added(final PeerboxFile f) {
-		final SharedFilesView parent = this;
+		final FileListView parent = this;
 		this.getDisplay().asyncExec(new Runnable() {
 
 			@Override
@@ -152,7 +152,7 @@ public class SharedFilesView extends Composite implements DisposeListener,
 
 	@Override
 	public void deleted(final PeerboxFile f) {
-		final SharedFilesView sfv = this;
+		final FileListView sfv = this;
 		this.getDisplay().asyncExec(new Runnable() {
 
 			@Override

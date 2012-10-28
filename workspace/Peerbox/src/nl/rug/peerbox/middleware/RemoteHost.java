@@ -2,7 +2,7 @@ package nl.rug.peerbox.middleware;
 
 import java.util.Date;
 
-class RemoteHost {
+public class RemoteHost {
 
 	private int hostID;
 	private int processedMessageID;
@@ -33,7 +33,7 @@ class RemoteHost {
 		return lastLifeSign;
 	}
 	
-	int getHostID() {
+	public int getHostID() {
 		return hostID;
 	}
 

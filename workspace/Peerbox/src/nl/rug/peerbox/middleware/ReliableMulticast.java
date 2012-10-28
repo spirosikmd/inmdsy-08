@@ -127,7 +127,8 @@ public class ReliableMulticast implements Multicast {
 		return receiver;
 	}
 
-	public RemoteHostManager getPeers() {
+	@Override
+	public RemoteHostManager getHostManager() {
 		return hostManager;
 	}
 
