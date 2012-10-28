@@ -4,7 +4,7 @@ import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.PeerboxFile;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
-public class InfoCreatedMessageHandler extends MessageHandler {
+public class CreatedMessageHandler extends MessageHandler {
 
 	@Override
 	void handle(Message message, Context ctx) {

@@ -25,14 +25,8 @@ public class Message implements Serializable {
 		Command, Files, Peer, File, FileId
 	}
 
-	public static interface Command {
-		public enum Request {
-			Join, List;
-		}
-
-		public enum Info {
-			Created, Deleted, Modified, ByeBye, List;
-		}
+	public static enum Command {
+			Created, Deleted, Modified, ByeBye, List, Join;
 	}
 
 	public void put(Key key, Object obj) {

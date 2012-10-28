@@ -16,11 +16,10 @@ public abstract class MessageHandler {
 	private static final Logger logger = Logger.getLogger(MessageHandler.class);
 
 	static {
-		registerHandler(new ReplyListMessageHandler(), Command.Info.List);
-		registerHandler(new RequestListMessageHandler(), Command.Request.List);
-		registerHandler(new InfoCreatedMessageHandler(), Command.Info.Created);
-		registerHandler(new InfoDeletedMessageHandler(), Command.Info.Deleted);
-		registerHandler(new InfoByeByeMessageHandler(), Command.Info.ByeBye);
+		registerHandler(new ListMessageHandler(), Command.List);
+		registerHandler(new CreatedMessageHandler(), Command.Created);
+		registerHandler(new DeletedMessageHandler(), Command.Deleted);
+		registerHandler(new ByeByeMessageHandler(), Command.ByeBye);
 	
 	}
 

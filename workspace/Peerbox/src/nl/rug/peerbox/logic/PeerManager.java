@@ -19,23 +19,16 @@ public class PeerManager implements HostListener {
 		multicast.getHostManager().addListener(this);
 	}
 
-	public void addPeerListener(PeerListener l) {
-		synchronized (listener) {
-			listener.add(l);
-		}
-	}
-
-	public void removePeerListener(PeerListener l) {
-		synchronized (listener) {
-			listener.remove(l);
-		}
-	}
-
 	public void updatePeer(int hostID, Peer peer) {
-		peers.put(hostID, peer);
+		boolean firstEncounter = (peers.putIfAbsent(hostID, peer) == null);
+		
 		synchronized (listener) {
 			for (PeerListener l : listener) {
-				l.updated(new PeerHost(hostID, peer));
+				if (firstEncounter) {
+					l.joined(new PeerHost(hostID, peer));
+				} else {
+					l.updated(new PeerHost(hostID, peer));	
+				}
 			}
 		}
 	}
@@ -59,21 +52,32 @@ public class PeerManager implements HostListener {
 	@Override
 	public void removed(int hostID) {
 		Peer p = peers.remove(hostID);
-
 		synchronized (listener) {
 			for (PeerListener l : listener) {
 				l.deleted(new PeerHost(hostID, p));
 			}
 		}
-
 	}
 
-	
+	@Override
 	public void detected(int hostID) {
 		synchronized (listener) {
 			for (PeerListener l : listener) {
 				l.updated(new PeerHost(hostID, peers.get(hostID)));
 			}
+		}
+	}
+	
+
+	public void addPeerListener(PeerListener l) {
+		synchronized (listener) {
+			listener.add(l);
+		}
+	}
+
+	public void removePeerListener(PeerListener l) {
+		synchronized (listener) {
+			listener.remove(l);
 		}
 	}
 	

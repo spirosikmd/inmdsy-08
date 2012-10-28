@@ -5,7 +5,7 @@ import nl.rug.peerbox.logic.Peer;
 import nl.rug.peerbox.logic.PeerboxFile;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
-public class InfoByeByeMessageHandler extends MessageHandler {
+public class ByeByeMessageHandler extends MessageHandler {
 
 	@Override
 	void handle(Message message, Context ctx) {

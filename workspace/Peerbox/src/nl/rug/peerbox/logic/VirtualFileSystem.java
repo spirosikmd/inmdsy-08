@@ -23,11 +23,12 @@ public class VirtualFileSystem implements PeerListener {
 
 	private Filelist filelist;
 	private final List<VFSListener> listeners = new ArrayList<VFSListener>();
+	private final Context ctx;
 	private static final Logger logger = Logger
 			.getLogger(VirtualFileSystem.class);
 
 	private VirtualFileSystem(final Context ctx) {
-		
+
 		FileSystem fs = FileSystems.getDefault();
 		try {
 			Path path = fs.getPath(ctx.getPathToPeerbox());
@@ -51,18 +52,21 @@ public class VirtualFileSystem implements PeerListener {
 									if (event.context() instanceof Path) {
 										String path = ctx.getPathToPeerbox();
 										File directory = new File(path);
-										String filename = event.context().toString();
+										String filename = event.context()
+												.toString();
 										File file = new File(
 												directory.getAbsolutePath()
 														+ System.getProperty("file.separator")
 														+ filename);
 										if (file.isFile() && !file.isHidden()) {
 											PeerboxFile pbf = new PeerboxFile(
-													file.getName(), ctx.getLocalPeer(), file);
+													file.getName(), ctx
+															.getLocalPeer(),
+													file);
 											addFile(pbf);
 											Message update = new Message();
 											update.put(Key.Command,
-													Command.Info.Created);
+													Command.Created);
 											update.put(Key.Peer,
 													ctx.getLocalPeer());
 											update.put(Key.File, pbf);
@@ -75,12 +79,14 @@ public class VirtualFileSystem implements PeerListener {
 									logger.info("Detect file deleted event "
 											+ event.context().toString());
 									if (event.context() instanceof Path) {
-										String filename = event.context().toString();
-										PeerboxFile pbf = new PeerboxFile(filename, ctx.getLocalPeer());
+										String filename = event.context()
+												.toString();
+										PeerboxFile pbf = new PeerboxFile(
+												filename, ctx.getLocalPeer());
 										if (removeFile(pbf.getUFID()) != null) {
 											Message update = new Message();
 											update.put(Key.Command,
-													Command.Info.Deleted);
+													Command.Deleted);
 											update.put(Key.Peer,
 													ctx.getLocalPeer());
 											update.put(Key.FileId,
@@ -98,8 +104,7 @@ public class VirtualFileSystem implements PeerListener {
 							watckKey.reset();
 						}
 					} catch (InterruptedException e) {
-					} 
-				finally {
+					} finally {
 						System.out.println("watcher finished");
 					}
 
@@ -111,9 +116,9 @@ public class VirtualFileSystem implements PeerListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		this.ctx = ctx;
 		ctx.addPeerListener(this);
-		
+
 	}
 
 	public static VirtualFileSystem initVirtualFileSystem(Context ctx) {
@@ -193,15 +198,10 @@ public class VirtualFileSystem implements PeerListener {
 		}
 	}
 
-	private void notifyAboutUpdatedFile(PeerboxFile f) {
+	private void notifyAboutUpdatedFile(final PeerboxFile f) {
 		for (VFSListener l : listeners) {
 			l.updated(f);
 		}
-	}
-
-	@Override
-	public void updated(PeerHost ph) {
-		
 	}
 
 	@Override
@@ -211,5 +211,23 @@ public class VirtualFileSystem implements PeerListener {
 				removeFile(f.getUFID());
 			}
 		}
+	}
+
+	@Override
+	public void joined(PeerHost peerHost) {
+		refresh();
+	}
+
+	@Override
+	public void updated(PeerHost ph) {
+	}
+
+	public void refresh() {
+		Message askForFiles = new Message();
+		askForFiles.put(Key.Command, Command.List);
+		askForFiles.put(Key.Peer, ctx.getLocalPeer());
+		askForFiles.put(Key.Files, getFileList());
+		ctx.getMulticastGroup().announce(askForFiles.serialize());
+
 	}
 }

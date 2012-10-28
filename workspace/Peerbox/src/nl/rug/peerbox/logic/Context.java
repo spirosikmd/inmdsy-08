@@ -20,9 +20,8 @@ public interface Context {
 
 	void leave();
 
-	void requestFiles(boolean initFilelist);
-	
 	void addPeerListener(PeerListener l);
+	
 	void removePeerListener(PeerListener l);
 
 	void peerLeft(Peer peer);

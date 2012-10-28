@@ -100,21 +100,11 @@ public class Peerbox implements MessageListener, Context {
 		group.announce(message.serialize());
 	}
 
-	@Override
-	public void requestFiles(boolean initFilelist) {
-		Message message = new Message();
-		message.put(Key.Command, Command.Request.List);
-		message.put(Key.Peer, getLocalPeer());
-		if (initFilelist) {
-			message.put(Key.Files, fs.getFileList());
-		}
-		group.announce(message.serialize());
-	}
 
 	@Override
 	public void leave() {
 		Message leave = new Message();
-		leave.put(Key.Command, Command.Info.ByeBye);
+		leave.put(Key.Command, Command.ByeBye);
 		leave.put(Key.Peer, getLocalPeer());
 		group.announce(leave.serialize());
 		pool.shutdownNow();

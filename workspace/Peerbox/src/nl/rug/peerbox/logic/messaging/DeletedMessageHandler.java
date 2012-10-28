@@ -4,7 +4,7 @@ import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.UFID;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
-public class InfoDeletedMessageHandler extends MessageHandler {
+public class DeletedMessageHandler extends MessageHandler {
 
 	@Override
 	void handle(Message message, Context ctx) {

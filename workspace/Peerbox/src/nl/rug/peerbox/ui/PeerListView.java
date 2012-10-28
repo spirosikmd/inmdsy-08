@@ -170,5 +170,40 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 		});
 		
 	}
+
+	@Override
+	public void joined(final PeerHost ph) {
+		final PeerListView parent = this;
+		this.getDisplay().asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				GridData textData = new GridData();
+				textData.grabExcessHorizontalSpace = true;
+				textData.horizontalAlignment = GridData.FILL;
+				boolean found = false;
+				for (Control c : parent.content.getChildren()) {
+					if (c instanceof PeerView) {
+						PeerView pv = (PeerView) c;
+						if (pv.getModel().getHostID() == ph.getHostID()) {
+							pv.setModel(ph);
+							 found = true;
+							 break;
+						}
+					}
+				}
+				if (!found) {
+					PeerView pv = new PeerView(parent.content);
+					pv.setModel(ph);
+					pv.setLayoutData(textData);
+				}
+				
+				content.layout();
+				Rectangle r = scrollable.getClientArea();
+				content.setSize(content.computeSize(r.width, SWT.DEFAULT));
+			}
+		});
+		
+	}
 	
 }

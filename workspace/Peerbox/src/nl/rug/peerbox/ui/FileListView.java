@@ -123,7 +123,7 @@ public class FileListView extends Composite implements DisposeListener,
 
 	@Override
 	public void widgetSelected(SelectionEvent se) {
-		peerbox.requestFiles(false);
+		peerbox.getVirtualFilesystem().refresh();
 	}
 
 	@Override
