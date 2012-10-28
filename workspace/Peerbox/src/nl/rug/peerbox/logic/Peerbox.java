@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -200,6 +201,11 @@ public class Peerbox implements MessageListener, Context {
 	public void peerLeft(Peer peer) {
 		peerManager.removePeer(peer);
 		
+	}
+
+	@Override
+	public Collection<PeerHost> getPeers() {
+		return peerManager.getPeers();
 	}
 
 }

@@ -1,6 +1,8 @@
 package nl.rug.peerbox.logic;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +35,7 @@ public class PeerManager implements HostListener {
 		peers.put(hostID, peer);
 		synchronized (listener) {
 			for (PeerListener l : listener) {
-				l.updated(hostID, peer);
+				l.updated(new PeerHost(hostID, peer));
 			}
 		}
 	}
@@ -48,7 +50,7 @@ public class PeerManager implements HostListener {
 		if (peers.remove(hostID) != null) {
 			synchronized (listener) {
 				for (PeerListener l : listener) {
-					l.deleted(hostID, peer);
+					l.deleted(new PeerHost(hostID, peer));
 				}
 			}
 		}
@@ -60,19 +62,28 @@ public class PeerManager implements HostListener {
 
 		synchronized (listener) {
 			for (PeerListener l : listener) {
-				l.deleted(hostID, p);
+				l.deleted(new PeerHost(hostID, p));
 			}
 		}
 
 	}
 
-	@Override
+	
 	public void detected(int hostID) {
 		synchronized (listener) {
 			for (PeerListener l : listener) {
-				l.updated(hostID, peers.get(hostID));
+				l.updated(new PeerHost(hostID, peers.get(hostID)));
 			}
 		}
+	}
+	
+	public Collection<PeerHost> getPeers() {
+		Context ctx = Peerbox.getInstance();
+		Collection<PeerHost> peerHosts = new  LinkedList<>();
+		for (int hostID : ctx.getMulticastGroup().getHostManager().getHostIDs()) {
+			peerHosts.add(new PeerHost(hostID, peers.get(hostID)));
+		}
+		return peerHosts;
 	}
 
 }

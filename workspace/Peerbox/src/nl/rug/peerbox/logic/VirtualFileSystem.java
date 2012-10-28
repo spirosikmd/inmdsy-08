@@ -200,14 +200,14 @@ public class VirtualFileSystem implements PeerListener {
 	}
 
 	@Override
-	public void updated(int hostID, Peer peer) {
+	public void updated(PeerHost ph) {
 		
 	}
 
 	@Override
-	public void deleted(int hostID, Peer peer) {
+	public void deleted(PeerHost ph) {
 		for (PeerboxFile f : filelist.values()) {
-			if (f.getOwner().equals(peer)) {
+			if (f.getOwner().equals(ph.getPeer())) {
 				removeFile(f.getUFID());
 			}
 		}

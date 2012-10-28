@@ -1,5 +1,7 @@
 package nl.rug.peerbox.logic;
 
+import java.util.Collection;
+
 import nl.rug.peerbox.middleware.Multicast;
 
 public interface Context {
@@ -24,5 +26,7 @@ public interface Context {
 	void removePeerListener(PeerListener l);
 
 	void peerLeft(Peer peer);
+
+	Collection<PeerHost> getPeers();
 
 }

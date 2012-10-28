@@ -1,7 +1,7 @@
 package nl.rug.peerbox.ui;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.Peer;
+import nl.rug.peerbox.logic.PeerHost;
 import nl.rug.peerbox.logic.PeerListener;
 import nl.rug.peerbox.logic.Peerbox;
 
@@ -27,7 +27,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 
 	private final Font title;
 	private final Color foreground;
-	private final Context peerbox;
+	private final Context ctx;
 	private final Composite content;
 	private ScrolledComposite scrollable;
 	private static final Logger logger = Logger
@@ -37,7 +37,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 		super(c, SWT.NONE);
 		addDisposeListener(this);
 		
-		this.peerbox = Peerbox.getInstance();
+		this.ctx = Peerbox.getInstance();
 		
 
 		Display display = Display.getCurrent();
@@ -85,16 +85,16 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 		});
 
 		
-		this.peerbox.addPeerListener(this);
-//		for (int h : peerbox.getMulticastGroup().getHostManager().getHostIDs()) {
-//			GridData textData = new GridData();
-//			textData.grabExcessHorizontalSpace = true;
-//			textData.horizontalAlignment = GridData.FILL;
-//			PeerView pv = new PeerView(content);
-//			pv.setHostID(h);
-//			pv.setLayoutData(textData);
-//			
-//		}
+		this.ctx.addPeerListener(this);
+		for (PeerHost ph : ctx.getPeers()) {
+			GridData textData = new GridData();
+			textData.grabExcessHorizontalSpace = true;
+			textData.horizontalAlignment = GridData.FILL;
+			PeerView pv = new PeerView(content);
+			pv.setModel(ph);
+			pv.setLayoutData(textData);
+		}
+
 		content.layout();
 		Rectangle r = scrollable.getClientArea();
 		content.setSize(content.computeSize(r.width, SWT.DEFAULT));content.layout();
@@ -103,7 +103,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 
 	@Override
 	public void widgetDisposed(DisposeEvent de) {
-		peerbox.removePeerListener(this);
+		ctx.removePeerListener(this);
 		title.dispose();
 		foreground.dispose();
 	}
@@ -112,7 +112,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 
 
 	@Override
-	public void updated(final int hostID, final Peer peer) {
+	public void updated(final PeerHost ph) {
 		final PeerListView parent = this;
 		this.getDisplay().asyncExec(new Runnable() {
 
@@ -125,9 +125,8 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 				for (Control c : parent.content.getChildren()) {
 					if (c instanceof PeerView) {
 						PeerView pv = (PeerView) c;
-						if (pv.getHostID() == hostID) {
-							pv.setHostID(hostID);
-							pv.setModel(peer);
+						if (pv.getModel().getHostID() == ph.getHostID()) {
+							pv.setModel(ph);
 							 found = true;
 							 break;
 						}
@@ -135,8 +134,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 				}
 				if (!found) {
 					PeerView pv = new PeerView(parent.content);
-					pv.setHostID(hostID);
-					pv.setModel(peer);
+					pv.setModel(ph);
 					pv.setLayoutData(textData);
 				}
 				
@@ -149,7 +147,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 	}
 
 	@Override
-	public void deleted(final int hostID, final Peer peer) {
+	public void deleted(final PeerHost ph) {
 		final PeerListView plv = this;
 		this.getDisplay().asyncExec(new Runnable() {
 
@@ -159,7 +157,7 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 
 					if (c instanceof PeerView) {
 						PeerView pv = (PeerView) c;
-						if (pv.getHostID() == hostID) {
+						if (pv.getModel().getHostID() == ph.getHostID()) {
 							pv.dispose();
 						}
 					}

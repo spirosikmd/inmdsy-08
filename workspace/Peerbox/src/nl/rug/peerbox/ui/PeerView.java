@@ -1,6 +1,6 @@
 package nl.rug.peerbox.ui;
 
-import nl.rug.peerbox.logic.Peer;
+import nl.rug.peerbox.logic.PeerHost;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -10,14 +10,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 public class PeerView extends Composite implements DisposeListener {
 
-	private int hostID;
-	private Peer model;
+	private PeerHost model;
 	private final Text peerID;
 	private final Text owner;
 	private final Text address;
@@ -71,15 +69,6 @@ public class PeerView extends Composite implements DisposeListener {
 
 	}
 
-	public void setHostID(int hostID) {
-		this.hostID = hostID;
-		peerID.setText(hostID + "");
-	}
-
-	public int getHostID() {
-		return hostID;
-	}
-
 	@Override
 	public Point computeSize(int whint, int hhint, boolean changed) {
 		super.computeSize(whint, hhint, changed);
@@ -99,31 +88,20 @@ public class PeerView extends Composite implements DisposeListener {
 		foreground.dispose();
 	}
 
-	public Peer getModel() {
+	public PeerHost getModel() {
 		return model;
 	}
 
-	public void setModel(Peer model) {
+	public void setModel(PeerHost model) {
 		this.model = model;
 		if (model != null) {
-			owner.setText(model.getName());
-			address.setText(model.getAddress().toString() + ":"
-					+ model.getPort());
+			peerID.setText(model.getHostID() + "");
+			if (model.getPeer() != null) {
+				owner.setText(model.getPeer().getName());
+				address.setText(model.getPeer().getAddress().toString() + ":"
+						+ model.getPeer().getPort());
+			}
 		}
 	}
-
-	// @Override
-	// public void modelUpdated() {
-	// this.getDisplay().asyncExec(new Runnable() {
-	//
-	// @Override
-	// public void run() {
-	// if (getModel().exists()) {
-	// action.setVisible(false);
-	// }
-	// layout();
-	// }
-	// });
-	// }
 
 }
