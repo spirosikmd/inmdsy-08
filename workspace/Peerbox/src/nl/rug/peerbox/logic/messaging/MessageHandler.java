@@ -20,6 +20,8 @@ public abstract class MessageHandler {
 		registerHandler(new CreatedMessageHandler(), Command.Created);
 		registerHandler(new DeletedMessageHandler(), Command.Deleted);
 		registerHandler(new ByeByeMessageHandler(), Command.ByeBye);
+		registerHandler(new JoinMessageHandler(), Command.Join);
+		registerHandler(new RefreshMessageHandler(), Command.Refresh);
 	
 	}
 

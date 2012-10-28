@@ -28,7 +28,7 @@ public class Message implements Serializable {
 	}
 
 	public static enum Command {
-			Created, Deleted, Modified, ByeBye, List, Join;
+			Created, Deleted, Modified, ByeBye, List, Join, Refresh;
 	}
 
 	public void put(Key key, Object obj) {

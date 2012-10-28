@@ -224,9 +224,8 @@ public class VirtualFileSystem implements PeerListener {
 
 	public void refresh() {
 		Message askForFiles = new Message();
-		askForFiles.put(Key.Command, Command.List);
+		askForFiles.put(Key.Command, Command.Refresh);
 		askForFiles.put(Key.Peer, ctx.getLocalPeer());
-		askForFiles.put(Key.Files, getFileList());
 		ctx.getMulticastGroup().announce(askForFiles.serialize());
 
 	}
