@@ -96,7 +96,6 @@ final class Receiver {
 			if (m.getPeerID() != group.getPeerId()) {
 				logger.debug("Acked: " + m.toString());
 			}
-
 		}
 	}
 

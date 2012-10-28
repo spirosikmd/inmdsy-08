@@ -16,7 +16,7 @@ final class Sender {
 	private final Queue<Announcement> sentMessagesList = new ConcurrentLinkedQueue<Announcement>();
 	private final BlockingQueue<Announcement> waitingForSendQueue = new ArrayBlockingQueue<Announcement>(
 			1024);
-	private final TimedSemaphore semaphore = new TimedSemaphore(100,
+	private final TimedSemaphore semaphore = new TimedSemaphore(50,
 			TimeUnit.MILLISECONDS, 1);
 
 	private static final Logger logger = Logger.getLogger(Sender.class);
