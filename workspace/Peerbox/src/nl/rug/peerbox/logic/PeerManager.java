@@ -63,7 +63,7 @@ public class PeerManager implements HostListener {
 	public void detected(int hostID) {
 		synchronized (listener) {
 			for (PeerListener l : listener) {
-				l.updated(new PeerHost(hostID, peers.get(hostID)));
+				l.joined(new PeerHost(hostID, peers.get(hostID)));
 			}
 		}
 	}
