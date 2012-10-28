@@ -38,10 +38,12 @@ public final class FileRequestTask implements Runnable {
 		String tempFilename = "." + filename;
 		File sharedFile = new File(ctx.getPathToPeerbox()
 				+ System.getProperty("file.separator") + tempFilename);
-		
+
 		try (Socket s = new Socket()) {
-			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()), SOCKET_TIMEOUT);
-			logger.debug("Created direct connection to " + h.getAddress().toString() +":"+ h.getPort());
+			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()),
+					SOCKET_TIMEOUT);
+			logger.debug("Created direct connection to "
+					+ h.getAddress().toString() + ":" + h.getPort());
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
 			byte[] mybytearray = new byte[1024];
@@ -60,23 +62,31 @@ public final class FileRequestTask implements Runnable {
 			logger.info("File " + filename + " has been received");
 		} catch (IOException e) {
 			logger.error(e);
-			sharedFile.delete();
-			sharedFile = null;
-			file.setFile(null);
 		} finally {
-			if (sharedFile.length() == file.getSize()) {
-				String checksum = MD5Util.md5(sharedFile);
-				System.out.println(checksum + "  "+ file.getChecksum());
-				if (file.getChecksum().equals(checksum)) {
-					//rename
-				}
-			} 
-			
+			boolean valid = true;
+			if (sharedFile.length() != file.getSize()) {
+				logger.debug("Filesize of " + filename + " incorrect");
+				valid = false;
+			}
+			String checksum = MD5Util.md5(sharedFile);
+			System.out.println(checksum + "  " + file.getChecksum());
+			if (!file.getChecksum().equals(checksum)) {
+				logger.debug("Checksum of " + filename + " incorrect");
+				valid = false;
+			}
+			if (valid) {
+			sharedFile.renameTo(new File(ctx.getPathToPeerbox()
+					+ System.getProperty("file.separator") + filename));
+			} else {
+				sharedFile.delete();
+				sharedFile = null;
+				file.setFile(null);
+			}
 		}
-		
-		// if successful 
-			//rename tempFilename to filename
-		//verify file with peerboxfile properties
-		//filesize and content checksum		
+
+		// if successful
+		// rename tempFilename to filename
+		// verify file with peerboxfile properties
+		// filesize and content checksum
 	}
 }
