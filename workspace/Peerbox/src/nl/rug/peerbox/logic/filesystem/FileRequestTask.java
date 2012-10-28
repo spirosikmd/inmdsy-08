@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peer;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 
 public final class FileRequestTask implements Runnable {
@@ -36,12 +37,24 @@ public final class FileRequestTask implements Runnable {
 		this.ctx = ctx;
 	}
 
+	File hide(File src) {
+		if (SystemUtils.IS_OS_WINDOWS) {
+			Process p;
+			try {
+				p = Runtime.getRuntime().exec("attrib +h " + src.getPath());
+				p.waitFor();
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return src;
+	}
+
 	@Override
 	public void run() {
 		String tempFilename = "." + filename;
-		File tempFile = new File(ctx.getPathToPeerbox()
-				+ System.getProperty("file.separator") + tempFilename);
-
+		File tempFile = hide(new File(ctx.getPathToPeerbox(), tempFilename));
+		
 		try (Socket s = new Socket()) {
 			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()),
 					SOCKET_TIMEOUT);
@@ -77,9 +90,9 @@ public final class FileRequestTask implements Runnable {
 				valid = false;
 			}
 			if (valid) {
-			File sharedFile = new File(ctx.getPathToPeerbox(),filename);
-			tempFile.renameTo(sharedFile);
-			file.setFile(sharedFile);
+				File sharedFile = new File(ctx.getPathToPeerbox(), filename);
+				tempFile.renameTo(sharedFile);
+				file.setFile(sharedFile);
 			} else {
 				tempFile.delete();
 				tempFile = null;
