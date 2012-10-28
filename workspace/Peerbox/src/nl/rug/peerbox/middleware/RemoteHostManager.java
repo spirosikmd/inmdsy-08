@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 public class RemoteHostManager {
 
-	private static final int TIMEOUT = (int)(1000 * 7.5); // should be smaller then
+	private static final int TIMEOUT = (int)(1000 * 30); // should be smaller then
 													// timeout
 	private static final int FREQUENCY = 1000 * 1; // should be smaller then
 													// timeout
