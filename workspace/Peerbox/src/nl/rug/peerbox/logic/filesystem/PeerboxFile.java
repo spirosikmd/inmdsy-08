@@ -41,6 +41,10 @@ public class PeerboxFile implements Serializable {
 		return filename;
 	}
 
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
 	public UFID getUFID() {
 		return ufid;
 	}

@@ -138,10 +138,11 @@ public class FileView extends Composite implements DisposeListener, SelectionLis
 			
 			@Override
 			public void run() {
+				if (getModel().isOwn()) return;
 				if (getModel().exists()) {
 					action.setVisible(false);
 					action.setEnabled(false);
-				} else {
+				} else{
 					action.setVisible(true);
 					action.setEnabled(true);
 				}

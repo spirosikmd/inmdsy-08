@@ -79,6 +79,13 @@ public class VirtualFileSystem implements PeerListener {
 
 	public void addFile(PeerboxFile file) {
 		if (!filelist.containsKey(file.getUFID())) {
+			for (PeerboxFile pbf : filelist.values()) {
+				if (file.getFilename().equals(pbf.getFilename())) {
+					if (! file.getOwner().equals(ctx.getLocalPeer())) {
+						file.setFilename(file.getOwner().getName()+"@"+file.getFilename());
+					}
+				}
+			}
 			filelist.put(file.getUFID(), file);
 			notifyAboutAddedFile(file);
 		}
