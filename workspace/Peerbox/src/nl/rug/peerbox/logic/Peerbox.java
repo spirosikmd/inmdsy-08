@@ -116,7 +116,6 @@ public class Peerbox implements MessageListener, Context {
 		leave.put(Key.Command, Command.Info.ByeBye);
 		leave.put(Key.Peer, getLocalPeer());
 		group.announce(leave.serialize());
-		group.shutdown();
 		pool.shutdownNow();
 	}
 

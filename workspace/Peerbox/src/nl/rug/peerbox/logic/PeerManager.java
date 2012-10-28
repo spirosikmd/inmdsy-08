@@ -29,32 +29,11 @@ public class PeerManager implements HostListener {
 		}
 	}
 
-	@Override
-	public void removed(int hostID) {
-		Peer p = peers.remove(hostID);
-		if (p != null) {
-			synchronized (listener) {
-				for (PeerListener l : listener) {
-					l.deleted(hostID, p);
-				}
-			}
-		}
-	}
-
 	public void updatePeer(int hostID, Peer peer) {
 		peers.put(hostID, peer);
 		synchronized (listener) {
 			for (PeerListener l : listener) {
 				l.updated(hostID, peer);
-			}
-		}
-	}
-
-	@Override
-	public void detected(int hostID) {
-		synchronized (listener) {
-			for (PeerListener l : listener) {
-				l.updated(hostID, peers.get(hostID));
 			}
 		}
 	}
@@ -74,4 +53,26 @@ public class PeerManager implements HostListener {
 			}
 		}
 	}
+
+	@Override
+	public void removed(int hostID) {
+		Peer p = peers.remove(hostID);
+
+		synchronized (listener) {
+			for (PeerListener l : listener) {
+				l.deleted(hostID, p);
+			}
+		}
+
+	}
+
+	@Override
+	public void detected(int hostID) {
+		synchronized (listener) {
+			for (PeerListener l : listener) {
+				l.updated(hostID, peers.get(hostID));
+			}
+		}
+	}
+
 }

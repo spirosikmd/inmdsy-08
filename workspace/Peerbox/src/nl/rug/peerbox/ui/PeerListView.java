@@ -34,8 +34,9 @@ public class PeerListView extends Composite implements DisposeListener, PeerList
 			.getLogger(FileListView.class);
 
 	public PeerListView(Composite c) {
-
 		super(c, SWT.NONE);
+		addDisposeListener(this);
+		
 		this.peerbox = Peerbox.getInstance();
 		
 

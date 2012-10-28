@@ -41,6 +41,7 @@ public class FileListView extends Composite implements DisposeListener,
 	public FileListView(Composite c) {
 
 		super(c, SWT.NONE);
+		addDisposeListener(this);
 		this.peerbox = Peerbox.getInstance();
 		this.peerbox.getVirtualFilesystem().addVFSListener(this);
 
@@ -111,6 +112,7 @@ public class FileListView extends Composite implements DisposeListener,
 
 	@Override
 	public void widgetDisposed(DisposeEvent de) {
+		this.peerbox.getVirtualFilesystem().removeVFSListener(this);
 		title.dispose();
 		foreground.dispose();
 	}
