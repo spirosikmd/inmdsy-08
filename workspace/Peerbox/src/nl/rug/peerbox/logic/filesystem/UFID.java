@@ -49,6 +49,6 @@ public class UFID implements Serializable {
 
 	@Override
 	public String toString() {
-		return fileid.concat(owner);
+		return filename;
 	}
 }
