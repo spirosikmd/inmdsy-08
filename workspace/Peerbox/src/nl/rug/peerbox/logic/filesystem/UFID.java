@@ -9,9 +9,11 @@ public class UFID implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String fileid;
 	private String owner;
+	private String filename;
 
 	public UFID(String filename, Peer owner) {
 		this.fileid = MD5Util.md5(filename);
+		this.filename = filename;
 		this.owner = MD5Util.md5(owner.getName());
 		// plus md5 of data
 	}
@@ -23,7 +25,11 @@ public class UFID implements Serializable {
 	public String getOwner() {
 		return owner;
 	}
-
+	
+	public String getFilename() {
+		return filename;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof UFID)) {

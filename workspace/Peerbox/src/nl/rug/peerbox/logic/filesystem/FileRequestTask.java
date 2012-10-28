@@ -66,7 +66,7 @@ public final class FileRequestTask implements Runnable {
 			logger.debug("Created direct connection to "
 					+ h.getAddress().toString() + ":" + h.getPort());
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
-			put.println(filename);
+			put.println(file.getUFID().getFilename());
 			byte[] mybytearray = new byte[1024];
 			InputStream is = s.getInputStream();
 
