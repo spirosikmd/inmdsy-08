@@ -23,4 +23,6 @@ public interface Context {
 	void addPeerListener(PeerListener l);
 	void removePeerListener(PeerListener l);
 
+	void peerLeft(Peer peer);
+
 }

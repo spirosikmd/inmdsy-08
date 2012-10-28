@@ -30,12 +30,8 @@ public class Message implements Serializable {
 			Join, List;
 		}
 
-		public enum Reply {
-			List;
-		}
-
 		public enum Info {
-			Created, Deleted, Modified, Heartbeat;
+			Created, Deleted, Modified, ByeBye, List;
 		}
 	}
 

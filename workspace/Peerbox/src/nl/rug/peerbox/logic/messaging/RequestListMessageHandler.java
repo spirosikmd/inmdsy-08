@@ -17,7 +17,7 @@ final class RequestListMessageHandler extends MessageHandler {
 		Collection<PeerboxFile> files = ctx.getVirtualFilesystem()
 				.getFileList();
 		Message reply = new Message();
-		reply.put(Key.Command, Command.Reply.List);
+		reply.put(Key.Command, Command.Info.List);
 		reply.put(Key.Files, files);
 		reply.put(Key.Peer, ctx.getLocalPeer());
 		ctx.getMulticastGroup().announce(reply.serialize());

@@ -112,7 +112,10 @@ public class Peerbox implements MessageListener, Context {
 
 	@Override
 	public void leave() {
-		group.announce("I left".getBytes());
+		Message leave = new Message();
+		leave.put(Key.Command, Command.Info.ByeBye);
+		leave.put(Key.Peer, getLocalPeer());
+		group.announce(leave.serialize());
 		group.shutdown();
 		pool.shutdownNow();
 	}
@@ -127,7 +130,7 @@ public class Peerbox implements MessageListener, Context {
 				Object obj = message.get(Key.Peer);
 				if (obj != Message.NULLOBJ && obj instanceof Peer) {
 					Peer peer = (Peer) obj;
-					peerManager.update(hostID, peer);
+					peerManager.updatePeer(hostID, peer);
 					MessageHandler.process(message, this);
 				}
 			} catch (UnsupportedCommandException e) {
@@ -191,6 +194,12 @@ public class Peerbox implements MessageListener, Context {
 	@Override
 	public void removePeerListener(PeerListener l) {
 		peerManager.removePeerListener(l);
+		
+	}
+
+	@Override
+	public void peerLeft(Peer peer) {
+		peerManager.removePeer(peer);
 		
 	}
 

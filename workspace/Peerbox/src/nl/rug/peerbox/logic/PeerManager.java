@@ -2,6 +2,7 @@ package nl.rug.peerbox.logic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import nl.rug.peerbox.middleware.HostListener;
@@ -40,7 +41,7 @@ public class PeerManager implements HostListener {
 		}
 	}
 
-	public void update(int hostID, Peer peer) {
+	public void updatePeer(int hostID, Peer peer) {
 		peers.put(hostID, peer);
 		synchronized (listener) {
 			for (PeerListener l : listener) {
@@ -54,6 +55,22 @@ public class PeerManager implements HostListener {
 		synchronized (listener) {
 			for (PeerListener l : listener) {
 				l.updated(hostID, peers.get(hostID));
+			}
+		}
+	}
+
+	public void removePeer(Peer peer) {
+		int hostID = -1;
+		for (Map.Entry<Integer, Peer> entry : peers.entrySet()) {
+			if (entry.getValue().equals(peer)) {
+				hostID = entry.getKey();
+			}
+		}
+		if (peers.remove(hostID) != null) {
+			synchronized (listener) {
+				for (PeerListener l : listener) {
+					l.deleted(hostID, peer);
+				}
 			}
 		}
 	}
