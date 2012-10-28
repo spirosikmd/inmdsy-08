@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 
 public class ReliableMulticast implements Multicast {
 
-	private static final int HEARTBEAT_FREQUENCY = 1000 * 10; //ms (10 seconds)
+	private static final int HEARTBEAT_FREQUENCY = 1000 * 5; //ms (10 seconds)
 
 	static Logger logger = Logger.getLogger(ReliableMulticast.class);
 
