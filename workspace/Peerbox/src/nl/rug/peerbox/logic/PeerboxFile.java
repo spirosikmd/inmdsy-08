@@ -25,8 +25,10 @@ public class PeerboxFile implements Serializable {
 	public PeerboxFile(String filename, Peer owner, File file) {
 		this.filename = filename;
 		this.file = file;
-		this.size = file.length();
-		this.checksum = MD5Util.md5(file);
+		if (file != null) {
+			this.size = file.length();
+			this.checksum = MD5Util.md5(file);
+		}
 		this.ufid = new UFID(filename, owner);
 		this.owner = owner;
 		listeners = new ArrayList<PeerboxFileListener>();
@@ -55,7 +57,7 @@ public class PeerboxFile implements Serializable {
 	public String getChecksum() {
 		return checksum;
 	}
-	
+
 	public boolean isOwn() {
 		return getOwner().equals(Peerbox.getInstance().getLocalPeer());
 	}
