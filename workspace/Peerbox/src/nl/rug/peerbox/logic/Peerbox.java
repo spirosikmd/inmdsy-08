@@ -94,6 +94,7 @@ public class Peerbox implements MessageListener, Context {
 	public void join() {
 		Message message = new Message();
 		message.put(Key.Command, "JOIN");
+		message.put(Key.Peer, getLocalPeer());
 		group.announce(message.serialize());
 	}
 
@@ -101,6 +102,7 @@ public class Peerbox implements MessageListener, Context {
 	public void requestFiles(boolean initFilelist) {
 		Message message = new Message();
 		message.put(Key.Command, Command.Request.List);
+		message.put(Key.Peer, getLocalPeer());
 		if (initFilelist) {
 			message.put(Key.Files, fs.getFileList());
 		}
@@ -115,7 +117,7 @@ public class Peerbox implements MessageListener, Context {
 	}
 
 	@Override
-	public void receivedMessage(byte[] data) {
+	public void receivedMessage(byte[] data, int hostID) {
 
 		Message message = Message.deserialize(data);
 

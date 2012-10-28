@@ -156,7 +156,7 @@ public class ReliableMulticast implements Multicast {
 				@Override
 				public void run() {
 					for (MessageListener ml : observer) {
-						ml.receivedMessage(about.getPayload());
+						ml.receivedMessage(about.getPayload(), about.getPeerID());
 					}
 				}
 			});

@@ -2,10 +2,7 @@ package nl.rug.peerbox.ui;
 
 import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peerbox;
-import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.VirtualFileSystem;
 import nl.rug.peerbox.middleware.HostListener;
-import nl.rug.peerbox.middleware.RemoteHost;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -16,13 +13,11 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -89,12 +84,12 @@ public class PeerListView extends Composite implements DisposeListener, HostList
 
 		
 		this.peerbox.getMulticastGroup().getHostManager().addListener(this);
-		for (RemoteHost h : peerbox.getMulticastGroup().getHostManager().getHosts()) {
+		for (int h : peerbox.getMulticastGroup().getHostManager().getHostIDs()) {
 			GridData textData = new GridData();
 			textData.grabExcessHorizontalSpace = true;
 			textData.horizontalAlignment = GridData.FILL;
 			PeerView pv = new PeerView(content);
-			pv.setModel(h);
+			pv.setHostID(h);
 			pv.setLayoutData(textData);
 			
 		}
@@ -111,7 +106,7 @@ public class PeerListView extends Composite implements DisposeListener, HostList
 	}
 
 
-	public void detected(final RemoteHost h) {
+	public void detected(final int h) {
 		final PeerListView parent = this;
 		this.getDisplay().asyncExec(new Runnable() {
 
@@ -121,7 +116,7 @@ public class PeerListView extends Composite implements DisposeListener, HostList
 				textData.grabExcessHorizontalSpace = true;
 				textData.horizontalAlignment = GridData.FILL;
 				PeerView fv = new PeerView(parent.content);
-				fv.setModel(h);
+				fv.setHostID(h);
 				fv.setLayoutData(textData);
 
 				content.layout();
@@ -133,7 +128,7 @@ public class PeerListView extends Composite implements DisposeListener, HostList
 	}
 
 	@Override
-	public void removed(final RemoteHost h) {
+	public void removed(final int h) {
 		final PeerListView plv = this;
 		this.getDisplay().asyncExec(new Runnable() {
 
@@ -143,7 +138,7 @@ public class PeerListView extends Composite implements DisposeListener, HostList
 
 					if (c instanceof PeerView) {
 						PeerView pv = (PeerView) c;
-						if (pv.getModel().equals(h)) {
+						if (pv.getHostID() == h) {
 							pv.dispose();
 						}
 					}

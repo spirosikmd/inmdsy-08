@@ -1,16 +1,8 @@
 package nl.rug.peerbox.ui;
 
-import nl.rug.peerbox.logic.FileRequestTask;
-import nl.rug.peerbox.logic.Peerbox;
-import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.PeerboxFileListener;
-import nl.rug.peerbox.middleware.RemoteHost;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -22,7 +14,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class PeerView extends Composite implements DisposeListener {
 
-	private RemoteHost model;
+	private int hostID;
 	private final Text peerID;
 	private final Text owner;
 	private final Color background;
@@ -74,19 +66,15 @@ public class PeerView extends Composite implements DisposeListener {
 		action.setLayoutData(actionData);
 	}
 
-	public void setModel(RemoteHost model) {
-		if (this.model != null) {
-			//this.model.removeListener(this);
-		}
-		this.model = model;
+	public void setHostID(int hostID) {
+		this.hostID = hostID;
 		//this.model.addListener(this);
-		peerID.setText(this.model.getHostID()+"");
+		peerID.setText(hostID+"");
 		layout();
-		
 	}
 
-	public RemoteHost getModel() {
-		return model;
+	public int getHostID() {
+		return hostID;
 	}
 
 	@Override

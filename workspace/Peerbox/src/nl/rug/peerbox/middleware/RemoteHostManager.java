@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.internal.image.GIFFileFormat;
 
 public class RemoteHostManager {
 
@@ -36,7 +37,7 @@ public class RemoteHostManager {
 						logger.info(h.getHostID() + "is dead");
 						hosts.remove(h.getHostID());
 						for (HostListener l : listeners) {
-							l.removed(h);
+							l.removed(h.getHostID());
 						}
 					}
 				}
@@ -54,12 +55,12 @@ public class RemoteHostManager {
 				+ h.getReceivedMessageID());
 		hosts.put(peerID, h);
 		for (HostListener l : listeners) {
-			l.detected(h);
+			l.detected(h.getHostID());
 		}
 	}
 	
-	public Collection<RemoteHost> getHosts() {
-		return hosts.values();
+	public Integer[] getHostIDs() {
+		return hosts.keySet().toArray(new Integer[0]);
 	}
 	
 	public void addListener(HostListener l) {
