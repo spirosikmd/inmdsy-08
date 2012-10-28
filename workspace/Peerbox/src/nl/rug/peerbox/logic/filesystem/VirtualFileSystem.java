@@ -144,22 +144,6 @@ public class VirtualFileSystem implements PeerListener {
 
 	}
 
-	private void addFile(File file) {
-		PeerboxFile pbf = new PeerboxFile(file.getName(), ctx.getLocalPeer(),
-				file);
-		for (PeerboxFile f : filelist.values()) {
-			if (file.equals(f.getFile())) {
-				return;
-			}
-		}
-		addFile(pbf);
-		Message update = new Message();
-		update.put(Key.Command, Command.Created);
-		update.put(Key.Peer, ctx.getLocalPeer());
-		update.put(Key.File, file);
-		ctx.getMulticastGroup().announce(update.serialize());
-	}
-
 	private static final class PeerboxPathWatcher implements Runnable {
 		private final Context ctx;
 		private final VirtualFileSystem vfs;
@@ -204,16 +188,43 @@ public class VirtualFileSystem implements PeerListener {
 							if (file.isFile()) {
 								logger.info("Detected file created event "
 										+ path.toString());
-								vfs.addFile(file);
+								PeerboxFile pbf = new PeerboxFile(
+										file.getName(), ctx.getLocalPeer(),
+										file);
+								boolean remoteFile = false;
+								for (PeerboxFile f : vfs.filelist.values()) {
+									if (file.equals(f.getFile())) {
+										remoteFile = true;
+										break;
+									}
+								}
+								if (!remoteFile) {
+									vfs.addFile(pbf);
+									Message update = new Message();
+									update.put(Key.Command, Command.Created);
+									update.put(Key.Peer, ctx.getLocalPeer());
+									update.put(Key.File, file);
+									ctx.getMulticastGroup().announce(
+											update.serialize());
+								}
 							}
 
 						}
 						if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+							logger.info("Detect file deleted event "
+									+ path.toString());
 							PeerboxFile pbf = new PeerboxFile(filename,
 									ctx.getLocalPeer());
-							if (vfs.removeFile(pbf.getUFID()) != null) {
-								logger.info("Detect file deleted event "
-										+ path.toString());
+							boolean remoteFile = false;
+							for (PeerboxFile f : vfs.filelist.values()) {
+								if (file.equals(f.getFile())) {
+									f.setFile(null);
+									remoteFile = true;
+									break;
+								}
+							}
+							if (!remoteFile && vfs.removeFile(pbf.getUFID()) != null) {
+								
 								Message update = new Message();
 								update.put(Key.Command, Command.Deleted);
 								update.put(Key.Peer, ctx.getLocalPeer());
@@ -221,7 +232,6 @@ public class VirtualFileSystem implements PeerListener {
 								ctx.getMulticastGroup().announce(
 										update.serialize());
 							}
-
 						}
 					}
 					watckKey.reset();
