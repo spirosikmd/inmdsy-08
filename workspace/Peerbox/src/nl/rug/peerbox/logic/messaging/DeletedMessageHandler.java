@@ -1,7 +1,7 @@
 package nl.rug.peerbox.logic.messaging;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.UFID;
+import nl.rug.peerbox.logic.filesystem.UFID;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
 public class DeletedMessageHandler extends MessageHandler {

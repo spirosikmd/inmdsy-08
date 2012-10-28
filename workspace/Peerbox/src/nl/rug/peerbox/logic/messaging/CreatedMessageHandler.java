@@ -1,7 +1,7 @@
 package nl.rug.peerbox.logic.messaging;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.PeerboxFile;
+import nl.rug.peerbox.logic.filesystem.PeerboxFile;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
 public class CreatedMessageHandler extends MessageHandler {

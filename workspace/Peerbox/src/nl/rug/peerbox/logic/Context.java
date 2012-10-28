@@ -2,6 +2,7 @@ package nl.rug.peerbox.logic;
 
 import java.util.Collection;
 
+import nl.rug.peerbox.logic.filesystem.VirtualFileSystem;
 import nl.rug.peerbox.middleware.Multicast;
 
 public interface Context {

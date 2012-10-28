@@ -2,9 +2,9 @@ package nl.rug.peerbox.ui;
 
 import nl.rug.peerbox.logic.Context;
 import nl.rug.peerbox.logic.Peerbox;
-import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.VFSListener;
-import nl.rug.peerbox.logic.VirtualFileSystem;
+import nl.rug.peerbox.logic.filesystem.PeerboxFile;
+import nl.rug.peerbox.logic.filesystem.VFSListener;
+import nl.rug.peerbox.logic.filesystem.VirtualFileSystem;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;

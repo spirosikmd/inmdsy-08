@@ -1,4 +1,4 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.filesystem;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

@@ -1,4 +1,4 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.filesystem;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -13,9 +13,12 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.rug.peerbox.logic.Context;
+import nl.rug.peerbox.logic.Peerbox;
+
 import org.apache.log4j.Logger;
 
-final class FileServer implements Runnable {
+public final class FileServer implements Runnable {
 
 	
 

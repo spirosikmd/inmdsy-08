@@ -11,6 +11,8 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.rug.peerbox.logic.filesystem.FileServer;
+import nl.rug.peerbox.logic.filesystem.VirtualFileSystem;
 import nl.rug.peerbox.logic.messaging.Message;
 import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;

@@ -1,10 +1,13 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.filesystem;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import nl.rug.peerbox.logic.Peer;
+import nl.rug.peerbox.logic.Peerbox;
 
 public class PeerboxFile implements Serializable {
 

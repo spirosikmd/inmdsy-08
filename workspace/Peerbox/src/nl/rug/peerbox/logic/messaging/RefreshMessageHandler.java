@@ -3,8 +3,8 @@ package nl.rug.peerbox.logic.messaging;
 import java.util.Collection;
 
 import nl.rug.peerbox.logic.Context;
-import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.VirtualFileSystem;
+import nl.rug.peerbox.logic.filesystem.PeerboxFile;
+import nl.rug.peerbox.logic.filesystem.VirtualFileSystem;
 import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 

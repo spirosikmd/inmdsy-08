@@ -1,9 +1,9 @@
 package nl.rug.peerbox.ui;
 
-import nl.rug.peerbox.logic.FileRequestTask;
 import nl.rug.peerbox.logic.Peerbox;
-import nl.rug.peerbox.logic.PeerboxFile;
-import nl.rug.peerbox.logic.PeerboxFileListener;
+import nl.rug.peerbox.logic.filesystem.FileRequestTask;
+import nl.rug.peerbox.logic.filesystem.PeerboxFile;
+import nl.rug.peerbox.logic.filesystem.PeerboxFileListener;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;

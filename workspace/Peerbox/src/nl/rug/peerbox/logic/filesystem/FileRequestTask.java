@@ -1,4 +1,4 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.filesystem;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -11,6 +11,9 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.MessageDigest;
 import java.util.concurrent.TimeoutException;
+
+import nl.rug.peerbox.logic.Context;
+import nl.rug.peerbox.logic.Peer;
 
 import org.apache.log4j.Logger;
 
@@ -36,7 +39,7 @@ public final class FileRequestTask implements Runnable {
 	@Override
 	public void run() {
 		String tempFilename = "." + filename;
-		File sharedFile = new File(ctx.getPathToPeerbox()
+		File tempFile = new File(ctx.getPathToPeerbox()
 				+ System.getProperty("file.separator") + tempFilename);
 
 		try (Socket s = new Socket()) {
@@ -49,7 +52,7 @@ public final class FileRequestTask implements Runnable {
 			byte[] mybytearray = new byte[1024];
 			InputStream is = s.getInputStream();
 
-			FileOutputStream fos = new FileOutputStream(sharedFile);
+			FileOutputStream fos = new FileOutputStream(tempFile);
 			BufferedOutputStream bos = new BufferedOutputStream(fos);
 
 			int bytesRead;
@@ -58,28 +61,28 @@ public final class FileRequestTask implements Runnable {
 			}
 			bos.close();
 			put.close();
-			file.setFile(sharedFile);
 			logger.info("File " + filename + " has been received");
 		} catch (IOException e) {
 			logger.error(e);
 		} finally {
 			boolean valid = true;
-			if (sharedFile.length() != file.getSize()) {
+			if (tempFile.length() != file.getSize()) {
 				logger.debug("Filesize of " + filename + " incorrect");
 				valid = false;
 			}
-			String checksum = MD5Util.md5(sharedFile);
+			String checksum = MD5Util.md5(tempFile);
 			System.out.println(checksum + "  " + file.getChecksum());
 			if (!file.getChecksum().equals(checksum)) {
 				logger.debug("Checksum of " + filename + " incorrect");
 				valid = false;
 			}
 			if (valid) {
-			sharedFile.renameTo(new File(ctx.getPathToPeerbox()
-					+ System.getProperty("file.separator") + filename));
+			File sharedFile = new File(ctx.getPathToPeerbox(),filename);
+			tempFile.renameTo(sharedFile);
+			file.setFile(sharedFile);
 			} else {
-				sharedFile.delete();
-				sharedFile = null;
+				tempFile.delete();
+				tempFile = null;
 				file.setFile(null);
 			}
 		}

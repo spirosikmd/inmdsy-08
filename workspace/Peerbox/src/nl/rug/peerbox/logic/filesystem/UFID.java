@@ -1,6 +1,8 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.filesystem;
 
 import java.io.Serializable;
+
+import nl.rug.peerbox.logic.Peer;
 
 public class UFID implements Serializable {
 

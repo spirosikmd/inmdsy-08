@@ -1,4 +1,4 @@
-package nl.rug.peerbox.logic;
+package nl.rug.peerbox.logic.filesystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nl.rug.peerbox.logic.Context;
+import nl.rug.peerbox.logic.PeerHost;
+import nl.rug.peerbox.logic.PeerListener;
 import nl.rug.peerbox.logic.messaging.Message;
 import nl.rug.peerbox.logic.messaging.Message.Command;
 import nl.rug.peerbox.logic.messaging.Message.Key;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.pattern.FullLocationPatternConverter;
 
 public class VirtualFileSystem implements PeerListener {
 
@@ -29,77 +31,6 @@ public class VirtualFileSystem implements PeerListener {
 			.getLogger(VirtualFileSystem.class);
 
 	private VirtualFileSystem(final Context ctx) {
-
-		FileSystem fs = FileSystems.getDefault();
-		try {
-			Path path = fs.getPath(ctx.getPathToPeerbox());
-			final WatchService watcher = fs.newWatchService();
-			path.register(watcher, StandardWatchEventKinds.ENTRY_CREATE,
-					StandardWatchEventKinds.ENTRY_DELETE,
-					StandardWatchEventKinds.ENTRY_MODIFY);
-
-			Thread peerboxObserver = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						while (true) {
-							WatchKey watckKey = watcher.take();
-							List<WatchEvent<?>> events = watckKey.pollEvents();
-							for (WatchEvent<?> event : events) {
-								if (!(event.context() instanceof Path)) {
-									continue;
-								}
-
-								Path path = (Path) event.context();
-
-								String filename = path.toString();
-								File file = new File(ctx.getPathToPeerbox(),
-										filename);
-								if (file.isDirectory() || file.isHidden()) {
-									continue;
-								}
-
-								if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-									if (file.isFile()) {
-										logger.info("Detected file created event "
-												+ event.context().toString());
-										addFile(file);
-									}
-
-								}
-								if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-									logger.info("Detect file deleted event " 
-											+ event.context().toString());
-									if (event.context() instanceof Path) {
-										PeerboxFile pbf = new PeerboxFile(
-												filename, ctx.getLocalPeer());
-										if (removeFile(pbf.getUFID()) != null) {
-
-										}
-									}
-								}
-								if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-									System.out.println("Modify: "
-											+ event.context().toString());
-								}
-							}
-							watckKey.reset();
-						}
-					} catch (InterruptedException e) {
-					} finally {
-						System.out.println("watcher finished");
-					}
-
-				}
-
-			});
-			peerboxObserver.setDaemon(true);
-			peerboxObserver.start();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		this.ctx = ctx;
 		ctx.addPeerListener(this);
 
@@ -138,29 +69,18 @@ public class VirtualFileSystem implements PeerListener {
 			}
 		}
 		vfs.filelist.serialize(datafile, path);
-		return vfs;
-	}
 
-	private void addFile(File file) {
-		PeerboxFile pbf = new PeerboxFile(file.getName(), ctx.getLocalPeer(),
-				file);
-		for (PeerboxFile f : filelist.values()) {
-			if (file.equals(f.getFile())) {
-				return;
-			}
-		}
-		addFile(pbf);
+		Thread peerboxObserver = new Thread(new PeerboxPathWatcher(ctx, vfs));
+		peerboxObserver.setDaemon(true);
+		peerboxObserver.start();
+
+		return vfs;
 	}
 
 	public void addFile(PeerboxFile file) {
 		if (!filelist.containsKey(file.getUFID())) {
 			filelist.put(file.getUFID(), file);
 			notifyAboutAddedFile(file);
-			Message update = new Message();
-			update.put(Key.Command, Command.Created);
-			update.put(Key.Peer, ctx.getLocalPeer());
-			update.put(Key.File, file);
-			ctx.getMulticastGroup().announce(update.serialize());
 		}
 	}
 
@@ -170,11 +90,6 @@ public class VirtualFileSystem implements PeerListener {
 		if (f != null) {
 			logger.info("Actually removed");
 			notifyAboutDeletedFile(f);
-			Message update = new Message();
-			update.put(Key.Command, Command.Deleted);
-			update.put(Key.Peer, ctx.getLocalPeer());
-			update.put(Key.FileId, f.getUFID());
-			ctx.getMulticastGroup().announce(update.serialize());
 		}
 		return f;
 	}
@@ -203,12 +118,6 @@ public class VirtualFileSystem implements PeerListener {
 		}
 	}
 
-	private void notifyAboutUpdatedFile(final PeerboxFile f) {
-		for (VFSListener l : listeners) {
-			l.updated(f);
-		}
-	}
-
 	@Override
 	public void deleted(PeerHost ph) {
 		for (PeerboxFile f : filelist.values()) {
@@ -233,5 +142,92 @@ public class VirtualFileSystem implements PeerListener {
 		askForFiles.put(Key.Peer, ctx.getLocalPeer());
 		ctx.getMulticastGroup().announce(askForFiles.serialize());
 
+	}
+
+	private void addFile(File file) {
+		PeerboxFile pbf = new PeerboxFile(file.getName(), ctx.getLocalPeer(),
+				file);
+		for (PeerboxFile f : filelist.values()) {
+			if (file.equals(f.getFile())) {
+				return;
+			}
+		}
+		addFile(pbf);
+		Message update = new Message();
+		update.put(Key.Command, Command.Created);
+		update.put(Key.Peer, ctx.getLocalPeer());
+		update.put(Key.File, file);
+		ctx.getMulticastGroup().announce(update.serialize());
+	}
+
+	private static final class PeerboxPathWatcher implements Runnable {
+		private final Context ctx;
+		private final VirtualFileSystem vfs;
+
+		public PeerboxPathWatcher(Context ctx, VirtualFileSystem vfs) {
+			this.ctx = ctx;
+			this.vfs = vfs;
+		}
+
+		@Override
+		public void run() {
+			FileSystem fs = FileSystems.getDefault();
+			Path peerboxPath = fs.getPath(ctx.getPathToPeerbox());
+			WatchService watcher;
+			try {
+				watcher = fs.newWatchService();
+				peerboxPath.register(watcher,
+						StandardWatchEventKinds.ENTRY_CREATE,
+						StandardWatchEventKinds.ENTRY_DELETE,
+						StandardWatchEventKinds.ENTRY_MODIFY);
+			} catch (IOException e) {
+				return;
+			}
+			try {
+				while (true) {
+					WatchKey watckKey = watcher.take();
+					List<WatchEvent<?>> events = watckKey.pollEvents();
+					for (WatchEvent<?> event : events) {
+						if (!(event.context() instanceof Path)) {
+							continue;
+						}
+
+						Path path = (Path) event.context();
+
+						String filename = path.toString();
+						File file = new File(ctx.getPathToPeerbox(), filename);
+						if (file.isDirectory() || file.isHidden()) {
+							continue;
+						}
+
+						if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+							if (file.isFile()) {
+								logger.info("Detected file created event "
+										+ path.toString());
+								vfs.addFile(file);
+							}
+
+						}
+						if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+							PeerboxFile pbf = new PeerboxFile(filename,
+									ctx.getLocalPeer());
+							if (vfs.removeFile(pbf.getUFID()) != null) {
+								logger.info("Detect file deleted event "
+										+ path.toString());
+								Message update = new Message();
+								update.put(Key.Command, Command.Deleted);
+								update.put(Key.Peer, ctx.getLocalPeer());
+								update.put(Key.FileId, pbf.getUFID());
+								ctx.getMulticastGroup().announce(
+										update.serialize());
+							}
+
+						}
+					}
+					watckKey.reset();
+				}
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 }
