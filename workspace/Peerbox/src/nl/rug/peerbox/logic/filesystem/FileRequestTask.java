@@ -84,7 +84,6 @@ public final class FileRequestTask implements Runnable {
 				valid = false;
 			}
 			String checksum = MD5Util.md5(tempFile);
-			System.out.println(checksum + "  " + file.getChecksum());
 			if (!file.getChecksum().equals(checksum)) {
 				logger.debug("Checksum of " + filename + " incorrect");
 				valid = false;
@@ -94,10 +93,10 @@ public final class FileRequestTask implements Runnable {
 				tempFile.renameTo(sharedFile);
 				file.setFile(sharedFile);
 			} else {
-				tempFile.delete();
-				tempFile = null;
 				file.setFile(null);
 			}
+			tempFile.delete();
+			tempFile = null;
 		}
 
 		// if successful
