@@ -53,7 +53,14 @@ public final class FileRequestTask implements Runnable {
 	@Override
 	public void run() {
 		String tempFilename = "." + filename;
-		File tempFile = hide(new File(ctx.getPathToPeerbox(), tempFilename));
+		File tempFile;
+		try {
+			tempFile = File.createTempFile("peerbox_", filename);
+		} catch (IOException e1) {
+			tempFile = new File(ctx.getPathToPeerbox(), tempFilename);
+		} 
+				
+				
 		
 		try (Socket s = new Socket()) {
 			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()),
