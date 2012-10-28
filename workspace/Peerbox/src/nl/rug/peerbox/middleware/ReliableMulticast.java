@@ -98,9 +98,9 @@ public class ReliableMulticast implements Multicast {
 	}
 
 	void rdeliver(Announcement m) {
+		logger.debug("Consumed: " + m.toString());
 		sendMessage(m);
 		notifyListener(m);
-		logger.debug("Consumed: " + m.toString());
 	}
 
 	public MulticastSocket getSocket() {

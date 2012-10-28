@@ -6,11 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 
 public final class FileRequestTask implements Runnable {
+
+	private static final int SOCKET_TIMEOUT = 5000;
 
 	private static final Logger logger = Logger
 			.getLogger(FileRequestTask.class);
@@ -30,9 +35,11 @@ public final class FileRequestTask implements Runnable {
 	@Override
 	public void run() {
 		File sharedFile = new File(ctx.getPathToPeerbox()
-				+ System.getProperty("file.separator") + filename + ".tmp");
-
-		try (Socket s = new Socket(h.getAddress(), h.getPort())) {
+				+ System.getProperty("file.separator") + filename);
+		
+		try (Socket s = new Socket()) {
+			s.connect(new InetSocketAddress(h.getAddress(), h.getPort()), SOCKET_TIMEOUT);
+			logger.debug("Created direct connection to " + h.getAddress().toString() +":"+ h.getPort());
 			PrintWriter put = new PrintWriter(s.getOutputStream(), true);
 			put.println(filename);
 			byte[] mybytearray = new byte[1024];
@@ -49,19 +56,17 @@ public final class FileRequestTask implements Runnable {
 			put.close();
 			logger.info("File " + filename + " has been received");
 			file.setFile(sharedFile);
+		} catch (SocketTimeoutException e) {
+			logger.error(e);
 		} catch (IOException e) {
 			logger.error(e);
-			sharedFile.delete();
-			sharedFile = null;
-			file.setFile(null);
+//			sharedFile.delete();
+//			sharedFile = null;
+//			file.setFile(null);
 		}
 		
 		
 		//verify file with peerboxfile properties
-		//filesize and content checksum
-		
-		
-		
-		
+		//filesize and content checksum		
 	}
 }

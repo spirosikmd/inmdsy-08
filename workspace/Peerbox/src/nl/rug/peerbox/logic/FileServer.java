@@ -29,7 +29,7 @@ final class FileServer implements Runnable {
 	
 	@Override
 	public void run() {
-		logger.info("Starting server" + ctx.getLocalPeer().getPort());
+		logger.info("Starting server " + ctx.getLocalPeer().getPort());
 		try (ServerSocket server = new ServerSocket(ctx.getLocalPeer().getPort())) {			
 			while (!Thread.currentThread().isInterrupted()) {
 				logger.info("Waiting for incoming connection");
