@@ -24,7 +24,7 @@ final class JoinMessageHandler extends MessageHandler {
 		}
 		
 		Collection<PeerboxFile> files = ctx.getVirtualFilesystem()
-				.getFileList();
+				.getLocalFileList();
 		Message reply = new Message();
 		reply.put(Key.Command, Command.List);
 		reply.put(Key.Files, files);

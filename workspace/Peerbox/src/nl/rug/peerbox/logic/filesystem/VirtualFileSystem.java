@@ -115,6 +115,16 @@ public class VirtualFileSystem implements PeerListener {
 		listeners.remove(l);
 	}
 
+	public Collection<PeerboxFile> getLocalFileList() {
+		ArrayList<PeerboxFile> localFiles = new ArrayList<PeerboxFile>();
+		for (PeerboxFile f : filelist.values()) {
+			if (f.isOwn()) {
+				localFiles.add(f);
+			}
+		}
+		return localFiles;
+	}
+	
 	public Collection<PeerboxFile> getFileList() {
 		return new ArrayList<PeerboxFile>(filelist.values());
 	}
