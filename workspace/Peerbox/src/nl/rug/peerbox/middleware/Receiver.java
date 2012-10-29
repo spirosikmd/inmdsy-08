@@ -141,7 +141,7 @@ final class Receiver {
 					// and h.messageid < missedID retry else message has been
 					// received
 					sendMiss(m.getPeerID(), missedID);
-					//missedTimer.schedule(new MissTimerTask(p, missedID), 5);
+					missedTimer.schedule(new MissTimerTask(p, missedID), 5000);
 				}
 			}
 		} else if (s <= r) {
@@ -181,6 +181,7 @@ final class Receiver {
 
 	private class MissTimerTask extends TimerTask {
 
+		private static final int REREQUEST_TIMER = 5000;
 		private final RemoteHost host;
 		private final int missedID;
 
@@ -191,11 +192,12 @@ final class Receiver {
 
 		@Override
 		public void run() {
-			logger.info("Check missedTimer " + host.getReceivedMessageID()
+			System.out.println("Check missedTimer " + host.getReceivedMessageID()
 					+ " < " + missedID);
 			if (host.getReceivedMessageID() < missedID) {
-				logger.info("Missed not received");
-				// resubmit
+				logger.debug("Re-request message " + missedID + " from " + host.getHostID());
+				sendMiss(host.getHostID(), missedID);
+				missedTimer.schedule(new MissTimerTask(host, missedID), REREQUEST_TIMER);
 			}
 		}
 	}

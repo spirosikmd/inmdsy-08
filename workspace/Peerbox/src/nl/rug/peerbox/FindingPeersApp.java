@@ -28,7 +28,6 @@ public class FindingPeersApp {
 
 		//BasicConfigurator.configure();
 		PropertyConfigurator.configure(LOGGER_PROPERTIES_FILE);
-
 		
 		Context peerbox = Peerbox.getInstance();
 		//peerbox.join();
@@ -37,7 +36,6 @@ public class FindingPeersApp {
 		Display.setAppName("Peerbox");
 		Display display = new Display();
 
-		
 		PeerboxUI view = new PeerboxUI(display);
 		view.getShell().setText("Peerbox");
 		
