@@ -192,8 +192,6 @@ final class Receiver {
 
 		@Override
 		public void run() {
-			System.out.println("Check missedTimer " + host.getReceivedMessageID()
-					+ " < " + missedID);
 			if (host.getReceivedMessageID() < missedID) {
 				logger.debug("Re-request message " + missedID + " from " + host.getHostID());
 				sendMiss(host.getHostID(), missedID);
