@@ -80,14 +80,15 @@ public class VirtualFileSystem implements PeerListener {
 	public void addFile(PeerboxFile file) {
 		if (!filelist.containsKey(file.getUFID())) {
 			for (PeerboxFile pbf : filelist.values()) {
-				if (! file.getOwner().equals(ctx.getLocalPeer())) {
+				if (!file.getOwner().equals(ctx.getLocalPeer())) {
 					if (file.getFilename().equals(pbf.getFilename())) {
 						if (file.getChecksum().equals(pbf.getChecksum())) {
-							//same file
+							// same file
 							return;
 						} else {
-							file.setFilename(file.getOwner().getName()+"_"+file.getFilename());
-							//different files
+							file.setFilename(file.getOwner().getName() + "_"
+									+ file.getFilename());
+							// different files
 						}
 					}
 				}
@@ -101,7 +102,6 @@ public class VirtualFileSystem implements PeerListener {
 		PeerboxFile f = filelist.remove(ufid);
 		logger.info("Remove " + ufid + " from VFS");
 		if (f != null) {
-			logger.info("Actually removed");
 			notifyAboutDeletedFile(f);
 		}
 		return f;
@@ -234,7 +234,9 @@ public class VirtualFileSystem implements PeerListener {
 							for (PeerboxFile f : vfs.filelist.values()) {
 								if (file.equals(f.getFile())) {
 									f.setFile(null);
-									remoteFile = true;
+									if (!f.isOwn()) {
+										remoteFile = true;
+									}
 									break;
 								}
 							}
