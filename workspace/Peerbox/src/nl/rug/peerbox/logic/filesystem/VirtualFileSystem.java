@@ -218,7 +218,7 @@ public class VirtualFileSystem implements PeerListener {
 									Message update = new Message();
 									update.put(Key.Command, Command.Created);
 									update.put(Key.Peer, ctx.getLocalPeer());
-									update.put(Key.File, file);
+									update.put(Key.File, pbf);
 									ctx.getMulticastGroup().announce(
 											update.serialize());
 								}
