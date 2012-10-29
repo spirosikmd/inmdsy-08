@@ -2,6 +2,8 @@ package nl.rug.peerbox.middleware;
 
 import java.net.DatagramPacket;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -19,13 +21,14 @@ final class Receiver {
 			RECEIVE_QUEUE_SIZE);
 
 	private ReliableMulticast group;
+	private volatile boolean alive = true;
+	private Thread thread;
+	private final Timer missedTimer;
 
 	public Receiver(ReliableMulticast group) {
 		this.group = group;
+		missedTimer = new Timer(true);
 	}
-
-	private volatile boolean alive = true;
-	private Thread thread;
 
 	void start() {
 		thread = new Thread(new Runnable() {
@@ -138,6 +141,7 @@ final class Receiver {
 					// and h.messageid < missedID retry else message has been
 					// received
 					sendMiss(m.getPeerID(), missedID);
+					//missedTimer.schedule(new MissTimerTask(p, missedID), 5);
 				}
 			}
 		} else if (s <= r) {
@@ -149,12 +153,12 @@ final class Receiver {
 		RemoteHost p;
 		p = new RemoteHost();
 		p.setHostID(m.getPeerID());
-		if (m.getCommand()!=Announcement.MESSAGE) {
+		if (m.getCommand() != Announcement.MESSAGE) {
 			p.setSeenMessageID(m.getMessageID());
 			p.setReceivedMessageID(m.getMessageID());
 		} else {
 			p.setSeenMessageID(m.getMessageID() - 1);
-			p.setReceivedMessageID(m.getMessageID() - 1);	
+			p.setReceivedMessageID(m.getMessageID() - 1);
 		}
 		p.heartbeated();
 		group.getHostManager().addRemoteHost(m.getPeerID(), p);
@@ -173,5 +177,26 @@ final class Receiver {
 			}
 		}
 		return null;
+	}
+
+	private class MissTimerTask extends TimerTask {
+
+		private final RemoteHost host;
+		private final int missedID;
+
+		public MissTimerTask(final RemoteHost h, final int missedID) {
+			this.host = h;
+			this.missedID = missedID;
+		}
+
+		@Override
+		public void run() {
+			logger.info("Check missedTimer " + host.getReceivedMessageID()
+					+ " < " + missedID);
+			if (host.getReceivedMessageID() < missedID) {
+				logger.info("Missed not received");
+				// resubmit
+			}
+		}
 	}
 }

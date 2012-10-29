@@ -12,7 +12,7 @@ public class TesterApp {
 		String address = "239.1.2.4";
 		int port = 1567;
 		Multicast group = ReliableMulticast.createPeer(address, port);
-		PrettyPrinter.registerPrinter(new MessagePrinter());
+		PrettyPrinter.registerPrinter(new MessagePrinter());	
 	}
 
 }
