@@ -42,7 +42,7 @@ public class PeerView extends Composite implements DisposeListener {
 		GridData ownerData = new GridData();
 		ownerData.grabExcessHorizontalSpace = true;
 		ownerData.horizontalAlignment = SWT.FILL;
-		ownerData.horizontalSpan = 4;
+		ownerData.horizontalSpan = 3;
 		owner = new Text(this, SWT.NONE);
 		owner.setBackground(background);
 		owner.setForeground(foreground);
@@ -51,16 +51,16 @@ public class PeerView extends Composite implements DisposeListener {
 		GridData addressData = new GridData();
 		addressData.grabExcessHorizontalSpace = true;
 		addressData.horizontalAlignment = SWT.FILL;
-		addressData.horizontalSpan = 4;
+		addressData.horizontalSpan = 6;
 		address = new Text(this, SWT.NONE);
 		address.setBackground(background);
 		address.setForeground(foreground);
-		address.setLayoutData(ownerData);
+		address.setLayoutData(addressData);
 
 		GridData peerIDData = new GridData();
 		peerIDData.grabExcessHorizontalSpace = true;
 		peerIDData.horizontalAlignment = SWT.FILL;
-		peerIDData.horizontalSpan = 4;
+		peerIDData.horizontalSpan = 3;
 		peerID = new Text(this, SWT.NONE);
 		peerID.setBackground(background);
 		peerID.setForeground(foreground);
